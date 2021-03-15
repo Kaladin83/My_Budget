@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.mybudget.MainActivity">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:paddingBottom="10dp"
+        android:layout_weight="9"
+        android:layout_height="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal"
+        android:paddingBottom="3dp"
+        android:layout_weight="1"
+        android:id="@+id/main_menu_layout"
+        style="?navLayoutBackground"
+        android:layout_height="0dp">
+
+        <ImageButton
+            android:id="@+id/categories_btn"
+            android:layout_width="35dp"
+            android:layout_marginEnd="22dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_categories"/>
+
+        <ImageButton
+            android:id="@+id/charts_btn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="22dp"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_charts"/>
+
+        <ImageButton
+            android:id="@+id/voice_btn"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="22dp"
+            android:layout_gravity="center"
+            android:src="@drawable/mic"/>
+
+        <ImageButton
+            android:id="@+id/edit_btn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="22dp"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_edit" />
+
+        <ImageButton
+            android:id="@+id/sync_btn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/sync"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/change_category_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/header_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/new_category_layout"
+        android:textSize="10pt" />
+
+    <View
+        android:id="@+id/separator_1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:id="@+id/new_category_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/new_category_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/colorPrimary"/>
+
+        <TextView
+            android:id="@+id/new_category_txt"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="textStart"
+            android:textSize="8pt"
+            android:text="@string/new_category" />
+
+        <EditText
+            android:id="@+id/category_edit"
+            android:layout_width="1dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/existing_category_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/existing_category_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/colorPrimary"/>
+
+        <TextView
+            android:id="@+id/existing_category_txt"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="textStart"
+            android:textSize="8pt"
+            android:text="@string/existing_category" />
+
+        <Spinner
+            android:id="@+id/category_spinner"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/separator_2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="0dp"
+            android:background="@color/toolBar"
+            android:text="@string/ok_button" />
+
+        <View
+            android:id="@+id/separator_3"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"/>
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:padding="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/toolBar"
+            android:text="@string/cancel_button" />
+
+    </LinearLayout>
+
+</LinearLayout>

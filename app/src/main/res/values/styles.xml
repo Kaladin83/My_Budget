@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="actionBarSize">@dimen/tool_bar</item>
+        <item name="colorControlNormal">@color/toolBar</item>
+    </style>
+
+    <style name="RedSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">#f9564d</item>
+        <item name="android:progressTint">#ff3e44</item>
+        <item name="android:colorControlActivated">#f50010</item>
+    </style>
+
+    <style name="GreenSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">#80f541</item>
+        <item name="android:progressTint">#40f225</item>
+        <item name="android:colorControlActivated">#11d949</item>
+    </style>
+
+    <style name="BlueSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">#4f85fa</item>
+        <item name="android:progressTint">#486eed</item>
+        <item name="android:colorControlActivated">#3e37ff</item>
+        <item name="android:colorControlHighlight">#3e37ff</item>
+        <item name="android:colorControlNormal">#3e37ff</item>
+    </style>
+
+    <style name="SpinnerTheme" parent="android:Widget.Spinner">
+        <item name="android:background">@drawable/custom_spinner</item>
+    </style>
+</resources>

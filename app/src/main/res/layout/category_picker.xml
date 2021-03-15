@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/category_picker"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/add_category_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="0dp"
+        android:orientation="horizontal"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        style="?borderedBackground"
+        android:layout_gravity="center">
+
+        <EditText
+            android:id="@+id/category_edit"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp"
+            android:layout_width="170dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="20dp"
+            android:layout_gravity="center_vertical"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/add_category_btn"
+            android:layout_width="120dp"
+            android:padding="0dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_gravity="center_vertical"
+            android:text="@string/add_category"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/combo_layout"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="70dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/recycle_layout"
+            android:layout_width="1dp"
+            android:layout_height="2dp"
+            style="?borderedBackground"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/category_header_txt"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:gravity="center"
+                android:textSize="9pt"
+                style="?headerBackground"
+                android:textAlignment="center"
+                android:text="@string/Categories"/>
+
+            <View
+                android:id="@+id/separator_1"
+                android:layout_width="match_parent"
+                style="?separator"
+                android:layout_height="1dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/category_recycler_view"
+                android:layout_width="2dp"
+                android:layout_marginStart="5dp"
+                android:layout_height="match_parent"
+                android:paddingBottom="5dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabs_layout"
+            android:layout_width="1dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="7dp"
+            style="?tabStyleBorderedBackground"
+            android:orientation="vertical">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="3dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginStart="1dp"
+                android:minHeight="?attr/actionBarSize"
+                android:background="@color/toolBar"
+                app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/pager"
+                android:layout_width="4dp"
+                android:layout_marginStart="1dp"
+                android:paddingBottom="8dp"
+                android:layout_height="5dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/update_layout"
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/current_color_txt"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:paddingTop="5dp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/arrow_txt"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:paddingTop="5dp"
+            android:background="@drawable/icon_arrow"/>
+
+        <TextView
+            android:id="@+id/new_color_txt"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:paddingTop="5dp"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/update_btn"
+            android:layout_width="10dp"
+            android:padding="0dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center_vertical"
+            android:text="@string/update"
+            android:textAllCaps="false" />
+    </LinearLayout>
+</LinearLayout>

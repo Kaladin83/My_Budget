@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="navLayoutBackground" format="reference" />
+    <attr name="borderedBackground" format="reference" />
+    <attr name="headerBackground" format="reference" />
+    <attr name="tabStyleBorderedBackground" format="reference" />
+    <attr name="recyclerItem" format="reference" />
+    <attr name="separator" format="reference" />
+    <attr name="spinnerItem" format="reference" />
+    <attr name="toggleView" format="reference" />
+    <attr name="menuColor" format="reference" />
+</resources>

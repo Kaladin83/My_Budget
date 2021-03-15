@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/menu_item_layout"
+    android:layout_width="match_parent"
+    android:paddingHorizontal="15dp"
+
+    android:layout_height="35dp">
+
+    <TextView
+        android:id="@+id/txtViewDay"
+        android:singleLine="true"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/colorViewDay"
+        android:singleLine="true"
+        android:background="@color/light_green"
+        style="?menuColor"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.3"
+        android:gravity="center"
+        android:textAlignment="center"/>
+
+    <View
+        android:id="@+id/separator"
+        style="?separator"
+        android:layout_width="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/txtView"
+        android:layout_height="1dp"/>
+
+
+    <TextView
+        android:id="@+id/txtViewNight"
+        android:singleLine="true"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/colorViewNight"
+        android:singleLine="true"
+        android:background="@color/light_black"
+        style="?menuColor"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.3"
+        android:gravity="center"
+        android:textAlignment="center"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

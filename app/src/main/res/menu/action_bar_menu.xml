@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/hamburger_item"
+        android:orderInCategory="100"
+        android:icon="@drawable/hamburger_menu"
+        app:showAsAction="always"
+        app:iconTint="@color/image_buttons_selector"
+        android:title="TODO">
+        <menu android:id="@+id/theme_menu">
+            <item
+                android:id="@+id/night_theme"
+                android:layout="@layout/menu_item"
+                android:title="Night" />
+            <item
+                android:id="@+id/day_theme"
+                android:layout="@layout/menu_item"
+
+                android:title="Day" />
+        </menu>
+    </item>
+</menu>
