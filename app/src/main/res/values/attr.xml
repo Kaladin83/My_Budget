@@ -9,4 +9,5 @@
     <attr name="spinnerItem" format="reference" />
     <attr name="toggleView" format="reference" />
     <attr name="menuColor" format="reference" />
+    <attr name="dialogBackground" format="reference" />
 </resources>

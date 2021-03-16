@@ -31,7 +31,7 @@
         <item name="navLayoutBackground">@style/NavigationLayoutStyle</item>
         <item name="borderedBackground">@style/BorderStyle</item>
         <item name="tabStyleBorderedBackground">@style/HalfBorderStyle</item>
-        <item name="headerBackground">?attr/colorAccent</item>
+        <item name="headerBackground">?attr/colorPrimary</item>
         <item name="recyclerItem">@style/RecyclerItemStyle</item>
         <item name="separator">@style/RecyclerDecoratorStyle</item>
         <item name="editTextStyle">@style/EditTextStyle</item>
@@ -71,13 +71,14 @@
         <item name="navLayoutBackground">@style/NavigationLayoutStyle</item>
         <item name="borderedBackground">@style/BorderStyle</item>
         <item name="tabStyleBorderedBackground">@style/HalfBorderStyle</item>
-        <item name="headerBackground">?attr/colorAccent</item>
+        <item name="headerBackground">?attr/colorPrimary</item>
         <item name="recyclerItem">@style/RecyclerItemStyle</item>
         <item name="separator">@style/RecyclerDecoratorStyle</item>
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="spinnerItem">@style/SpinnerItemStyle</item>
         <item name="toggleView">@style/ToggleViewStyle</item>
         <item name="menuColor">?attr/colorPrimary</item>
+        <item name="dialogBackground">@style/DialogStyle</item>
 
     </style>
 
@@ -151,7 +152,10 @@
     <style name="MenuTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textSize">9pt</item>
+    </style>
 
+    <style name="DialogStyle">
+        <item name="android:background">?attr/colorPrimary</item>
     </style>
 
 </resources>

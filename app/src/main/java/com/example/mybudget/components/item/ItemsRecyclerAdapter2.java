@@ -31,6 +31,10 @@ import com.example.mybudget.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.mybudget.utils.Enums.Level.CATEGORY_LVL;
+import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
+import static com.example.mybudget.utils.Enums.Level.SUB_CATEGORY_LVL;
+
 public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAdapter2.MyViewHolder> implements Constants{
     private final int screenWidth, logicalDensity;
     private final DataHelper dataHelper;
@@ -133,9 +137,9 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
 
             int color = Utils.findColor(combinedItem.getItem().getCategory());
             holder1.categoryTxt.setText(combinedItem.getItem().getCategory());
-            holder1.categoryTxt.setBackground(Utils.createBorder(20, color, 1));
+            //holder1.categoryTxt.setBackground(Utils.createBorder(context, 20, color, 1));
             holder1.categorySumsLayout.setPadding(15, 0, 15, 0);
-            holder1.categorySumsLayout.setBackground(Utils.createBorder(15, GRAY_3, 1));
+           // holder1.categorySumsLayout.setBackground(Utils.createBorder(context, 15, GRAY_3, 1));
             holder1.categorySumTxt.setText(context.getString(R.string.category_total, String.valueOf(stats.getSum())));
             holder1.categoryAverageTxt.setText(context.getString(R.string.category_average, String.valueOf(stats.getMean())));
 
@@ -167,7 +171,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
             MyViewHolder2 holder2 = (MyViewHolder2) holder;
             height = createItemRow(holder2, position, height, parentLine + subTotalLine + margins);
             holder2.descriptionEdit.setText(combinedItem.getItem().getDescription());
-            holder2.descriptionEdit.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 1));
+            //holder2.descriptionEdit.setBackground(Utils.createBorder(context, 10, Color.TRANSPARENT, 1));
             holder2.descriptionEdit.setPadding(10, 5, 10, 5);
             holder2.descriptionEdit.addTextChangedListener(new MyTextWatcher(holder2, logicalDensity, subCategoryWidth));
             holder2.amountTxt.setText(String.valueOf(combinedItem.getItem().getAmount()));

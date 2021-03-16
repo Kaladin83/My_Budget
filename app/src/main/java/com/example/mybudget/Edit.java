@@ -15,12 +15,14 @@ import androidx.fragment.app.Fragment;
 import com.example.mybudget.adapters.SimpleSpinnerAdapter;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.components.item.ItemRecycler;
-import com.example.mybudget.enums.Fragments;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.utils.Utils;
 
 import java.util.List;
+
+import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
+import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
 
 /**
  * Class that allows user to add expense by writing, and edit existed expenses
@@ -69,8 +71,8 @@ public class Edit extends Fragment implements View.OnClickListener, View.OnTouch
         {
             DataHelper.getDataHelper(getContext()).addItemFromText(categorySpinner.getSelectedItem().toString(),
                     Double.parseDouble(amountEdit.getText().toString()), descriptionEdit.getText().toString());
-            ((ItemRecycler) ViewsHelper.getViewsHelper().getFragment(Fragments.MAIN_RECYCLER)).refreshItems();
-            ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(Fragments.CATEGORY_PICKER)).refreshCategories();
+            ((ItemRecycler) ViewsHelper.getViewsHelper().getFragment(MAIN_RECYCLER)).refreshItems();
+            ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER)).refreshCategories();
         }
     }
 

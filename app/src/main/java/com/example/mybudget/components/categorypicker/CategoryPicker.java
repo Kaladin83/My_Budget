@@ -31,17 +31,25 @@ import com.example.mybudget.R;
 import com.example.mybudget.components.colorpicker.ColorPicker;
 import com.example.mybudget.components.colorpicker.FavouriteColors;
 import com.example.mybudget.components.item.ItemRecycler;
-import com.example.mybudget.enums.Fragments;
 import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
+import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.example.mybudget.utils.Enums.Action.ADD_CATEGORY;
+import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
+import static com.example.mybudget.utils.Enums.Fragment.EDIT;
+import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
+import static com.example.mybudget.utils.Enums.Fragment.COLOR_PICKER;
+import static com.example.mybudget.utils.Enums.Fragment.FAVOURITE_COLORS;
 
 /**
  * Class that gives to user the tools to add new category, and manage them.
@@ -57,7 +65,6 @@ public class CategoryPicker extends Fragment implements
     private Activity activity;
     private View mainView;
     private ItemRecycler itemRecycler;
-    private FavouriteColors favoriteColors;
     private EditText addCategoryEdit;
     private CategoryRecyclerAdapter categoryAdapter;
     private ViewPager2 pager;
@@ -65,16 +72,19 @@ public class CategoryPicker extends Fragment implements
     private LinearLayout mainLayout;
     private LinearLayout.LayoutParams lParams;
     private CategoryPicker categoryPicker;
+    private FavouriteColors favoriteColors;
     private ManageCategoryDialog manageCategoryDialog;
+    private int strokeColor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.category_picker, container, false);
 
         activity = requireActivity();
+        strokeColor = Utils.getThemeStrokeColor(activity);
         viewsHelper = ViewsHelper.getViewsHelper();
         dataHelper = DataHelper.getDataHelper(getContext());
-        itemRecycler = ((ItemRecycler) viewsHelper.getFragment(Fragments.MAIN_RECYCLER));
+        itemRecycler = ((ItemRecycler) viewsHelper.getFragment(MAIN_RECYCLER));
         categoryPicker = new CategoryPicker();
         categoryPicker = this;
         screenWidth = Utils.getScreenWidth(activity);
@@ -139,7 +149,7 @@ public class CategoryPicker extends Fragment implements
         lParams.setMargins((screenWidth - updateLayoutWidth) / 2, betweenLayoutsMargin / 2, 0, 0);
         LinearLayout updateLayout = mainView.findViewById(R.id.update_layout);
         updateLayout.setLayoutParams(lParams);
-        updateLayout.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 1));
+        updateLayout.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 1, strokeColor));
 
         lParams = new LinearLayout.LayoutParams(addCatButtonWidth, compAddCatHeight);
         lParams.gravity = Gravity.CENTER_VERTICAL;
@@ -161,7 +171,7 @@ public class CategoryPicker extends Fragment implements
         lParams.setMargins(bigLayoutMarginWidth * 4, 0, 0, 0);
         addCategoryEdit = mainView.findViewById(R.id.category_edit);
         addCategoryEdit.setLayoutParams(lParams);
-        addCategoryEdit.setBackground(Utils.createBorder(10, Color.WHITE, 1));
+        //addCategoryEdit.setBackground(Utils.createBorder(10, Color.WHITE, 1, strokeColor));
         addCategoryEdit.clearFocus();
 
         lParams = new LinearLayout.LayoutParams(catRecyclerWidth, entireHeaderHeight);
@@ -172,10 +182,10 @@ public class CategoryPicker extends Fragment implements
         lParams.setMargins(betweenColorsMargin, 0, 0, 0);
         newColorTxt = mainView.findViewById(R.id.new_color_txt);
         newColorTxt.setLayoutParams(lParams);
-        newColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1));
+        newColorTxt.setBackground(Utils.createBorder( 15, Color.TRANSPARENT, 1, strokeColor));
         currentColorTxt = mainView.findViewById(R.id.current_color_txt);
         currentColorTxt.setLayoutParams(lParams);
-        currentColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1));
+        currentColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
         lParams = new LinearLayout.LayoutParams(arrowWidth, (int) (compAddCatHeight * 0.7));
         lParams.gravity = Gravity.CENTER_VERTICAL;
         lParams.setMargins(betweenColorsMargin, 0, 0, 0);
@@ -216,8 +226,7 @@ public class CategoryPicker extends Fragment implements
         pager = mainView.findViewById(R.id.pager);
         pager.setLayoutParams(lParams);
 
-        final PagerAdapter adapter = new PagerAdapter
-                (getChildFragmentManager(), getLifecycle(), tabLayout.getTabCount());
+        final PagerAdapter adapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
         pager.setAdapter(adapter);
         //pager.registerOnPageChangeCallback(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         new TabLayoutMediator(tabLayout, pager, (tab, position) ->
@@ -228,7 +237,7 @@ public class CategoryPicker extends Fragment implements
         if (categoryAdapter != null)
         {
             categoryAdapter.notifyDataSetChanged();
-            ((Edit) viewsHelper.getFragment(Fragments.EDIT)).notifyDataChanged();
+            ((Edit) viewsHelper.getFragment(EDIT)).notifyDataChanged();
         }
     }
 
@@ -246,8 +255,7 @@ public class CategoryPicker extends Fragment implements
             Toast.makeText(getContext(), "The category already in the list", Toast.LENGTH_LONG).show();
         }
 
-        manageCategoryDialog = new ManageCategoryDialog(activity, (int) (screenWidth / 1.3), (int) (screenHeight / 2.5),
-                "subCategory") {
+        manageCategoryDialog = new ManageCategoryDialog(activity, ADD_CATEGORY) {
             @Override
             public void okButtonPressed(String categoryName) {
                 int color = Utils.findColor(categoryName);
@@ -260,11 +268,6 @@ public class CategoryPicker extends Fragment implements
                 Toast.makeText(categoryPicker.getContext(), "The category: " + category.getName() + " was added",
                         Toast.LENGTH_SHORT).show();
                 refreshCategories();
-                manageCategoryDialog.dismiss();
-            }
-
-            @Override
-            public void cancelButtonPressed() {
                 manageCategoryDialog.dismiss();
             }
         };
@@ -310,8 +313,7 @@ public class CategoryPicker extends Fragment implements
             List<Item> itemsOfCategory = dataHelper.getListOfItems(item -> item.getCategory().equals(deletedCategory.getName()));
             if (!itemsOfCategory.isEmpty())
             {
-                manageCategoryDialog = new ManageCategoryDialog(activity, (int) (screenWidth / 1.3),
-                        (int) (screenHeight / 2.5), "delete") {
+                manageCategoryDialog = new ManageCategoryDialog(activity, DELETE_CATEGORY) {
                     @Override
                     public void okButtonPressed(String newCategoryName) {
 
@@ -352,7 +354,7 @@ public class CategoryPicker extends Fragment implements
 
     public void updateColorField(int color) {
         newSelectedColor = color;
-        newColorTxt.setBackgroundColor(color);
+        newColorTxt.setBackground(Utils.createBorder( 15, color, 1, strokeColor));
     }
 
 
@@ -360,10 +362,6 @@ public class CategoryPicker extends Fragment implements
         restoreOption(deleteColor, null, deletedIndex, "The color removed from list");
     }
 
-
-    public void switchTab() {
-        pager.setCurrentItem(1);
-    }
 
     public void restoreCategory(Category deleteCategory, int deletedIndex) {
         categoryAdapter.restoreItem(deleteCategory, deletedIndex);
@@ -396,38 +394,35 @@ public class CategoryPicker extends Fragment implements
     }
 
     public void updateColor(String category) {
-        currentColorTxt.setBackgroundColor(Utils.findColor(category));
+        currentColorTxt.setBackground(Utils.createBorder(15, Utils.findColor(category), 1, strokeColor));
         categoryAdapter.notifyDataSetChanged();
     }
 
-    private class PagerAdapter extends FragmentStateAdapter {
-        int mNumOfTabs;
+    public void refreshFavouriteColors() {
+        pager.setCurrentItem(1);
+    }
 
-        private PagerAdapter(FragmentManager fm, Lifecycle lifecycle, int NumOfTabs) {
+    private class PagerAdapter extends FragmentStateAdapter {
+        private final Map<Integer, Fragment> fragments;
+
+        private PagerAdapter(FragmentManager fm, Lifecycle lifecycle) {
             super(fm, lifecycle);
-            this.mNumOfTabs = NumOfTabs;
+            Fragment colorPicker = new ColorPicker();
+            favoriteColors = new FavouriteColors();
+            ViewsHelper.getViewsHelper().registerFragment(COLOR_PICKER, colorPicker)
+                    .registerFragment(FAVOURITE_COLORS, favoriteColors);
+            fragments = JavaUtils.mapOf(colorPicker, favoriteColors);
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            ColorPicker colorPicker;
-            switch (position)
-            {
-                case 0:
-                    colorPicker = new ColorPicker();
-                    viewsHelper.registerFragment(Fragments.COLOR_PICKER, colorPicker);
-                    return colorPicker;
-                default:
-                    favoriteColors = new FavouriteColors();
-                    viewsHelper.registerFragment(Fragments.FAVOURITE_COLORS, favoriteColors);
-                    return favoriteColors;
-            }
+            return fragments.get(position);
         }
 
         @Override
         public int getItemCount() {
-            return mNumOfTabs;
+            return fragments.size();
         }
     }
 }

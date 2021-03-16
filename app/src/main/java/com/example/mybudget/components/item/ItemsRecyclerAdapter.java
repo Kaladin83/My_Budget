@@ -31,7 +31,11 @@ import com.example.mybudget.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
+
+import static com.example.mybudget.utils.Enums.Level;
+import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
+import static com.example.mybudget.utils.Enums.Level.CATEGORY_LVL;
+import static com.example.mybudget.utils.Enums.Level.SUB_CATEGORY_LVL;
 
 public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdapter.MyViewHolder> implements Constants{
     private final int screenWidth, logicalDensity;
@@ -125,6 +129,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         int parentLine = 45;
         int subTotalLine = 25;
         int subCategoryWidth = (int) ((screenWidth) * 0.8);
+        int strokeColor = Utils.getColor(R.color.light_black, context);
         ItemDrawer combinedItem = dataHelper.getListOfCombinedItems().get(position);
         Item lastAddedItem = dataHelper.getLastAddedItem();
         Statistics stats = Utils.getStatisticsByCategory(combinedItem.getItem().getCategory());
@@ -135,9 +140,9 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
 
             int color = Utils.findColor(combinedItem.getItem().getCategory());
             holder1.categoryTxt.setText(combinedItem.getItem().getCategory());
-            holder1.categoryTxt.setBackground(Utils.createBorder(20, color, 1));
+            holder1.categoryTxt.setBackground(Utils.createBorder(20, color, 1, strokeColor));
             holder1.categorySumsLayout.setPadding(15, 0, 15, 0);
-            holder1.categorySumsLayout.setBackground(Utils.createBorder(15, GRAY_3, 1));
+            holder1.categorySumsLayout.setBackground(Utils.createBorder(15, GRAY_3, 1, strokeColor));
             holder1.categorySumTxt.setText(context.getString(R.string.category_total, String.valueOf(stats.getSum())));
             holder1.categoryAverageTxt.setText(context.getString(R.string.category_average, String.valueOf(stats.getMean())));
 
@@ -169,7 +174,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             MyViewHolder2 holder2 = (MyViewHolder2) holder;
             height = createItemRow(holder2, position, height, parentLine + subTotalLine + margins);
             holder2.descriptionEdit.setText(combinedItem.getItem().getDescription());
-            holder2.descriptionEdit.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 1));
+            holder2.descriptionEdit.setBackground(Utils.createBorder( 10, Color.TRANSPARENT, 1, strokeColor));
             holder2.descriptionEdit.setPadding(10, 5, 10, 5);
             holder2.descriptionEdit.addTextChangedListener(new MyTextWatcher(holder2, logicalDensity, subCategoryWidth));
             holder2.amountTxt.setText(String.valueOf(combinedItem.getItem().getAmount()));
@@ -221,16 +226,6 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         List<Item> listOfItems;
         List<Item> listOfSubs;
         List<ItemDrawer> combinedItems = dataHelper.getListOfCombinedItems();
-        ItemDrawer combinedItem = combinedItems.get(position);
-//        List<ItemDrawer> combinedItemsResult = new ArrayList<>();
-//        IntStream.range(0, combinedItems.size()).forEach(index -> {
-//            addCombineItem(combinedItems.get(index), index, position, combinedItems.get(index).getLevel(),
-//                    combinedItemsResult);
-//        });
-//
-//        dataHelper.setListOfCombinedItems(combinedItemsResult);
-
-
         boolean isItemChosen = combinedItems.get(position).getLevel() == ITEM_LVL;
         boolean isItemExpanded = combinedItems.get(position).isExtended();
         boolean isCategoryExpanded =
@@ -255,62 +250,25 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         dataHelper.setListOfCombinedItems(new ArrayList<>());
 
         selectedParent = addToCombinedItems(dataHelper.getListOfStatisticItems(), combinedItems.get(position).getItem(), parentName.equals("") ? subCategoryName : parentName, isCategoryExpanded, isItemChosen,
-                -1, CATEGORY_LVL);
+                -1, Level.CATEGORY_LVL);
         if (!isCategoryExpanded)
         {
             selectedSub = addToCombinedItems(listOfSubs, combinedItems.get(position).getItem(), subCategoryName, isSubCategoryExpanded, isItemChosen,
-                    selectedParent, SUB_CATEGORY_LVL);
+                    selectedParent, Level.SUB_CATEGORY_LVL);
             if (!isSubCategoryExpanded)
             {
                 addToCombinedItems(listOfItems, combinedItems.get(position).getItem(), "", isItemExpanded, isItemChosen,
-                        selectedSub == -1 ? selectedParent : selectedSub, ITEM_LVL);
+                        selectedSub == -1 ? selectedParent : selectedSub, Level.ITEM_LVL);
             }
         }
-    }
-
-    private void addCombineItem(ItemDrawer combineItem, int index, int indexPressed, int level, List<ItemDrawer> combinedItemsResult) {
-        Item item = combineItem.getItem();
-        boolean isExtended = !combineItem.isExtended() && index == indexPressed;
-        int color = index == indexPressed? BLUE_5: Color.WHITE;
-        addItem(item, isExtended, color, level, combinedItemsResult);
-        if (level == CATEGORY_LVL && isExtended)
-        {
-            List<String> subCategories = Utils.getCategoriesNames(cat -> cat.getParent().equals(item.getCategory()));
-            if (!subCategories.isEmpty() && isExtended)
-            {
-                subCategories.stream()
-                        .map(cat -> Utils.getItemsOfCategories(cat).stream()
-                                .max((v0, v1) -> v0.getDate().compareTo(v1.getDate())).orElse(null))
-                        .forEach(s -> addItem(s, !isExtended, color, SUB_CATEGORY_LVL, combinedItemsResult));
-            }
-            else if (isExtended)
-            {
-               // addToCombinedItems(item.getCategory(), !isExtended, color, combinedItemsResult, )
-                //addCombineItemsForSubCategory(item.getCategory(), !isExtended, color, combinedItemsResult);
-            }
-        }
-        else if (level == SUB_CATEGORY_LVL && isExtended)
-        {
-            addCombineItemsForSubCategory(item.getCategory(), isExtended, color, combinedItemsResult);
-        }
-    }
-
-    private void addCombineItemsForSubCategory(String category, boolean isExtended, int color,
-                                               List<ItemDrawer> combinedItemsResult) {
-        dataHelper.getListOfItems(s -> s.getCategory().equals(category))
-                .forEach(s -> addItem(s, isExtended, color, ITEM_LVL, combinedItemsResult));
-    }
-
-    private void addItem(Item item, boolean isExtended, int color, int level, List<ItemDrawer> combinedItemsResult) {
-        combinedItemsResult.add(new ItemDrawer(item, color, isExtended, level));
     }
 
     private int addToCombinedItems(List<Item> items, Item item, String categoryName, boolean isExpanded, boolean isItemChosen,
-                                   int selectedParent, int level) {
+                                   int selectedParent, Level level) {
         int selectedSub = -1, i = 0;
-        int index = level == CATEGORY_LVL? 0: selectedParent + 1;
-        int color = level == CATEGORY_LVL? Color.WHITE : BLUE_5;
-        Predicate<Item> predicate = itm -> level == ITEM_LVL ? itm.equals(item) && isItemChosen : itm.getCategory().equals(categoryName);
+        int index = level == Level.CATEGORY_LVL? 0: selectedParent + 1;
+        int color = level == Level.CATEGORY_LVL? Color.WHITE : BLUE_5;
+        Predicate<Item> predicate = itm -> level == Level.ITEM_LVL ? itm.equals(item) && isItemChosen : itm.getCategory().equals(categoryName);
         List<ItemDrawer> combinedItems = dataHelper.getListOfCombinedItems();
         for (Item itm: items)
         {

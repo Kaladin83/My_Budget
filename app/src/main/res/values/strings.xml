@@ -5,7 +5,7 @@
     <string name="Categories">Categories</string>
     <string name="update">Update</string>
     <string name="new_category_layout">The Category is in use. \nMove items to:</string>
-    <string name="sub_category_layout">Add a standalone category or a sub category?:</string>
+    <string name="sub_category_layout">Add a standalone category or a subcategory:</string>
     <string name="new_category">New category</string>
     <string name="existing_category">Existing category</string>
     <string name="standalone_category">A standalone category</string>

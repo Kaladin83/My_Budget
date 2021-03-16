@@ -42,11 +42,4 @@ public interface Constants {
     int PURPLE_3 = Color.parseColor("#ebc0f7");
     int PURPLE_4 = Color.parseColor("#eddcf2");
     int PURPLE_5 = Color.parseColor("#e9e3ea");
-
-    int CATEGORY_LVL = 1;
-    int SUB_CATEGORY_LVL = 2;
-    int ITEM_LVL = 3;
-
-    String UPDATE = "update";
-    String INSERT = "insert";
 }

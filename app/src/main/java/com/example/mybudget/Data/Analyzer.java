@@ -6,8 +6,6 @@ import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.ItemToAdd;
-import com.example.mybudget.enums.DateFormat;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
 import com.google.common.collect.ImmutableList;
 
@@ -16,6 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static com.example.mybudget.utils.Enums.Action.INSERT_STATISTICS;
+import static com.example.mybudget.utils.Enums.Action;
+import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 
 public class Analyzer {
 
@@ -101,7 +103,7 @@ public class Analyzer {
         return new ItemToAdd(otherName, parentName, addedCategoryName, amount, description);
     }
 
-    public Map<Statistics, String> calculateStatisticSums(Item item) {
+    public Map<Statistics, Action> calculateStatisticSums(Item item) {
         String total = "total";
         String category = item.getCategory();
         List<String> categories = ImmutableList.of(Utils.getParentCategoryName(category), category, total);
@@ -112,12 +114,14 @@ public class Analyzer {
                 .collect(Collectors.toMap(p -> p.first, p -> p.second));
     }
 
-    private Pair<Statistics, String> getUpdateStatisticsPairs(Statistics stats, String cat, Item item) {
+    private Pair<Statistics, Action> getUpdateStatisticsPairs(Statistics stats, String cat, Item item) {
         if (stats == null)
         {
-            return new Pair<>(new Statistics(Utils.getCurrentDate(DateFormat.PAY), item.getAmount(), cat), Constants.INSERT);
+            return new Pair<>(new Statistics(Utils.getCurrentDate(PAY), item.getAmount(), cat),
+                    INSERT_STATISTICS);
         }
         stats.setSum(stats.getSum() + item.getAmount());
-        return new Pair<>(stats, Constants.UPDATE);
+        stats.setMean(Utils.getAverage(cat));
+        return new Pair<>(stats, Action.UPDATE_STATISTICS);
     }
 }

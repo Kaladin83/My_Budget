@@ -6,18 +6,22 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
+import com.example.mybudget.R;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.Statistics;
-import com.example.mybudget.enums.DateFormat;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.example.mybudget.utils.Enums.*;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -36,16 +41,27 @@ public class Utils implements Constants {
     private static DataHelper dataHelper;
 
     public static void setApplicationContext(Context context) {
+
         dataHelper = DataHelper.getDataHelper(context);
     }
 
-    public static Drawable createBorder(int radius, int color, int stroke) {
+    public static Drawable createBorder(int radius, int color, int stroke, int strokeColor) {
         GradientDrawable gd;
         gd = new GradientDrawable();
         gd.setColor(color);
         gd.setCornerRadius(radius);
-        gd.setStroke(stroke, BLACK_2);
+        gd.setStroke(stroke, strokeColor);
         return gd;
+    }
+
+    public static int getThemeStrokeColor(Context context) {
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.colorSecondary, typedValue, true);
+        return typedValue.data;
+    }
+
+    public static int getColor(int color, Context context){
+        return ContextCompat.getColor(context, color);
     }
 
     public static void closeKeyboard(EditText edit, Activity activity) {
@@ -141,18 +157,6 @@ public class Utils implements Constants {
                 .orElse("");
     }
 
-    /** For Item: Categories that have at least 1 subcategory won't be included **/
-    public static Predicate<Item> getItemParentPredicate() {
-        return item -> dataHelper.getListOfCategories().stream()
-                .noneMatch(cat-> cat.getParent().equals(item.getCategory()));
-    }
-
-    /** For Item: Categories that have at least 1 subcategory won't be included **/
-    public static Predicate<Item> getItemNoParentPredicate() {
-        return item -> dataHelper.getListOfCategories().stream()
-                .noneMatch(cat-> cat.getParent().equals(item.getCategory()));
-    }
-
     /** For Category: Categories that don't have otherName **/
     public static Predicate<Category> getCategoryNoOtherNamePredicate() {
         return cat -> cat.getOtherName().equals("");
@@ -221,7 +225,7 @@ public class Utils implements Constants {
     }
 
     public static String getCurrentDate(DateFormat dateFormat) {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateFormat.format));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateFormat.value));
     }
 
     public static double firstFoundWordsToNumber(String input) {
@@ -246,5 +250,24 @@ public class Utils implements Constants {
             }
         }
         return result;
+    }
+
+    public static double getAverage(String category) {
+        List<String> subCategories = Utils.getCategoriesNames(cat -> cat.getParent().equals(category));
+        if (subCategories.isEmpty())
+        {
+            return round(dataHelper.getListOfItems().stream()
+                    .filter(cat -> cat.getCategory().equals(category))
+                    .mapToDouble(Item::getAmount)
+                    .average().orElse(0));
+        }
+        return round(dataHelper.getListOfItems().stream()
+                .filter(item -> subCategories.contains(item.getCategory()))
+                .mapToDouble(Item::getAmount)
+                .average().orElse(0));
+    }
+
+    public static double round(double val) {
+        return ((int) (val * 100)) / 100d;
     }
 }

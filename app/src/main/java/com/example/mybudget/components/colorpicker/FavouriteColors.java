@@ -13,9 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.R;
 import com.example.mybudget.helpers.DataHelper;
-import com.example.mybudget.enums.Fragments;
 import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
+
+import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
 
 /**
  * Displays a list of favourite colors.
@@ -33,10 +34,11 @@ public class FavouriteColors extends Fragment implements RecyclerTouchHelper.Rec
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mainView = inflater.inflate(R.layout.favourite_colors, container, false);
 
+
+
         dataHelper = DataHelper.getDataHelper(getContext());
-        categoryPicker = ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(Fragments.CATEGORY_PICKER));
+        categoryPicker = ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER));
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        // coordinatorLayout = mainView.findViewById(R.id.coordinator_layout);
         colorAdapter = new ColorRecyclerAdapter(this);
         RecyclerView colorRecyclerView = mainView.findViewById(R.id.colors_recycler_view);
         colorRecyclerView.setAdapter(colorAdapter);

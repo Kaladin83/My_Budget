@@ -10,8 +10,8 @@ import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.ItemToAdd;
-import com.example.mybudget.enums.DateFormat;
 import com.example.mybudget.interfaces.Constants;
+import com.example.mybudget.utils.Enums.Action;
 import com.example.mybudget.utils.Utils;
 import com.google.common.collect.ImmutableMap;
 
@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.example.mybudget.utils.Enums.DateFormat.PAY;
+import static com.example.mybudget.utils.Enums.DateFormat.TIMESTAMP;
+import static com.example.mybudget.utils.Enums.Level.CATEGORY_LVL;
 import static java.util.stream.Collectors.toList;
 
 
@@ -110,11 +113,8 @@ public class DataHelper implements Constants {
 
     public void populateMonthlyStatistics(List<Statistics> list) {
         setListOfStatistics(list);
-        for (Statistics s : getListOfStatistics())
-        {
-            s.setMean(dataBase.fetchCategoryAverage(s.getCategory()));
-        }
 
+        list.forEach(stat -> stat.setMean(Utils.getAverage(stat.getCategory())));
         if (list.size() > 0)
         {
             setListOfStatisticItems(Utils.getParentStatisticsAsItems());
@@ -191,8 +191,8 @@ public class DataHelper implements Constants {
         dataBase.updateItemsCategory(newCategoryName, category.getName());
         dataBase.deleteCategory(category);
         dataBase.fetchCategories();
-        dataBase.fetchAllItems(Utils.getCurrentDate(DateFormat.PAY));
-        dataBase.fetchMonthlyStatistics(Utils.getCurrentDate(DateFormat.PAY));
+        dataBase.fetchAllItems(Utils.getCurrentDate(PAY));
+        dataBase.fetchMonthlyStatistics(Utils.getCurrentDate(PAY));
     }
 
     public void removeCategory(Category category) {
@@ -244,17 +244,17 @@ public class DataHelper implements Constants {
             dataBase.insertCategory(newCat);
             dataBase.updateItemsCategory(otherCategoryName, categoryName);
             dataBase.updateOtherCategoryName(otherCategoryName, categoryName);
-            dataBase.fetchAllItems(Utils.getCurrentDate(DateFormat.PAY));
+            dataBase.fetchAllItems(Utils.getCurrentDate(PAY));
             dataBase.fetchCategories();
             double sum = listOfItems.stream().mapToDouble(Item::getAmount).sum();
-            Statistics statistics = new Statistics(Utils.getCurrentDate(DateFormat.PAY), sum, otherCategoryName);
-            Map<Statistics, String> stats = ImmutableMap.of(statistics, Constants.INSERT);
+            Statistics statistics = new Statistics(Utils.getCurrentDate(PAY), sum, otherCategoryName);
+            Map<Statistics, Action> stats = ImmutableMap.of(statistics, Action.INSERT_STATISTICS);
             updateStatistics(stats);
         }
 
         categoryName = otherExists && givenCategoryName.equals(categoryName) ? otherCategoryName : givenCategoryName;
-        Item item = new Item.Builder(categoryName, Utils.getCurrentDate(DateFormat.TIMESTAMP),
-                Utils.getCurrentDate(DateFormat.PAY))
+        Item item = new Item.Builder(categoryName, Utils.getCurrentDate(TIMESTAMP),
+                Utils.getCurrentDate(PAY))
                 .withAmount(amount).withDescription(description).build();
         setLastAddedItem(item);
         dataBase.insertItem(item);
@@ -292,12 +292,12 @@ public class DataHelper implements Constants {
 
     /* -----------------------   Statistics Manipulations   ----------------------- */
 
-    private void updateStatistics(Map<Statistics, String> statistics) {
+    private void updateStatistics(Map<Statistics, Action> statistics) {
         String date = "";
-        for (Map.Entry<Statistics, String> entry : statistics.entrySet())
+        for (Map.Entry<Statistics, Action> entry : statistics.entrySet())
         {
             date = entry.getKey().getPayDate();
-            if (entry.getValue().equals(INSERT) && entry.getKey().getSum() > 0)
+            if (entry.getValue().equals(Action.INSERT_STATISTICS) && entry.getKey().getSum() > 0)
             {
                 dataBase.insertStatistics(entry.getKey());
             }

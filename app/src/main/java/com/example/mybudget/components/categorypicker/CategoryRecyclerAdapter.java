@@ -1,5 +1,6 @@
 package com.example.mybudget.components.categorypicker;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +24,13 @@ public class CategoryRecyclerAdapter  extends RecyclerView.Adapter<CategoryRecyc
     private final DataHelper dataHelper;
     private final CategoryPicker categoryPicker;
     private final float logicalDensity;
+    private final Activity activity;
 
     public CategoryRecyclerAdapter(CategoryPicker categoryPicker){
+        this.activity = categoryPicker.requireActivity();
         this.categoryPicker = categoryPicker;
-        this.dataHelper = DataHelper.getDataHelper(categoryPicker.requireActivity());
-        this.logicalDensity = Utils.getLogicalDensity(categoryPicker.requireActivity());
+        this.dataHelper = DataHelper.getDataHelper(activity);
+        this.logicalDensity = Utils.getLogicalDensity(activity);
     }
 
     public int getSelectedPosition() {
@@ -71,12 +74,12 @@ public class CategoryRecyclerAdapter  extends RecyclerView.Adapter<CategoryRecyc
         lParams.setMarginEnd(6);
         holder.colorTxt.setLayoutParams(lParams);
         holder.colorTxt.setBackground(Utils.createBorder(15, category.getParent().equals("") ? color :
-                Utils.findColor(category.getParent()), 3));
+                Utils.findColor(category.getParent()), 1, Utils.getThemeStrokeColor(activity)));
 
         lParams = new LinearLayout.LayoutParams(width, (int) Math.ceil(20 * logicalDensity));
         holder.colorSubTxt.setVisibility(category.getParent().equals("") ? View.GONE : View.VISIBLE);
         holder.colorSubTxt.setLayoutParams(lParams);
-        holder.colorSubTxt.setBackground(Utils.createBorder(15, color, 1));
+        holder.colorSubTxt.setBackground(Utils.createBorder(15, color, 1, Utils.getColor(R.color.light_black, activity)));
 
         holder.mainLayout.setOnClickListener(view -> {
             selectedPosition = position;

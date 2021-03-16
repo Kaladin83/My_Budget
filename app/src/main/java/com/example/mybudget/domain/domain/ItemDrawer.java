@@ -1,15 +1,18 @@
 package com.example.mybudget.domain.domain;
 
+
+import static com.example.mybudget.utils.Enums.Level;
+
 /**
  * ItemDrawer class - holds all the data necessary for drawing an item/category in the recyclerView
  */
 public class ItemDrawer {
     Item item;
     int background;
-    int level;
+    Level level;
     boolean isExtended;
 
-    public ItemDrawer(Item item, int background, boolean isExtended, int level) {
+    public ItemDrawer(Item item, int background, boolean isExtended, Level level) {
         this.item = item;
         this.background = background;
         this.isExtended = isExtended;
@@ -32,11 +35,11 @@ public class ItemDrawer {
         this.background = background;
     }
 
-    public int getLevel() {
+    public Level getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
 

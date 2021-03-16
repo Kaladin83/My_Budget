@@ -19,7 +19,6 @@ import com.example.mybudget.MainActivity;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
 import com.example.mybudget.R;
-import com.example.mybudget.enums.Fragments;
 import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.interfaces.Constants;
@@ -29,6 +28,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+
+import static com.example.mybudget.utils.Enums.Fragment.CHARTS;
+import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
 
 public class ItemRecycler extends Fragment implements RecyclerTouchHelper.RecyclerItemTouchHelperListener, Constants {
     private View mainView;
@@ -66,8 +68,8 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
 
     public void refreshItems() {
         parentItemAdapter.notifyDataSetChanged();
-        mainActivity.moveToMainPage();
-        ((Charts) ViewsHelper.getViewsHelper().getFragment(Fragments.CHARTS)).refreshCharts();
+        //mainActivity.moveToMainPage();
+        ((Charts) ViewsHelper.getViewsHelper().getFragment(CHARTS)).refreshCharts();
     }
 
     @Override

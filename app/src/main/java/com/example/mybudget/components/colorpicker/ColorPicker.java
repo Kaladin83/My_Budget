@@ -14,8 +14,10 @@ import androidx.fragment.app.Fragment;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.R;
 import com.example.mybudget.helpers.DataHelper;
-import com.example.mybudget.enums.Fragments;
 import com.example.mybudget.helpers.ViewsHelper;
+
+import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
+import static com.example.mybudget.utils.Enums.Fragment.FAVOURITE_COLORS;
 
 /**
  * Class that allows the user to create its own color
@@ -33,7 +35,7 @@ public class ColorPicker extends Fragment implements SeekBar.OnSeekBarChangeList
 
         viewsHelper = ViewsHelper.getViewsHelper();
         dataHelper = DataHelper.getDataHelper(getContext());
-        categoryPicker = ((CategoryPicker) viewsHelper.getFragment(Fragments.CATEGORY_PICKER));
+        categoryPicker = ((CategoryPicker) viewsHelper.getFragment(CATEGORY_PICKER));
 
         //updateCategoryPickerListener = (MainActivity)this.getActivity();
         SeekBar redSeekBar = mainView.findViewById(R.id.red_bar);
@@ -86,9 +88,8 @@ public class ColorPicker extends Fragment implements SeekBar.OnSeekBarChangeList
             }
             dataHelper.addColor(selectedColor);
             dataHelper.getListOfColors().add(selectedColor);
+            categoryPicker.refreshFavouriteColors();
 
-            ((FavouriteColors) viewsHelper.getFragment(Fragments.FAVOURITE_COLORS)).refreshColorRecyclerView();
-            categoryPicker.switchTab();
             Toast.makeText(this.getContext(), "The color was added", Toast.LENGTH_SHORT).show();
         }
     }

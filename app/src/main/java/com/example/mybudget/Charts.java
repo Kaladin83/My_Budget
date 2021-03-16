@@ -20,7 +20,6 @@ import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.adapters.SimpleSpinnerAdapter;
-import com.example.mybudget.enums.DateFormat;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.JavaUtils;
@@ -49,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -128,7 +128,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void populateDataLayout() {
-        String currentPayDate = Utils.getCurrentDate(DateFormat.PAY);
+        String currentPayDate = Utils.getCurrentDate(PAY);
         String month = monthsMap.get(currentPayDate.substring(5, 6));
         String year = currentPayDate.substring(0, 4);
         chosenDate = String.join("", month, " ", year);
@@ -241,7 +241,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                 if (selected != null)
                 {
                     String str = String.join("", selected.getCategory(), ": ", String.valueOf(selected.getAmount()), " " + "NIS");
-                    Toast.makeText(getContext(), str, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
                 }
             }
 

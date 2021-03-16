@@ -86,16 +86,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
         fetchCategories();
     }
 
-    public void deleteAllItemsInCategory(Item item)
-    {
-        Object[] data = new Object[]{item.getPayDate(), item.getCategory()};
-        dbInstance.execSQL("DELETE FROM ITEM WHERE PAY_DATE = ? AND CATEGORY IN " +
-                "(SELECT NAME FROM CATEGORY WHERE PARENT = ?)", data);
-
-        dbInstance.execSQL("DELETE FROM STATISTICS WHERE PAY_DATE = ? AND CATEGORY IN " +
-                "(SELECT NAME FROM CATEGORY WHERE PARENT = ?)", data);
-    }
-
     public void deleteAllMonthlyItems(String month)
     {
         Object[] data = new Object[]{month};
@@ -282,7 +272,8 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
     {
         double average = 0;
         dbInstance = this.getReadableDatabase();
-        Cursor res =  dbInstance.rawQuery( "SELECT AVG(SUM) AVERAGE FROM STATISTICS WHERE CATEGORY = ?", new String[]{category});
+        Cursor res =  dbInstance.rawQuery( "SELECT AVG(AMOUNT) AVERAGE FROM ITEM GROUP BY CATEGORY HAVING CATEGORY = ?",
+                new String[]{category});
         res.moveToFirst();
 
         while(!res.isAfterLast()){

@@ -21,11 +21,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.components.item.ItemRecycler;
-import com.example.mybudget.enums.DateFormat;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.Data.Preferences;
-import com.example.mybudget.enums.Fragments;
-import com.example.mybudget.enums.Mode;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
@@ -33,6 +30,13 @@ import com.example.mybudget.utils.Utils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.example.mybudget.utils.Enums.Mode;
+import static com.example.mybudget.utils.Enums.DateFormat.PAY;
+import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
+import static com.example.mybudget.utils.Enums.Fragment.EDIT;
+import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
+import static com.example.mybudget.utils.Enums.Fragment.CHARTS;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ItemRecycler itemRecycler;
@@ -53,9 +57,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         itemRecycler = new ItemRecycler(this);
         dataHelper = DataHelper.getDataHelper(this);
-        //dataHelper.deleteItems(Utils.getCurrentDate(DateFormat.PAY));
+        //dataHelper.deleteItems(Utils.getCurrentDate(PAY));
         // dataHelper.populateInitialCategories();
-        dataHelper.fetchData(Utils.getCurrentDate(DateFormat.PAY));
+        dataHelper.fetchData(Utils.getCurrentDate(PAY));
 
         handleVoiceCommands();
         createButtons();
@@ -197,9 +201,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CategoryPicker categoryPicker = new CategoryPicker();
             Charts charts = new Charts();
             Edit edit = new Edit();
-            ViewsHelper.getViewsHelper().registerFragment(Fragments.CATEGORY_PICKER, categoryPicker)
-                    .registerFragment(Fragments.EDIT, edit).registerFragment(Fragments.MAIN_RECYCLER, itemRecycler)
-                    .registerFragment(Fragments.CHARTS, charts);
+            ViewsHelper.getViewsHelper().registerFragment(CATEGORY_PICKER, categoryPicker)
+                    .registerFragment(EDIT, edit).registerFragment(MAIN_RECYCLER, itemRecycler)
+                    .registerFragment(CHARTS, charts);
             fragments = JavaUtils.mapOf(categoryPicker, charts, itemRecycler, edit);
         }
 
