@@ -79,6 +79,7 @@
         <item name="toggleView">@style/ToggleViewStyle</item>
         <item name="menuColor">?attr/colorPrimary</item>
         <item name="dialogBackground">@style/DialogStyle</item>
+        <item name="radioButtonStyle">@style/RadioStyle</item>
 
     </style>
 
@@ -156,6 +157,12 @@
 
     <style name="DialogStyle">
         <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="RadioStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="buttonTint">?attr/colorSecondary</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">8pt</item>
     </style>
 
 </resources>

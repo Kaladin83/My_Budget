@@ -25,6 +25,7 @@ import com.example.mybudget.utils.Enums.Action;
 import java.util.List;
 
 import static com.example.mybudget.utils.Enums.Action.ADD_CATEGORY;
+import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
 
 
 /**
@@ -37,7 +38,6 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
     private final Activity activity;
     private EditText categoryEdit;
     private Spinner categorySpinner;
-    private TextView firstChoiceTxt, secondChoiceTxt;
     private RadioButton firstChoiceRadio, secondChoiceRadio;
 
     public ManageCategoryDialog(Activity activity, Action action) {
@@ -71,8 +71,6 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
         firstChoiceRadio.setOnClickListener(this);
         secondChoiceRadio = findViewById(R.id.existing_category_radio);
         secondChoiceRadio.setOnClickListener(this);
-        firstChoiceTxt = findViewById(R.id.new_category_txt);
-        secondChoiceTxt = findViewById(R.id.existing_category_txt);
         categoryEdit = findViewById(R.id.category_edit);
         categorySpinner =  findViewById(R.id.category_spinner);
         categorySpinner.setAdapter(adapter);
@@ -82,18 +80,18 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
             categoryEdit.setVisibility(View.INVISIBLE);
             editPlaceHolder.setVisibility(View.VISIBLE);
             headerTxt.setText(R.string.sub_category_layout);
-            firstChoiceTxt.setText(R.string.standalone_category);
-            secondChoiceTxt.setText(R.string.sub_category);
+            firstChoiceRadio.setText(R.string.standalone_category);
+            secondChoiceRadio.setText(R.string.sub_category);
         }
         else
         {
             categoryEdit.setVisibility(View.VISIBLE);
             editPlaceHolder.setVisibility(View.INVISIBLE);
             headerTxt.setText(R.string.new_category_layout);
-            firstChoiceTxt.setText(R.string.new_category);
-            secondChoiceTxt.setText(R.string.existing_category);
+            firstChoiceRadio.setText(R.string.new_category);
+            secondChoiceRadio.setText(R.string.existing_category);
         }
-        enableFields(true, true, true, false, false, false);
+        enableFields(true, true, false, false);
         JavaUtils.addToMapIds(R.id.new_category_radio, 0, R.id.existing_category_radio, 1, R.id.ok_button, 2, R.id.cancel_button, 3);
     }
 
@@ -102,10 +100,10 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
         int id = JavaUtils.getId(v.getId());
         switch (id) {
             case 0:
-                enableFields(true, true, true, false, false, false);
+                enableFields(true, true, false, false);
                 break;
             case 1:
-                enableFields(false, false, false, true, true, true);
+                enableFields(false, false, true, true);
                 break;
             case 2:
                 getCategory(); break;
@@ -117,7 +115,7 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
     private void getCategory() {
         if (firstChoiceRadio.isChecked())
         {
-            if (action.equals("delete"))
+            if (action == DELETE_CATEGORY)
             {
                 if (Utils.validateTextInput(categoryEdit.getText().toString()))
                 {
@@ -139,13 +137,11 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
         }
     }
 
-    private void enableFields(boolean b, boolean b1, boolean b2, boolean b3, boolean b4, boolean b5) {
-        firstChoiceTxt.setEnabled(b);
-        categoryEdit.setEnabled(b1);
-        firstChoiceRadio.setChecked(b2);
-        secondChoiceTxt.setEnabled(b3);
-        categorySpinner.setEnabled(b4);
-        secondChoiceRadio.setChecked(b5);
+    private void enableFields(boolean b0, boolean b1, boolean b2, boolean b3) {
+        categoryEdit.setEnabled(b0);
+        firstChoiceRadio.setChecked(b1);
+        categorySpinner.setEnabled(b2);
+        secondChoiceRadio.setChecked(b3);
     }
 
     public abstract void okButtonPressed(String categoryName);

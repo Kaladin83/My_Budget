@@ -28,26 +28,14 @@
         android:layout_height="1dp"/>
     <RadioButton
         android:id="@+id/new_category_radio"
-        android:paddingHorizontal="5dp"
+        android:paddingHorizontal="7dp"
+        android:paddingVertical="10dp"
+        android:text="@string/new_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/separator_1"
-        app:layout_constraintBottom_toTopOf="@+id/existing_category_txt"
-        app:layout_constraintStart_toStartOf="parent"
-        android:buttonTint="?attr/colorSecondary"/>
-
-    <TextView
-        android:id="@+id/new_category_txt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintHeight_percent="0.15"
-        app:layout_constraintWidth_percent="0.41"
-        app:layout_constraintTop_toBottomOf="@+id/separator_1"
-        app:layout_constraintBottom_toTopOf="@id/existing_category_txt"
-        app:layout_constraintStart_toEndOf="@+id/new_category_radio"
-        android:textSize="8pt"
-        android:textAlignment="textStart"
-        android:text="@string/new_category" />
+        app:layout_constraintBottom_toTopOf="@+id/existing_category_radio"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/category_edit"
@@ -60,7 +48,7 @@
         app:layout_constraintBottom_toTopOf="@+id/category_spinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.12"
-        app:layout_constraintStart_toEndOf="@+id/new_category_txt"
+        app:layout_constraintStart_toEndOf="@+id/new_category_radio"
         app:layout_constraintTop_toBottomOf="@+id/separator_1"
         app:layout_constraintWidth_percent="0.42" />
 
@@ -68,38 +56,26 @@
         android:id="@+id/edit_place_holder"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingHorizontal="5dp"
+        android:paddingEnd="5dp"
+        android:paddingStart="0dp"
         app:layout_constraintBottom_toTopOf="@+id/category_spinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.12"
-        app:layout_constraintStart_toEndOf="@+id/new_category_txt"
+        app:layout_constraintStart_toEndOf="@+id/new_category_radio"
         app:layout_constraintTop_toBottomOf="@+id/separator_1"
         app:layout_constraintWidth_percent="0.42" />
 
     <RadioButton
         android:id="@+id/existing_category_radio"
         android:gravity="center"
-        android:paddingHorizontal="5dp"
+        android:paddingHorizontal="7dp"
+        android:paddingVertical="10dp"
         android:layout_width="wrap_content"
+        android:text="@string/existing_category"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/new_category_txt"
+        app:layout_constraintTop_toBottomOf="@id/new_category_radio"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/ok_button"
-        android:buttonTint="?attr/colorSecondary"/>
-
-    t<TextView
-        android:id="@+id/existing_category_txt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintHeight_percent="0.15"
-        app:layout_constraintWidth_percent="0.41"
-        app:layout_constraintTop_toBottomOf="@+id/new_category_txt"
-        app:layout_constraintBottom_toTopOf="@id/ok_button"
-        app:layout_constraintStart_toEndOf="@+id/new_category_radio"
-        android:textAlignment="textStart"
-        android:paddingVertical="13dp"
-        android:textSize="8pt"
-        android:text="@string/existing_category" />
+        app:layout_constraintBottom_toTopOf="@id/ok_button"/>
 
     <Spinner
         android:id="@+id/category_spinner"
@@ -110,8 +86,7 @@
         app:layout_constraintBottom_toTopOf="@+id/cancel_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/category_edit"
-        app:layout_constraintStart_toEndOf="@+id/existing_category_txt"
-        android:layout_marginHorizontal="5dp"/>
+        app:layout_constraintStart_toEndOf="@+id/existing_category_radio" />
 
     <View
         android:id="@+id/separator_2"

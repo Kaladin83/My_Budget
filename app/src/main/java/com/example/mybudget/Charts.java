@@ -2,18 +2,17 @@ package com.example.mybudget;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.mybudget.domain.domain.Category;
@@ -47,8 +46,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import static com.example.mybudget.utils.Enums.DateFormat.PAY;
+import static android.widget.AdapterView.*;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -56,22 +56,21 @@ import static java.util.stream.Collectors.toList;
  */
 
 public class Charts extends Fragment implements View.OnClickListener, Constants {
-    private int chartHeight, radiosHeight;
     private View mainView;
-    private List<Item> listOfNonParents;
+    private List<Item> parentItems;
+    private List<Item> nonParentItems;
     private PieChart pieChart;
     private BarChart barChart;
     private RadioButton categoryRadio, subCategoryRadio;
     private final Map<String, String> monthsMap = JavaUtils.mapOf("01", "JEN", "02", "FEB", "03", "MAR", "04", "APR", "05",
             "MAY", "06", "JUN", "07", "JUL", "08", "AUG", "09", "SEP", "10", "OCT", "11", "NOV", "12", "DEC");
-    private String chosenDate, chosenCategory;
-    private RelativeLayout pieLayout, barLayout, pieSpinnerLayout, barSpinnerLayout;
+    private ConstraintLayout pieLayout, barLayout;
     private TextView barTxt, pieTxt;
+    private Spinner monthSpinner, categorySpinner;
     private Map<Float, Double> mapOfPercents = new HashMap<>();
 
     private Activity activity;
     private DataHelper dataHelper;
-    private int screenWidth, logicalDensity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,10 +78,8 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
         activity = requireActivity();
         dataHelper = DataHelper.getDataHelper(getContext());
-        screenWidth = Utils.getScreenWidth(activity);
-        logicalDensity = (int) Utils.getLogicalDensity(activity);
-        RelativeLayout noDataLayout = mainView.findViewById(R.id.no_data_layout);
-        RelativeLayout dataLayout = mainView.findViewById(R.id.data_layout);
+        FrameLayout noDataLayout = mainView.findViewById(R.id.no_data_layout);
+        ConstraintLayout dataLayout = mainView.findViewById(R.id.data_layout);
         if (!dataHelper.getListOfItems().isEmpty())
         {
             refreshCharts();
@@ -109,7 +106,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private List<String> getCategoryValues() {
-        return Utils.getParentStatisticsAsItems().stream()
+        return Stream.concat(nonParentItems.stream(), parentItems.stream())
                 .map(Item::getCategory)
                 .collect(toList());
     }
@@ -128,76 +125,38 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void populateDataLayout() {
-        String currentPayDate = Utils.getCurrentDate(PAY);
-        String month = monthsMap.get(currentPayDate.substring(5, 6));
-        String year = currentPayDate.substring(0, 4);
-        chosenDate = String.join("", month, " ", year);
-        listOfNonParents = getItemsOfNonParents();
-        pieSpinnerLayout = mainView.findViewById(R.id.pie_spinner_layout);
-        barSpinnerLayout = mainView.findViewById(R.id.bar_spinner_layout);
+        parentItems = getItemsOfNonParents();
+        nonParentItems = Utils.getParentStatisticsAsItems();
 
         barTxt = mainView.findViewById(R.id.bar_txt);
-        barTxt.setOnClickListener(this);
         pieTxt = mainView.findViewById(R.id.pie_txt);
+        barTxt.setOnClickListener(this);
         pieTxt.setOnClickListener(this);
 
         categoryRadio = mainView.findViewById(R.id.category_radio);
-        categoryRadio.setOnClickListener(this);
         subCategoryRadio = mainView.findViewById(R.id.subcategory_radio);
+        categoryRadio.setOnClickListener(this);
         subCategoryRadio.setOnClickListener(this);
 
-        calculateDimensions();
-        createMonthSpinner();
-        createCategorySpinner();
         createPieChart();
         createBarChart();
-
-        RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth, chartHeight + radiosHeight);
-        rParams.addRule(RelativeLayout.BELOW, R.id.header_layout);
-        rParams.setMargins(0, 20, 0, 10);
+        createMonthSpinner();
+        createCategorySpinner();
 
         pieLayout = mainView.findViewById(R.id.pie_layout);
         barLayout = mainView.findViewById(R.id.bar_layout);
-        pieLayout.setLayoutParams(new FrameLayout.LayoutParams(screenWidth, chartHeight + radiosHeight));
-        barLayout.setLayoutParams(new FrameLayout.LayoutParams(screenWidth, chartHeight + radiosHeight));
-        FrameLayout chartsLayout = mainView.findViewById(R.id.charts_layout);
-        chartsLayout.setLayoutParams(rParams);
         changeSelection(true, View.VISIBLE, View.VISIBLE, false, View.GONE, View.GONE);
-    }
-
-    private void calculateDimensions() {
-        int chartsScreenHeight = Utils.getScreenHeight(activity) - 60 * logicalDensity;
-        int topLayoutHeight = 153 * logicalDensity;
-        radiosHeight = 40 * logicalDensity;
-        chartHeight = chartsScreenHeight - topLayoutHeight - radiosHeight;
     }
 
     private void createMonthSpinner() {
         SimpleSpinnerAdapter monthsAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, getMonthValues());
-        Spinner monthSpinner = mainView.findViewById(R.id.pieSpinner);
+        monthSpinner = mainView.findViewById(R.id.pieSpinner);
         monthSpinner.setAdapter(monthsAdapter);
-        monthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        monthSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                //enableFields(false, false, true,true);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-    }
-
-    private void createCategorySpinner() {
-        SimpleSpinnerAdapter categoryAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, getCategoryValues());
-        Spinner categorySpinner = mainView.findViewById(R.id.columnSpinner);
-        categorySpinner.setAdapter(categoryAdapter);
-        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                chosenCategory = adapterView.getSelectedItem().toString();
-                loadBarData();
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                String selectedItem = monthSpinner.getItemAtPosition(position).toString();
+                loadPieData(selectedItem);
                 barChart.notifyDataSetChanged();
                 barChart.invalidate();
             }
@@ -207,16 +166,32 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
             }
         });
-        chosenCategory = categorySpinner.getAdapter().getItem(0).toString();
+        loadPieData(monthsAdapter.getItem(0));
+    }
+
+    private void createCategorySpinner() {
+        SimpleSpinnerAdapter categoryAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, getCategoryValues());
+        categorySpinner = mainView.findViewById(R.id.columnSpinner);
+        categorySpinner.setAdapter(categoryAdapter);
+        categorySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                loadBarData(categorySpinner.getSelectedItem().toString());
+                barChart.notifyDataSetChanged();
+                barChart.invalidate();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        loadBarData(categoryAdapter.getItem(0));
     }
 
     private void createPieChart() {
-        RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth, chartHeight);
-        rParams.setMargins(10 * logicalDensity, 0, 10 * logicalDensity, 0);
-        rParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         pieChart = mainView.findViewById(R.id.pie_chart);
         pieChart.setCenterText("Pie charts");
-        pieChart.setLayoutParams(rParams);
         pieChart.setCenterTextSize(12);
         pieChart.setHoleRadius(25f);
         pieChart.setTransparentCircleAlpha(50);
@@ -230,7 +205,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                 }
                 else
                 {
-                    displayPieData(e, listOfNonParents);
+                    displayPieData(e, parentItems);
                 }
             }
 
@@ -250,17 +225,10 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
             }
         });
-
-        loadPieData(dataHelper.getListOfStatisticItems());
-        rParams = new RelativeLayout.LayoutParams(screenWidth, radiosHeight);
-        rParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        rParams.setMargins(0, 30, 0, 0);
-        RelativeLayout radioLayout = mainView.findViewById(R.id.radio_group);
-        radioLayout.setLayoutParams(rParams);
-        radioLayout.setGravity(Gravity.BOTTOM);
     }
 
-    private void loadPieData(List<Item> items) {
+    private void loadPieData(String selectedMonth) {
+        List<Item> items = categoryRadio.isChecked()? parentItems : dataHelper.getListOfStatisticItems();
         List<PieEntry> entryY = new ArrayList<>();
         LegendEntry[] lEntries = new LegendEntry[items.size()];
         int[] arrayOfColors = new int[items.size()];
@@ -277,7 +245,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         pieChart.getLegend().setForm(Legend.LegendForm.CIRCLE);
         pieChart.getLegend().setDirection(Legend.LegendDirection.LEFT_TO_RIGHT);
         pieChart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        pieChart.getDescription().setText(String.join("", "Expenses for ", chosenDate, " (shown in percents)"));
+        pieChart.getDescription().setText(String.join("", "Expenses for ", selectedMonth, " (shown in percents)"));
         pieChart.getDescription().setTextSize(12);
         pieChart.getDescription().setYOffset(-7);
         PieData pieData = new PieData(dataSet);
@@ -310,20 +278,14 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void createBarChart() {
-        RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth, chartHeight);
-        rParams.setMargins(10 * logicalDensity, 0, 10 * logicalDensity, 0);
-        rParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         barChart = mainView.findViewById(R.id.bar_chart);
         barChart.setDrawValueAboveBar(true);
-        barChart.setLayoutParams(rParams);
         barChart.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         barChart.setFitBars(true);
-
-        loadBarData();
     }
 
-    private void loadBarData() {
-        List<BarEntry> barEntries = ImmutableList.of(new BarEntry(0, sumOfCategory(chosenCategory)), new BarEntry(1, 120f),
+    private void loadBarData(String selectedCategory) {
+        List<BarEntry> barEntries = ImmutableList.of(new BarEntry(0, sumOfCategory(selectedCategory)), new BarEntry(1, 120f),
                 new BarEntry(2, 100f), new BarEntry(3, 35f), new BarEntry(4, 111f), new BarEntry(5, 78f));
 
         final String[] dates = new String[]{"Jul 2018", "Aug 2018", "Sep 2018", "Oct 2018", "Nov 2018", "Dec 2018"};
@@ -334,20 +296,20 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         barData.setBarWidth(0.8f);
         barData.setValueTextSize(12);
 
-        if (chosenCategory.equals(getString(R.string.total_sum)))
+        if (selectedCategory.equals(getString(R.string.total_sum)))
         {
             dataSet.setColors(categoryColors(cat -> cat.getParent().equals("")));
         }
         else
         {
-            int color = Utils.findColor(chosenCategory);
+            int color = Utils.findColor(selectedCategory);
             dataSet.setColor(color);
         }
 
         barChart.setData(barData);
         barChart.getDescription().setYOffset(-55);
         barChart.getDescription().setXOffset(-25);
-        barChart.getDescription().setText(String.join("", "Distribution by dates for ", chosenCategory));
+        barChart.getDescription().setText(String.join("", "Distribution by dates for ", selectedCategory));
 
         XAxis xAxis = barChart.getXAxis();
         xAxis.setLabelRotationAngle(45f);
@@ -385,11 +347,11 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                 break;
             case 2:
                 changeSelection(true, false);
-                loadPieData(dataHelper.getListOfStatisticItems());
+                loadPieData(monthSpinner.getSelectedItem().toString());
                 break;
             case 3:
                 changeSelection(false, true);
-                loadPieData(listOfNonParents);
+                loadPieData(monthSpinner.getSelectedItem().toString());
                 break;
         }
     }
@@ -402,10 +364,10 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private void changeSelection(boolean selected1, int visibleChart1, int visibleSpinner1, boolean selected2,
                                  int visibleChart2, int visibleSpinner2) {
         pieLayout.setVisibility(visibleChart1);
-        pieSpinnerLayout.setVisibility(visibleSpinner1);
+        monthSpinner.setVisibility(visibleSpinner1);
         pieTxt.setSelected(selected1);
         barLayout.setVisibility(visibleChart2);
-        barSpinnerLayout.setVisibility(visibleSpinner2);
+        categorySpinner.setVisibility(visibleSpinner2);
         barTxt.setSelected(selected2);
     }
 

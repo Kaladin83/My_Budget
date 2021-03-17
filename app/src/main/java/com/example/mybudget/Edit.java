@@ -18,7 +18,6 @@ import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.helpers.ViewsHelper;
-import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.Utils;
 
 import java.util.List;

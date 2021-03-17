@@ -1,168 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/charts"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/data_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/data_layout">
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="25dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="83dp"
-            android:layout_marginTop="30dp"
-            android:orientation="horizontal"
-            android:id="@+id/header_layout">
+        <TextView
+            android:id="@+id/pie_txt"
+            style="?toggleView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/pie_chart_choice"
+            app:layout_constraintHeight_percent="0.07"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.40" />
 
-            <LinearLayout
-                android:layout_width="142dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginStart="15dp"
-                android:id="@+id/choice_layout">
+        <View
+            android:id="@+id/separator"
+            style="?separator"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pie_txt"
+            app:layout_constraintWidth_percent="0.40" />
 
-                <TextView
-                    android:id="@+id/pie_txt"
-                    style="?toggleView"
-                    android:layout_width="match_parent"
-                    android:layout_height="38dp"
-                    android:gravity="center|center"
-                    android:text="@string/pie_chart_choice" />
+        <TextView
+            android:id="@+id/bar_txt"
+            style="?toggleView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/bar_chart_choice"
+            app:layout_constraintHeight_percent="0.07"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator"
+            app:layout_constraintWidth_percent="0.40" />
 
-                <View
-                    style="?separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:id="@+id/separator"/>
+        <Spinner
+            android:id="@+id/pieSpinner"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:drawSelectorOnTop="true"
+            android:dropDownVerticalOffset="-53dp"
+            android:spinnerMode="dropdown"
+            app:layout_constraintWidth_percent="0.50"
+            app:layout_constraintHeight_percent="0.07"
+            app:layout_constraintBottom_toTopOf="@+id/charts_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-                <TextView
-                    android:id="@+id/bar_txt"
-                    style="?toggleView"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center|center"
-                    android:text="@string/bar_chart_choice" />
+        <Spinner
+            android:id="@+id/columnSpinner"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:drawSelectorOnTop="true"
+            android:dropDownVerticalOffset="-53dp"
+            android:spinnerMode="dropdown"
+            app:layout_constraintHeight_percent="0.07"
+            app:layout_constraintWidth_percent="0.50"
+            app:layout_constraintBottom_toTopOf="@+id/charts_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-            </LinearLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/pie_spinner_layout">
-
-                    <Spinner
-                        android:id="@+id/pieSpinner"
-                        android:layout_centerInParent="true"
-                        android:layout_width="170dp"
-                        android:layout_height="40dp"
-                        android:drawSelectorOnTop="true"
-                        android:dropDownVerticalOffset="-53dp"
-                        android:spinnerMode="dropdown"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="81dp"
-                    android:id="@+id/bar_spinner_layout">
-
-                    <Spinner
-                        android:id="@+id/columnSpinner"
-                        android:layout_centerInParent="true"
-                        android:layout_width="170dp"
-                        android:layout_height="40dp"
-                        android:drawSelectorOnTop="true"
-                        android:dropDownVerticalOffset="-53dp"
-                        android:spinnerMode="dropdown"/>
-
-                </RelativeLayout>
-            </FrameLayout>
-
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_margin="20dp"
-            android:layout_width="match_parent"
-            android:layout_below="@+id/header_layout"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/charts_layout"
-            android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.85"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bar_txt">
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/pie_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/pie_layout">
+                android:paddingVertical="15dp"
+                app:layout_constraintHeight_percent="0.80">
 
                 <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/pie_chart"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:id="@+id/pie_chart">
+                    android:layout_height="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_percent="0.80"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <FrameLayout
+                        android:id="@+id/no_data_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/no_data_txt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center|center"
+                            android:text="@string/no_charts_data"
+                            android:textColor="@color/red"
+                            android:textSize="12pt" />
+                    </FrameLayout>
 
                 </com.github.mikephil.charting.charts.PieChart>
 
-                <RelativeLayout
-                    android:id="@+id/radio_group"
-                    android:layout_below="@+id/pie_chart"
+                <RadioButton
+                    android:id="@+id/category_radio"
                     android:layout_width="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="0dp"
+                    android:layout_marginStart="5dp"
+                    android:checked="true"
+                    android:text="@string/radio_categories"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHeight_percent="0.05"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pie_chart" />
 
-                    <RadioButton
-                        android:id="@+id/category_radio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/radio_categories"
-                        android:layout_marginStart="20dp"
-                        android:layout_alignParentStart="true"
-                        android:checked="true" />
+                <RadioButton
+                    android:id="@+id/subcategory_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="@string/radio_subcategories"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_percent="0.05"
+                    app:layout_constraintTop_toBottomOf="@+id/pie_chart" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <RadioButton
-                        android:id="@+id/subcategory_radio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="20dp"
-                        android:layout_alignParentEnd="true"
-                        android:text="@string/radio_subcategories" />
-                </RelativeLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/bar_layout">
+                android:layout_height="match_parent">
 
                 <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/bar_chart"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/bar_chart">
-
-                </com.github.mikephil.charting.charts.BarChart>
-            </RelativeLayout>
-        </FrameLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/no_data_layout">
-
-        <TextView
-            android:id="@+id/no_data_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center|center"
-            android:textSize="12pt"
-            android:textColor="@color/red"
-            android:text="@string/no_charts_data" />
-    </RelativeLayout>
-
-</LinearLayout>
+                    android:layout_height="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_percent="0.8"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
