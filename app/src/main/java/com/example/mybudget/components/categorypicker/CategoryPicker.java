@@ -35,6 +35,7 @@ import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
+import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
@@ -44,6 +45,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Action.ADD_CATEGORY;
 import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
 import static com.example.mybudget.utils.Enums.Fragment.EDIT;
@@ -288,7 +290,7 @@ public class CategoryPicker extends Fragment implements
 
         Toast.makeText(getContext(), "The color of " + category.getName() + " was changed", Toast.LENGTH_SHORT).show();
         refreshCategories();
-        itemRecycler.refreshItems();
+        itemRecycler.refreshItems(UPDATE_CATEGORY);
     }
 
     @Override
@@ -321,7 +323,7 @@ public class CategoryPicker extends Fragment implements
                         //category.setColor(newColor);
                         //category.setName(newCategoryName);
                         dataHelper.changeCategoryName(deletedCategory, newCategoryName);
-                        itemRecycler.refreshItems();
+                        itemRecycler.refreshItems(REMOVE_ITEM);
                         Toast.makeText(getContext(), deletedCategory.getName() + " was renamed to " + newCategoryName, Toast.LENGTH_SHORT).show();
                         manageCategoryDialog.dismiss();
                         refreshCategories();

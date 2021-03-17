@@ -24,6 +24,7 @@ import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.Data.Preferences;
 import com.example.mybudget.helpers.ViewsHelper;
+import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Mode;
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         {
                             List<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                             dataHelper.addItemFromVoice(matches);
-                            itemRecycler.refreshItems();
+                            itemRecycler.refreshItems(ADD_ITEM);
                         }
                     }
                 }

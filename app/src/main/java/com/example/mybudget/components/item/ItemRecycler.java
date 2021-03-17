@@ -23,13 +23,17 @@ import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
+import com.example.mybudget.utils.Enums;
+import com.example.mybudget.utils.Enums.Action;
 import com.example.mybudget.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Fragment.CHARTS;
+import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
 import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
 
 public class ItemRecycler extends Fragment implements RecyclerTouchHelper.RecyclerItemTouchHelperListener, Constants {
@@ -66,10 +70,13 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
         new ItemTouchHelper(parentSwiper).attachToRecyclerView(recyclerView);
     }
 
-    public void refreshItems() {
+    public void refreshItems(Action action) {
         parentItemAdapter.notifyDataSetChanged();
-        //mainActivity.moveToMainPage();
         ((Charts) ViewsHelper.getViewsHelper().getFragment(CHARTS)).refreshCharts();
+        if (action == ADD_ITEM)
+        {
+            mainActivity.moveToMainPage();
+        }
     }
 
     @Override
@@ -80,12 +87,12 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
         Snackbar snackbar = Snackbar.make(mainLayout, "The item was removed", Snackbar.LENGTH_LONG);
         snackbar.setAction("UNDO", view -> {
             dataHelper.restoreItems(deletedItems);
-            refreshItems();
+            refreshItems(RESTORE_CATEGORY);
         });
         snackbar.setActionTextColor(Color.YELLOW);
         snackbar.show();
         dataHelper.removeItems(deletedItems);
-        refreshItems();
+        refreshItems(DELETE_CATEGORY);
     }
 
     private List<Item> findDeletedItems(ItemDrawer itemToDelete) {

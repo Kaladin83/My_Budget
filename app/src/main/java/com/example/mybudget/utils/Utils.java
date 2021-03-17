@@ -20,14 +20,13 @@ import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.example.mybudget.utils.Enums.*;
 import static java.util.stream.Collectors.toList;

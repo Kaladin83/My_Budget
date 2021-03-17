@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -17,10 +18,12 @@ import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.helpers.ViewsHelper;
+import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.Utils;
 
 import java.util.List;
 
+import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
 import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
 
@@ -69,11 +72,24 @@ public class Edit extends Fragment implements View.OnClickListener, View.OnTouch
     public void onClick(View view) {
         if (view.getId() == R.id.add_button)
         {
-            DataHelper.getDataHelper(getContext()).addItemFromText(categorySpinner.getSelectedItem().toString(),
-                    Double.parseDouble(amountEdit.getText().toString()), descriptionEdit.getText().toString());
-            ((ItemRecycler) ViewsHelper.getViewsHelper().getFragment(MAIN_RECYCLER)).refreshItems();
-            ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER)).refreshCategories();
+            if (amountEdit.getText().toString().equals(""))
+            {
+                Toast.makeText(activity, "The Amount must not be empty", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                DataHelper.getDataHelper(getContext()).addItemFromText(categorySpinner.getSelectedItem().toString(),
+                        Double.parseDouble(amountEdit.getText().toString()), descriptionEdit.getText().toString());
+                ((ItemRecycler) ViewsHelper.getViewsHelper().getFragment(MAIN_RECYCLER)).refreshItems(ADD_ITEM);
+                ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER)).refreshCategories();
+                clearFields();
+            }
         }
+    }
+
+    private void clearFields() {
+        amountEdit.setText("");
+        descriptionEdit.setText("");
     }
 
     @Override
