@@ -54,7 +54,12 @@ public class Utils implements Constants {
 
     public static int getThemeStrokeColor(Context context) {
         TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.colorSecondary, typedValue, true);
+        context.getTheme().resolveAttribute(R.attr.colorOnSecondary, typedValue, true);
+        return typedValue.data;
+    }
+    public static int getAttrColor(Context context, int attrColor) {
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(attrColor, typedValue, true);
         return typedValue.data;
     }
 

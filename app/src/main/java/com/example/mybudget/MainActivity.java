@@ -24,7 +24,6 @@ import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.Data.Preferences;
 import com.example.mybudget.helpers.ViewsHelper;
-import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 
@@ -95,10 +94,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void createPager() {
         final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
         changeSelection(false, false, true, false);
+        Integer currentPage = Preferences.getValue("CurrentPage", Integer.class);
 
         pager = findViewById(R.id.pager);
         pager.setAdapter(adapter);
-        pager.setCurrentItem(2, false);
+        pager.setCurrentItem(currentPage == null? 2: currentPage, false);
+        setRefreshPage(2);
         pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -119,6 +120,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+    }
+
+    private void setRefreshPage(int pageNumber) {
+        Preferences.putValue("CurrentPage", pageNumber);
     }
 
     private void changeSelection(boolean b, boolean b1, boolean b2, boolean b3) {
@@ -185,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             return super.onOptionsItemSelected(item);
         }
+        setRefreshPage(pager.getCurrentItem());
         Preferences.putValue("Theme", id == 0 ? Mode.NIGHT_MODE : Mode.DAY_MODE);
         startActivity(new Intent(this, getClass()));
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

@@ -8,9 +8,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#252525</color>
     <color name="light_black">#555454</color>
-    <color name="very_light_black">#7A7979</color>
-    <color name="super_light_black">#989898</color>
-    <color name="light_gray">#CCCACA</color>
+    <color name="very_light_black">#787878</color>
+    <color name="ultra_light_black">#8C8A8A</color>
+    <color name="super_light_black">#AAAAAA</color>
+    <color name="light_gray">#C1C1C1</color>
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
 
@@ -24,7 +25,7 @@
     <color name="very_dark_green">#01911C</color>
     <color name="dark_green">#0CA829</color>
     <color name="green">#28c745</color>
-    <color name="light_green">#62A16B</color>
+    <color name="light_green">#73B57C</color>
     <color name="very_light_green">#CAF6D3</color>
     <color name="super_light_green">#ECFAEF</color>
     <color name="toolBar">#eff2f7</color>

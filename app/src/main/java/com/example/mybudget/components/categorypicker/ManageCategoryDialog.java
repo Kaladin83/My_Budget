@@ -18,12 +18,12 @@ import android.widget.Toast;
 import com.example.mybudget.R;
 import com.example.mybudget.adapters.SimpleSpinnerAdapter;
 import com.example.mybudget.interfaces.Constants;
-import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 import com.example.mybudget.utils.Enums.Action;
 
 import java.util.List;
 
+import static com.example.mybudget.utils.Enums.*;
 import static com.example.mybudget.utils.Enums.Action.ADD_CATEGORY;
 import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
 
@@ -62,8 +62,8 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
 
         TextView headerTxt = findViewById(R.id.header_txt);
         View editPlaceHolder = findViewById(R.id.edit_place_holder);
-        Button okButton = findViewById(R.id.ok_button);
-        Button cancelButton = findViewById(R.id.cancel_button);
+        Button okButton = findViewById(R.id.dialog_ok_button);
+        Button cancelButton = findViewById(R.id.dialog_cancel_button);
         okButton.setOnClickListener(this);
         cancelButton.setOnClickListener(this);
         firstChoiceRadio = findViewById(R.id.new_category_radio);
@@ -92,22 +92,22 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
             secondChoiceRadio.setText(R.string.existing_category);
         }
         enableFields(true, true, false, false);
-        JavaUtils.addToMapIds(R.id.new_category_radio, 0, R.id.existing_category_radio, 1, R.id.ok_button, 2, R.id.cancel_button, 3);
     }
 
     @Override
     public void onClick(View v) {
-        int id = JavaUtils.getId(v.getId());
-        switch (id) {
-            case 0:
+        switch (Id.getId(v.getId()))
+        {
+            case NEW_CATEGORY_RADIO:
                 enableFields(true, true, false, false);
                 break;
-            case 1:
+            case EXISTING_CATEGORY_RADIO:
                 enableFields(false, false, true, true);
                 break;
-            case 2:
-                getCategory(); break;
-            case 3:
+            case DIALOG_OK_BUTTON:
+                getCategory();
+                break;
+            case DIALOG_CANCEL_BUTTON:
                 cancelButtonPressed();
         }
     }

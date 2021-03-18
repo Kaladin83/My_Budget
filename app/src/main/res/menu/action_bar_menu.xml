@@ -7,7 +7,7 @@
         android:orderInCategory="100"
         android:icon="@drawable/hamburger_menu"
         app:showAsAction="always"
-        app:iconTint="@color/image_buttons_selector"
+        app:iconTint="?android:attr/textColorSecondary"
         android:title="TODO">
         <menu android:id="@+id/theme_menu">
             <item

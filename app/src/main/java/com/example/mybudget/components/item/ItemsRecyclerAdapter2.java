@@ -61,7 +61,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
             mainRowLayout = v.findViewById(R.id.main_row_layout);
             backgroundLayout = v.findViewById(R.id.background_layout);
             dateTxt = v.findViewById(R.id.date_added_txt);
-            arrowTxt = v.findViewById(R.id.arrow_txt);
+            arrowTxt = v.findViewById(R.id.arrow_image);
         }
     }
 
@@ -270,12 +270,12 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
         {
             if (parentItems.get(i).getCategory().equals(parentName) && !isCategoryExpanded)
             {
-                combinedItems.add(new ItemDrawer(parentItems.get(i), BLUE_5, true, CATEGORY_LVL));
+                combinedItems.add(new ItemDrawer(parentItems.get(i), true, true, CATEGORY_LVL));
                 selectedParent = i;
             }
             else
             {
-                combinedItems.add(new ItemDrawer(parentItems.get(i), Color.WHITE, false, CATEGORY_LVL));
+                combinedItems.add(new ItemDrawer(parentItems.get(i), false, false, CATEGORY_LVL));
             }
         }
         return selectedParent;
@@ -289,12 +289,12 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
         {
             if (subCategoryName.equals(listOfSubs.get(i).getCategory()) && !isSubCategoryExpanded)
             {
-                combinedItems.add(selectedParent + 1 + i, new ItemDrawer(listOfSubs.get(i), BLUE_5, true, SUB_CATEGORY_LVL));
+                combinedItems.add(selectedParent + 1 + i, new ItemDrawer(listOfSubs.get(i), true, true, SUB_CATEGORY_LVL));
                 selectedSub = selectedParent + 1 + i;
             }
             else
             {
-                combinedItems.add(selectedParent + 1 + i, new ItemDrawer(listOfSubs.get(i), BLUE_5, false, SUB_CATEGORY_LVL));
+                combinedItems.add(selectedParent + 1 + i, new ItemDrawer(listOfSubs.get(i), false, false, SUB_CATEGORY_LVL));
             }
         }
         return selectedSub;
@@ -309,16 +309,16 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
             {
                 if (isItemChosen && !isItemExpanded)
                 {
-                    combinedItems.add(selectedSub + 1 + i, new ItemDrawer(listOfItems.get(i), BLUE_5, true, ITEM_LVL));
+                    combinedItems.add(selectedSub + 1 + i, new ItemDrawer(listOfItems.get(i), true, true, ITEM_LVL));
                 }
                 else
                 {
-                    combinedItems.add(selectedSub + 1 + i, new ItemDrawer(listOfItems.get(i), BLUE_5, false, ITEM_LVL));
+                    combinedItems.add(selectedSub + 1 + i, new ItemDrawer(listOfItems.get(i), true, false, ITEM_LVL));
                 }
             }
             else
             {
-                combinedItems.add(selectedSub + 1 + i, new ItemDrawer(listOfItems.get(i), BLUE_5, false, ITEM_LVL));
+                combinedItems.add(selectedSub + 1 + i, new ItemDrawer(listOfItems.get(i), true, false, ITEM_LVL));
             }
         }
     }
@@ -349,7 +349,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
         ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
         int height = id.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setBackgroundColor(id.getBackground());
+        holder.mainLayout.setSelected(id.getSelected());
         holder.categorySumsLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
         //    holder.separator.setVisibility(id.isExtended()? View.VISIBLE: View.GONE);
         return height;
@@ -363,7 +363,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
         ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
         int height = id.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setBackgroundColor(id.getBackground());
+        holder.mainLayout.setSelected(id.getSelected());
         holder.descriptionLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
         return height;
     }

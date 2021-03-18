@@ -13,7 +13,7 @@
         android:layout_marginTop="25dp">
 
         <TextView
-            android:id="@+id/pie_txt"
+            android:id="@+id/monthly_expenses_txt"
             style="?toggleView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -30,11 +30,11 @@
             android:layout_width="0dp"
             android:layout_height="1dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pie_txt"
+            app:layout_constraintTop_toBottomOf="@+id/monthly_expenses_txt"
             app:layout_constraintWidth_percent="0.40" />
 
         <TextView
-            android:id="@+id/bar_txt"
+            android:id="@+id/all_expenses_txt"
             style="?toggleView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -78,7 +78,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.85"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bar_txt">
+            app:layout_constraintTop_toBottomOf="@+id/all_expenses_txt">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pie_layout"

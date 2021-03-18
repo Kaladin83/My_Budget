@@ -8,13 +8,13 @@ import static com.example.mybudget.utils.Enums.Level;
  */
 public class ItemDrawer {
     Item item;
-    int background;
+    boolean isSelected;
     Level level;
     boolean isExtended;
 
-    public ItemDrawer(Item item, int background, boolean isExtended, Level level) {
+    public ItemDrawer(Item item, boolean isSelected, boolean isExtended, Level level) {
         this.item = item;
-        this.background = background;
+        this.isSelected = isSelected;
         this.isExtended = isExtended;
         this.level = level;
     }
@@ -27,12 +27,12 @@ public class ItemDrawer {
         this.item = item;
     }
 
-    public int getBackground() {
-        return background;
+    public boolean getSelected() {
+        return isSelected;
     }
 
-    public void setBackground(int background) {
-        this.background = background;
+    public void setSelected(int background) {
+        this.isSelected = isSelected;
     }
 
     public Level getLevel() {

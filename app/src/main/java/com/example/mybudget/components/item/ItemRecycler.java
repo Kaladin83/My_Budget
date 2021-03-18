@@ -62,7 +62,6 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
         RecyclerView recyclerView = mainView.findViewById(R.id.recycler_view);
         recyclerView.setAdapter(parentItemAdapter);
         recyclerView.setLayoutManager(pLinearLayoutManager);
-        recyclerView.setBackgroundColor(Color.WHITE);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 

@@ -35,7 +35,6 @@ import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
-import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
@@ -45,6 +44,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.mybudget.utils.Enums.*;
 import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Action.ADD_CATEGORY;
 import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
@@ -151,7 +151,7 @@ public class CategoryPicker extends Fragment implements
         lParams.setMargins((screenWidth - updateLayoutWidth) / 2, betweenLayoutsMargin / 2, 0, 0);
         LinearLayout updateLayout = mainView.findViewById(R.id.update_layout);
         updateLayout.setLayoutParams(lParams);
-        updateLayout.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 1, strokeColor));
+        updateLayout.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 2, strokeColor));
 
         lParams = new LinearLayout.LayoutParams(addCatButtonWidth, compAddCatHeight);
         lParams.gravity = Gravity.CENTER_VERTICAL;
@@ -184,14 +184,14 @@ public class CategoryPicker extends Fragment implements
         lParams.setMargins(betweenColorsMargin, 0, 0, 0);
         newColorTxt = mainView.findViewById(R.id.new_color_txt);
         newColorTxt.setLayoutParams(lParams);
-        newColorTxt.setBackground(Utils.createBorder( 15, Color.TRANSPARENT, 1, strokeColor));
+        newColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
         currentColorTxt = mainView.findViewById(R.id.current_color_txt);
         currentColorTxt.setLayoutParams(lParams);
         currentColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
         lParams = new LinearLayout.LayoutParams(arrowWidth, (int) (compAddCatHeight * 0.7));
         lParams.gravity = Gravity.CENTER_VERTICAL;
         lParams.setMargins(betweenColorsMargin, 0, 0, 0);
-        TextView arrowTxt = mainView.findViewById(R.id.arrow_txt);
+        TextView arrowTxt = mainView.findViewById(R.id.arrow_image);
         arrowTxt.setLayoutParams(lParams);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -295,16 +295,15 @@ public class CategoryPicker extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        switch (view.getId())
+        switch (Id.getId(view.getId()))
         {
-            case R.id.add_category_btn:
+            case ADD_CATEGORY_BUTTON:
                 addCategory();
                 break;
-            case R.id.update_btn:
+            case UPDATE_CATEGORY_COLOR:
                 updateCategoryColor();
                 break;
         }
-
     }
 
     @Override
@@ -324,7 +323,8 @@ public class CategoryPicker extends Fragment implements
                         //category.setName(newCategoryName);
                         dataHelper.changeCategoryName(deletedCategory, newCategoryName);
                         itemRecycler.refreshItems(REMOVE_ITEM);
-                        Toast.makeText(getContext(), deletedCategory.getName() + " was renamed to " + newCategoryName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), deletedCategory.getName() + " was renamed to " + newCategoryName,
+                                Toast.LENGTH_SHORT).show();
                         manageCategoryDialog.dismiss();
                         refreshCategories();
                     }
@@ -356,7 +356,7 @@ public class CategoryPicker extends Fragment implements
 
     public void updateColorField(int color) {
         newSelectedColor = color;
-        newColorTxt.setBackground(Utils.createBorder( 15, color, 1, strokeColor));
+        newColorTxt.setBackground(Utils.createBorder(15, color, 1, strokeColor));
     }
 
 

@@ -21,6 +21,7 @@ import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.adapters.SimpleSpinnerAdapter;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
+import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 import com.github.mikephil.charting.charts.BarChart;
@@ -49,6 +50,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static android.widget.AdapterView.*;
+import static com.example.mybudget.utils.Enums.*;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -62,13 +64,12 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private PieChart pieChart;
     private BarChart barChart;
     private RadioButton categoryRadio, subCategoryRadio;
+    private final Map<Float, Double> mapOfPercents = new HashMap<>();
     private final Map<String, String> monthsMap = JavaUtils.mapOf("01", "JEN", "02", "FEB", "03", "MAR", "04", "APR", "05",
             "MAY", "06", "JUN", "07", "JUL", "08", "AUG", "09", "SEP", "10", "OCT", "11", "NOV", "12", "DEC");
     private ConstraintLayout pieLayout, barLayout;
     private TextView barTxt, pieTxt;
     private Spinner monthSpinner, categorySpinner;
-    private Map<Float, Double> mapOfPercents = new HashMap<>();
-
     private Activity activity;
     private DataHelper dataHelper;
 
@@ -91,7 +92,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
             noDataLayout.setVisibility(View.VISIBLE);
             dataLayout.setVisibility(View.GONE);
         }
-        JavaUtils.addToMapIds(R.id.pie_txt, 0, R.id.bar_txt, 1, R.id.category_radio, 2, R.id.subcategory_radio, 3);
+
         return mainView;
     }
 
@@ -117,6 +118,10 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                 .collect(toList());
     }
 
+    private List<Item> getItems() {
+        return categoryRadio.isChecked()? parentItems : nonParentItems;
+    }
+
     public void refreshCharts() {
         if (mainView != null && !dataHelper.getListOfItems().isEmpty())
         {
@@ -125,11 +130,11 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void populateDataLayout() {
-        parentItems = getItemsOfNonParents();
-        nonParentItems = Utils.getParentStatisticsAsItems();
+        parentItems = Utils.getParentStatisticsAsItems();
+        nonParentItems = getItemsOfNonParents();
 
-        barTxt = mainView.findViewById(R.id.bar_txt);
-        pieTxt = mainView.findViewById(R.id.pie_txt);
+        barTxt = mainView.findViewById(R.id.all_expenses_txt);
+        pieTxt = mainView.findViewById(R.id.monthly_expenses_txt);
         barTxt.setOnClickListener(this);
         pieTxt.setOnClickListener(this);
 
@@ -191,27 +196,21 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
     private void createPieChart() {
         pieChart = mainView.findViewById(R.id.pie_chart);
-        pieChart.setCenterText("Pie charts");
+        pieChart.setCenterText("Category");
+        pieChart.setHoleRadius(32);
         pieChart.setCenterTextSize(12);
-        pieChart.setHoleRadius(25f);
         pieChart.setTransparentCircleAlpha(50);
         pieChart.setDrawEntryLabels(true);
+        pieChart.setRotationEnabled(false);
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                if (categoryRadio.isChecked())
-                {
-                    displayPieData(e, dataHelper.getListOfStatisticItems());
-                }
-                else
-                {
-                    displayPieData(e, parentItems);
-                }
+                displayPieData(e, getItems());
             }
 
             private void displayPieData(Entry e, List<Item> list) {
                 Item selected = list.stream()
-                        .filter(item -> mapOfPercents.containsKey(e.getY()) && item.getAmount() == mapOfPercents.get(e.getY()))
+                        .filter(item -> item.getAmount() == mapOfPercents.get(e.getY()))
                         .findFirst().orElse(null);
                 if (selected != null)
                 {
@@ -228,7 +227,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void loadPieData(String selectedMonth) {
-        List<Item> items = categoryRadio.isChecked()? parentItems : dataHelper.getListOfStatisticItems();
+        List<Item> items = getItems();
         List<PieEntry> entryY = new ArrayList<>();
         LegendEntry[] lEntries = new LegendEntry[items.size()];
         int[] arrayOfColors = new int[items.size()];
@@ -245,6 +244,8 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         pieChart.getLegend().setForm(Legend.LegendForm.CIRCLE);
         pieChart.getLegend().setDirection(Legend.LegendDirection.LEFT_TO_RIGHT);
         pieChart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        pieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        pieChart.getLegend().setTextSize(12);
         pieChart.getDescription().setText(String.join("", "Expenses for ", selectedMonth, " (shown in percents)"));
         pieChart.getDescription().setTextSize(12);
         pieChart.getDescription().setYOffset(-7);
@@ -254,11 +255,9 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void getPieDataSet(List<PieEntry> entryY, LegendEntry[] lEntries, int[] arrayOfColors, List<Item> items) {
-        mapOfPercents = new HashMap<>();
-        double totalSum = dataHelper.getListOfStatistics().stream()
-                .filter(s -> s.getCategory().equals(getString(R.string.total_sum)))
-                .mapToDouble(Statistics::getSum)
-                .findFirst().orElse(0);
+        double totalSum = items.stream()
+                .mapToDouble(Item::getAmount)
+                .sum();
 
         String[] arrayOfCategories = new String[items.size()];
         int i = 0;
@@ -337,28 +336,29 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
     @Override
     public void onClick(View view) {
-        switch (JavaUtils.getId(view.getId()))
+        switch (Id.getId(view.getId()))
         {
-            case 0:
+            case MONTHLY_EXPENSES_TXT:
                 changeSelection(true, View.VISIBLE, View.VISIBLE, false, View.GONE, View.GONE);
                 break;
-            case 1:
+            case ALL_EXPENSES_TXT:
                 changeSelection(false, View.GONE, View.GONE, true, View.VISIBLE, View.VISIBLE);
                 break;
-            case 2:
-                changeSelection(true, false);
+            case CATEGORY_RADIO:
+                changeSelection(true, false, "Categories");
                 loadPieData(monthSpinner.getSelectedItem().toString());
                 break;
-            case 3:
-                changeSelection(false, true);
+            case SUBCATEGORY_RADIO:
+                changeSelection(false, true, "Subcategories");
                 loadPieData(monthSpinner.getSelectedItem().toString());
                 break;
         }
     }
 
-    private void changeSelection(boolean b, boolean b1) {
+    private void changeSelection(boolean b, boolean b1, String pieChartHoleText) {
         categoryRadio.setChecked(b);
         subCategoryRadio.setChecked(b1);
+        pieChart.setCenterText(pieChartHoleText);
     }
 
     private void changeSelection(boolean selected1, int visibleChart1, int visibleSpinner1, boolean selected2,

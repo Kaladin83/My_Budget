@@ -83,7 +83,7 @@ public class DataHelper implements Constants {
 
     public void setInitialListOfCombinedItems() {
         listOfCombinedItems = listOfStatisticItems.stream()
-                .map(item -> new ItemDrawer(item, Color.WHITE, false, CATEGORY_LVL))
+                .map(item -> new ItemDrawer(item, false, false, CATEGORY_LVL))
                 .collect(toList());
     }
 

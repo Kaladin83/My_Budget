@@ -5,9 +5,7 @@
     android:id="@+id/main_recycler_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.maratbe.budget.MainRecycler"
-    android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+    android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

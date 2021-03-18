@@ -1,7 +1,6 @@
 package com.example.mybudget.components.item;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,21 +40,22 @@ import static com.example.mybudget.utils.Enums.Level.SUB_CATEGORY_LVL;
 public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdapter.MyViewHolder> implements Constants{
     private final int screenWidth, logicalDensity;
     private final DataHelper dataHelper;
-    private final Context context;
+    private final Activity activity;
 
     public ItemsRecyclerAdapter(Activity activity)
     {
-        context = activity.getApplicationContext();
-        dataHelper = DataHelper.getDataHelper(context);
-        screenWidth = Utils.getScreenWidth(activity);
-        logicalDensity = (int) Utils.getLogicalDensity(activity);
+        this.activity = activity;
+        this.dataHelper = DataHelper.getDataHelper(this.activity);
+        this.screenWidth = Utils.getScreenWidth(activity);
+        this.logicalDensity = (int) Utils.getLogicalDensity(activity);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout mainLayout;
         FrameLayout objectLayout;
         RelativeLayout backgroundLayout, mainRowLayout;
-        TextView dateTxt, arrowTxt;
+        TextView dateTxt;
+        ImageView arrowImage;
 
         private MyViewHolder(View v) {
             super(v);
@@ -63,14 +64,13 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             mainRowLayout = v.findViewById(R.id.main_row_layout);
             backgroundLayout = v.findViewById(R.id.background_layout);
             dateTxt = v.findViewById(R.id.date_added_txt);
-            arrowTxt = v.findViewById(R.id.arrow_txt);
+            arrowImage = v.findViewById(R.id.arrow_image);
         }
     }
 
     public class MyViewHolder1 extends MyViewHolder {
         RelativeLayout categorySumsLayout;
         TextView categoryTxt, categorySumTxt, categoryAverageTxt;
-        View separator;
 
         private MyViewHolder1(View v) {
             super(v);
@@ -78,7 +78,6 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             categorySumsLayout = v.findViewById(R.id.category_sums_layout);
             categorySumTxt = v.findViewById(R.id.category_total_txt);
             categoryAverageTxt = v.findViewById(R.id.category_average_txt);
-            separator = v.findViewById(R.id.separator);
         }
     }
 
@@ -129,26 +128,28 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         int parentLine = 45;
         int subTotalLine = 25;
         int subCategoryWidth = (int) ((screenWidth) * 0.8);
-        int strokeColor = Utils.getColor(R.color.light_black, context);
+        int strokeColor = Utils.getColor(R.color.light_black, activity);
         ItemDrawer combinedItem = dataHelper.getListOfCombinedItems().get(position);
         Item lastAddedItem = dataHelper.getLastAddedItem();
         Statistics stats = Utils.getStatisticsByCategory(combinedItem.getItem().getCategory());
         if (holder instanceof MyViewHolder1)
         {
             MyViewHolder1 holder1 = (MyViewHolder1) holder;
-            height = createCategoryRow(holder1, position, height, parentLine + subTotalLine + margins);
+            height = createRow(holder1, position, height, parentLine + subTotalLine + margins, CATEGORY_LVL);
 
             int color = Utils.findColor(combinedItem.getItem().getCategory());
+            int statisticsColor = Utils.getAttrColor(activity, R.attr.colorPrimaryVariant);
+
             holder1.categoryTxt.setText(combinedItem.getItem().getCategory());
-            holder1.categoryTxt.setBackground(Utils.createBorder(20, color, 1, strokeColor));
+            holder1.categoryTxt.setBackground(Utils.createBorder(20, Color.TRANSPARENT, 8, color));
             holder1.categorySumsLayout.setPadding(15, 0, 15, 0);
-            holder1.categorySumsLayout.setBackground(Utils.createBorder(15, GRAY_3, 1, strokeColor));
-            holder1.categorySumTxt.setText(context.getString(R.string.category_total, String.valueOf(stats.getSum())));
-            holder1.categoryAverageTxt.setText(context.getString(R.string.category_average, String.valueOf(stats.getMean())));
+            holder1.categorySumsLayout.setBackground(Utils.createBorder(15, statisticsColor, 1, strokeColor));
+            holder1.categorySumTxt.setText(activity.getString(R.string.category_total, String.valueOf(stats.getSum())));
+            holder1.categoryAverageTxt.setText(activity.getString(R.string.category_average, String.valueOf(stats.getMean())));
 
             if (combinedItem.getLevel() == SUB_CATEGORY_LVL)
             {
-                holder1.arrowTxt.setVisibility(View.VISIBLE);
+                holder1.arrowImage.setVisibility(View.VISIBLE);
 
                 RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(subCategoryWidth,
                         subTotalLine * logicalDensity);
@@ -159,10 +160,9 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             }
             else
             {
-                holder1.arrowTxt.setVisibility(View.GONE);
+                holder1.arrowImage.setVisibility(View.GONE);
 
-                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth,
-                        subTotalLine * logicalDensity);
+                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth, subTotalLine * logicalDensity);
                 rParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                 rParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 rParams.setMargins(15 * logicalDensity, 5 * logicalDensity, 15 * logicalDensity, 5 * logicalDensity);
@@ -172,22 +172,22 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         else
         {
             MyViewHolder2 holder2 = (MyViewHolder2) holder;
-            height = createItemRow(holder2, position, height, parentLine + subTotalLine + margins);
+            height = createRow(holder2, position, height, parentLine + subTotalLine + margins, ITEM_LVL);
             holder2.descriptionEdit.setText(combinedItem.getItem().getDescription());
-            holder2.descriptionEdit.setBackground(Utils.createBorder( 10, Color.TRANSPARENT, 1, strokeColor));
-            holder2.descriptionEdit.setPadding(10, 5, 10, 5);
+            holder2.descriptionEdit.setBackground(Utils.createBorder( 15, Color.TRANSPARENT, 1,
+                    Utils.getThemeStrokeColor(activity)));
+            holder2.descriptionEdit.setPadding(15, 10, 15, 10);
             holder2.descriptionEdit.addTextChangedListener(new MyTextWatcher(holder2, logicalDensity, subCategoryWidth));
             holder2.amountTxt.setText(String.valueOf(combinedItem.getItem().getAmount()));
-            holder2.amountTxt.setTextColor(combinedItem.getItem().getDate().equals
-                    (lastAddedItem.getDate()) ? GREEN_2 : Color.BLACK);
-            holder2.okButton.setBackground(ContextCompat.getDrawable(context, R.drawable.icon_check));
+            holder2.amountTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
+            holder2.okButton.setBackground(ContextCompat.getDrawable(activity, R.drawable.icon_check));
             holder2.okButton.setOnClickListener(v -> {
                 if (holder2.descriptionEdit.getText().toString().equals(""))
                 {
                     // update description  in table and refresh
                 }
             });
-            holder2.cancelButton.setBackground(ContextCompat.getDrawable(context, R.drawable.icon_close));
+            holder2.cancelButton.setBackground(ContextCompat.getDrawable(activity, R.drawable.icon_close));
             holder2.cancelButton.setOnClickListener(v -> holder2.descriptionEdit.setText(""));
 
             RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(subCategoryWidth,
@@ -210,9 +210,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
 
         String date = combinedItem.getItem().getDate().substring(0, combinedItem.getItem().getDate().length() - 3);
         holder.dateTxt.setText(date);
-        holder.dateTxt.setTextColor(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()) ?
-                GREEN_2 : Color.BLACK);
-
+        holder.dateTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
         holder.mainRowLayout.setOnClickListener(view -> {
             dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems());
             addToCombinedItems(position);
@@ -267,19 +265,19 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
                                    int selectedParent, Level level) {
         int selectedSub = -1, i = 0;
         int index = level == Level.CATEGORY_LVL? 0: selectedParent + 1;
-        int color = level == Level.CATEGORY_LVL? Color.WHITE : BLUE_5;
+        boolean isSelected = level != Level.CATEGORY_LVL;
         Predicate<Item> predicate = itm -> level == Level.ITEM_LVL ? itm.equals(item) && isItemChosen : itm.getCategory().equals(categoryName);
         List<ItemDrawer> combinedItems = dataHelper.getListOfCombinedItems();
         for (Item itm: items)
         {
             if (predicate.test(itm) && !isExpanded)
             {
-                combinedItems.add(index + i, new ItemDrawer(itm, BLUE_5, true, level));
+                combinedItems.add(index + i, new ItemDrawer(itm, true, true, level));
                 selectedSub = index + i;
             }
             else
             {
-                combinedItems.add(index + i, new ItemDrawer(itm, color, false, level));
+                combinedItems.add(index + i, new ItemDrawer(itm, isSelected, false, level));
             }
             i++;
         }
@@ -291,7 +289,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         return dataHelper.getListOfCombinedItems().size();
     }
 
-    private int createCategoryRow(MyViewHolder1 holder, int position, int smallHeight, int largeHeight) {
+    private int createRow(MyViewHolder holder, int position, int smallHeight, int largeHeight, Level level) {
         if (position == -1)
         {
             return smallHeight;
@@ -299,22 +297,15 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
         int height = id.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setBackgroundColor(id.getBackground());
-        holder.categorySumsLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
-        //    holder.separator.setVisibility(id.isExtended()? View.VISIBLE: View.GONE);
-        return height;
-    }
-
-    private int createItemRow(MyViewHolder2 holder, int position, int smallHeight, int largeHeight) {
-        if (position == -1)
+        holder.mainLayout.setSelected(id.getSelected());
+        if (level == ITEM_LVL)
         {
-            return smallHeight;
+            ((MyViewHolder2) holder).descriptionLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
         }
-        ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
-        int height = id.isExtended() ? largeHeight : smallHeight;
-
-        holder.mainLayout.setBackgroundColor(id.getBackground());
-        holder.descriptionLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
+        else
+        {
+            ((MyViewHolder1) holder).categorySumsLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
+        }
         return height;
     }
 
@@ -338,7 +329,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (!s.toString().equals("") || count != before)
             {
-                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth - (120 * logicalDensity),
+                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth - (150 * logicalDensity),
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 rParams.setMarginStart(20 * logicalDensity);
                 holder2.descriptionEdit.setLayoutParams(rParams);

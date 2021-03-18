@@ -62,7 +62,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="5dp"
                 android:gravity="center"
-                android:textSize="9pt"
                 style="?headerBackground"
                 android:textAlignment="center"
                 android:text="@string/Categories"/>
@@ -123,7 +122,7 @@
             android:textAlignment="center" />
 
         <TextView
-            android:id="@+id/arrow_txt"
+            android:id="@+id/arrow_image"
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:paddingTop="5dp"
