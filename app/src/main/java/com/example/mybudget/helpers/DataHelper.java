@@ -279,6 +279,16 @@ public class DataHelper implements Constants {
         });
     }
 
+    public void updateDescription(Item selectedItem, String description, int position) {
+        if (selectedItem.getDescription() == null || !selectedItem.getDescription().equals(description))
+        {
+            Item item = Item.copyItemWithDescription(selectedItem, description);
+            listOfCombinedItems.get(position).setItem(item);
+            dataBase.updateItemDescription(item);
+            dataBase.fetchAllItems(item.getPayDate());
+        }
+    }
+
     public Item getLastAddedItem() {
         return lastAddedItem == null ?
                 getListOfItems().stream()

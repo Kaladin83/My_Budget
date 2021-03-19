@@ -83,7 +83,6 @@
         <item name="toggleView">@style/ToggleViewStyle</item>
         <item name="menuColor">?attr/colorPrimary</item>
         <item name="radioButtonStyle">@style/RadioStyle</item>
-
     </style>
 
     <style name="actionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">

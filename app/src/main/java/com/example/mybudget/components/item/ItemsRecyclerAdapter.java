@@ -2,22 +2,18 @@ package com.example.mybudget.components.item;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mybudget.domain.domain.Item;
@@ -41,6 +37,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
     private final int screenWidth, logicalDensity;
     private final DataHelper dataHelper;
     private final Activity activity;
+    private DescriptionDialog descriptionDialog;
 
     public ItemsRecyclerAdapter(Activity activity)
     {
@@ -82,17 +79,12 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
     }
 
     public class MyViewHolder2 extends MyViewHolder {
-        RelativeLayout descriptionLayout;
         TextView amountTxt;
-        Button okButton, cancelButton;
-        EditText descriptionEdit;
+        ImageView descriptionImage;
 
         private MyViewHolder2(View v) {
             super(v);
-            cancelButton = v.findViewById(R.id.cancel_btn);
-            okButton = v.findViewById(R.id.ok_btn);
-            descriptionEdit = v.findViewById(R.id.description_edit);
-            descriptionLayout = v.findViewById(R.id.description_layout);
+            descriptionImage = v.findViewById(R.id.description_image);
             amountTxt = v.findViewById(R.id.amount_txt);
         }
     }
@@ -122,12 +114,13 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        int height = 45;
+        int categoryItemWidth = (int) ((screenWidth) * 0.92);
+        int subCategoryItemWidth = (int) ((screenWidth) * 0.82);
+        int height = 50;
         int margins = 10;
         FrameLayout.LayoutParams fParams;
-        int parentLine = 45;
-        int subTotalLine = 25;
-        int subCategoryWidth = (int) ((screenWidth) * 0.8);
+        int parentLine = 50;
+        int subTotalLine = 27;
         int strokeColor = Utils.getColor(R.color.light_black, activity);
         ItemDrawer combinedItem = dataHelper.getListOfCombinedItems().get(position);
         Item lastAddedItem = dataHelper.getLastAddedItem();
@@ -135,7 +128,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         if (holder instanceof MyViewHolder1)
         {
             MyViewHolder1 holder1 = (MyViewHolder1) holder;
-            height = createRow(holder1, position, height, parentLine + subTotalLine + margins, CATEGORY_LVL);
+            height = createRow(holder1, position, height, parentLine + subTotalLine + margins);
 
             int color = Utils.findColor(combinedItem.getItem().getCategory());
             int statisticsColor = Utils.getAttrColor(activity, R.attr.colorPrimaryVariant);
@@ -151,63 +144,61 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             {
                 holder1.arrowImage.setVisibility(View.VISIBLE);
 
-                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(subCategoryWidth,
+                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(subCategoryItemWidth,
                         subTotalLine * logicalDensity);
                 rParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                 rParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                rParams.setMargins(0, 5 * logicalDensity, 15 * logicalDensity, 5 * logicalDensity);
+                rParams.setMargins(10 * logicalDensity, 10 * logicalDensity, 10 * logicalDensity, 10 * logicalDensity);
                 holder1.categorySumsLayout.setLayoutParams(rParams);
             }
             else
             {
                 holder1.arrowImage.setVisibility(View.GONE);
 
-                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth, subTotalLine * logicalDensity);
+                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(categoryItemWidth,
+                        subTotalLine * logicalDensity);
                 rParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                 rParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                rParams.setMargins(15 * logicalDensity, 5 * logicalDensity, 15 * logicalDensity, 5 * logicalDensity);
+                rParams.setMargins(10 * logicalDensity, 10 * logicalDensity, 10 * logicalDensity, 10 * logicalDensity);
                 holder1.categorySumsLayout.setLayoutParams(rParams);
             }
+            int width = combinedItem.getLevel() == CATEGORY_LVL? screenWidth : categoryItemWidth;
+            int gravity = combinedItem.getLevel() == CATEGORY_LVL? RelativeLayout.CENTER_HORIZONTAL : RelativeLayout.ALIGN_PARENT_END;
+            RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(width, parentLine * logicalDensity);
+            rParams.addRule(gravity);
+            rParams.setMargins(10 * logicalDensity, 0, 10 * logicalDensity, 0);
+            holder1.mainRowLayout.setLayoutParams(rParams);
         }
         else
         {
             MyViewHolder2 holder2 = (MyViewHolder2) holder;
-            height = createRow(holder2, position, height, parentLine + subTotalLine + margins, ITEM_LVL);
-            holder2.descriptionEdit.setText(combinedItem.getItem().getDescription());
-            holder2.descriptionEdit.setBackground(Utils.createBorder( 15, Color.TRANSPARENT, 1,
-                    Utils.getThemeStrokeColor(activity)));
-            holder2.descriptionEdit.setPadding(15, 10, 15, 10);
-            holder2.descriptionEdit.addTextChangedListener(new MyTextWatcher(holder2, logicalDensity, subCategoryWidth));
+            holder.mainLayout.setSelected(combinedItem.getSelected());
             holder2.amountTxt.setText(String.valueOf(combinedItem.getItem().getAmount()));
             holder2.amountTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
-            holder2.okButton.setBackground(ContextCompat.getDrawable(activity, R.drawable.icon_check));
-            holder2.okButton.setOnClickListener(v -> {
-                if (holder2.descriptionEdit.getText().toString().equals(""))
-                {
-                    // update description  in table and refresh
-                }
-            });
-            holder2.cancelButton.setBackground(ContextCompat.getDrawable(activity, R.drawable.icon_close));
-            holder2.cancelButton.setOnClickListener(v -> holder2.descriptionEdit.setText(""));
+            holder2.descriptionImage.setOnClickListener(v ->
+                    ShowDescriptionDialog(combinedItem.getItem(), position));
 
-            RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(subCategoryWidth,
+            String parentCategoryName = Utils.getParentCategoryName(combinedItem.getItem().getCategory());
+            int width = !parentCategoryName.equals("")? subCategoryItemWidth: categoryItemWidth;
+            RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(width,
                     parentLine * logicalDensity);
-            rParams.setMargins(35 * logicalDensity, 0, 10 * logicalDensity, 0);
+            rParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+            rParams.setMargins(10 * logicalDensity, 0, 10 * logicalDensity, 0);
             holder2.mainRowLayout.setLayoutParams(rParams);
         }
 
         fParams = new FrameLayout.LayoutParams(screenWidth, (int) Math.ceil(height * logicalDensity));
-        fParams.gravity = Gravity.TOP;
+        fParams.gravity = Gravity.END;
         LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams((int) (screenWidth * 0.9),
                 (int) Math.ceil(subTotalLine * logicalDensity));
-        lParams.gravity = Gravity.CENTER;
+
+        lParams.gravity = Gravity.END;
         lParams.setMargins(10, (int) Math.ceil(8 * logicalDensity), 10, (int) Math.ceil(11 * logicalDensity));
-        holder.mainLayout.setLayoutParams(fParams);
-        holder.mainLayout.setGravity(Gravity.CENTER);
+        holder.mainLayout.setHorizontalGravity(Gravity.END);
         holder.mainLayout.setVerticalGravity(Gravity.TOP);
+        holder.mainLayout.setLayoutParams(fParams);
         holder.objectLayout.setLayoutParams(fParams);
         holder.backgroundLayout.setLayoutParams(fParams);
-
         String date = combinedItem.getItem().getDate().substring(0, combinedItem.getItem().getDate().length() - 3);
         holder.dateTxt.setText(date);
         holder.dateTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
@@ -216,6 +207,18 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             addToCombinedItems(position);
             notifyDataSetChanged();
         });
+    }
+
+    private void ShowDescriptionDialog(Item selectedItem, int position) {
+        descriptionDialog = new DescriptionDialog(activity, selectedItem) {
+            @Override
+            public void okButtonPressed(String description) {
+                Toast.makeText(activity, "The description was updated", Toast.LENGTH_SHORT).show();
+                dataHelper.updateDescription(selectedItem, description, position);
+                descriptionDialog.dismiss();
+            }
+        };
+        descriptionDialog.show();
     }
 
     public void addToCombinedItems(int position) {
@@ -289,68 +292,16 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         return dataHelper.getListOfCombinedItems().size();
     }
 
-    private int createRow(MyViewHolder holder, int position, int smallHeight, int largeHeight, Level level) {
+    private int createRow(MyViewHolder1 holder, int position, int smallHeight, int largeHeight) {
         if (position == -1)
         {
             return smallHeight;
         }
-        ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
-        int height = id.isExtended() ? largeHeight : smallHeight;
+        ItemDrawer itemDrawer = dataHelper.getListOfCombinedItems().get(position);
+        int height = itemDrawer.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setSelected(id.getSelected());
-        if (level == ITEM_LVL)
-        {
-            ((MyViewHolder2) holder).descriptionLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
-        }
-        else
-        {
-            ((MyViewHolder1) holder).categorySumsLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
-        }
+        holder.mainLayout.setSelected(itemDrawer.getSelected());
+        holder.categorySumsLayout.setVisibility(itemDrawer.isExtended() ? View.VISIBLE : View.GONE);
         return height;
-    }
-
-    private class MyTextWatcher implements TextWatcher {
-        private final ItemsRecyclerAdapter.MyViewHolder2 holder2;
-        private final int logicalDensity;
-        private final int subCategoryWidth;
-
-        public MyTextWatcher(ItemsRecyclerAdapter.MyViewHolder2 holder, int logicalDensity, int subCategoryWidth) {
-            this.subCategoryWidth = subCategoryWidth;
-            this.logicalDensity = logicalDensity;
-            holder2 = holder;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (!s.toString().equals("") || count != before)
-            {
-                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(screenWidth - (150 * logicalDensity),
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                rParams.setMarginStart(20 * logicalDensity);
-                holder2.descriptionEdit.setLayoutParams(rParams);
-                holder2.okButton.setVisibility(View.VISIBLE);
-                holder2.cancelButton.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(subCategoryWidth,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                rParams.addRule(RelativeLayout.ALIGN_PARENT_END);
-                rParams.setMarginStart(20 * logicalDensity);
-                holder2.descriptionEdit.setLayoutParams(rParams);
-                holder2.okButton.setVisibility(View.GONE);
-                holder2.cancelButton.setVisibility(View.GONE);
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
     }
 }

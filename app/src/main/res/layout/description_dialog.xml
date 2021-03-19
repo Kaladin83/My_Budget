@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/change_category_layout2"
+    android:background="?attr/colorPrimaryVariant"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/header_txt"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.22"
+        android:background="?attr/colorPrimary"
+        android:textColor="?android:attr/textColorSecondary"
+        android:text="@string/new_category_layout"
+        android:textSize="9pt"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/separator_1"
+        android:background="?android:attr/textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/header_txt"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/table"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintTop_toBottomOf="@+id/separator_1"
+        tools:layout_editor_absoluteX="0dp">
+
+        <TextView
+            android:id="@+id/amount_column_txt"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintWidth_percent="0.24"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="Amount"
+            android:padding="3dp"
+            android:gravity="center"
+            style="?headerBackground"/>
+
+        <View
+            android:id="@+id/col_1_separator"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/textColorPrimary"
+            app:layout_constraintStart_toEndOf="@id/amount_column_txt"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/category_column_txt"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintWidth_percent="0.39"
+            app:layout_constraintStart_toEndOf="@+id/col_1_separator"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="Category"
+            android:gravity="center"
+            style="?headerBackground"/>
+
+        <View
+            android:id="@+id/col_2_separator"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/textColorPrimary"
+            app:layout_constraintStart_toEndOf="@id/category_column_txt"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/date_column_txt"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintWidth_percent="0.36"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="Date"
+            android:gravity="center"
+            style="?headerBackground"/>
+
+
+        <TextView
+            android:id="@+id/amount_column_val"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintWidth_percent="0.24"
+            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@+id/amount_column_txt"/>
+
+        <TextView
+            android:id="@+id/category_column_val"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintWidth_percent="0.39"
+            app:layout_constraintStart_toEndOf="@+id/col_1_separator"
+            app:layout_constraintTop_toBottomOf="@+id/category_column_txt"
+            android:gravity="center"/>
+
+
+        <TextView
+            android:id="@+id/date_column_val"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintWidth_percent="0.36"
+            app:layout_constraintTop_toBottomOf="@+id/date_column_txt"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/separator_2"
+        android:background="?android:attr/textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/table"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <EditText
+        android:id="@+id/description_edit"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.30"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"
+        android:minLines="3"
+        android:singleLine="false"
+        android:gravity="top|start"
+        android:paddingHorizontal="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_ok_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/separator_2" />
+
+    <View
+        android:id="@+id/separator_3"
+        android:background="?android:attr/textColorPrimary"
+        app:layout_constraintBottom_toTopOf="@id/dialog_ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <Button
+        android:id="@+id/dialog_ok_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.18"
+        app:layout_constraintWidth_percent="0.50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:padding="0dp"
+        android:background="?attr/colorSecondaryVariant"
+        android:text="@string/ok_button" />
+
+    <View
+        android:id="@+id/separator_4"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.18"
+        app:layout_constraintStart_toEndOf="@+id/dialog_ok_button"
+        app:layout_constraintEnd_toStartOf="@id/dialog_cancel_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="?android:attr/textColorPrimary"/>
+
+    <Button
+        android:id="@+id/dialog_cancel_button"
+        android:padding="0dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.18"
+        app:layout_constraintWidth_percent="0.49"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="?attr/colorSecondaryVariant"
+        android:text="@string/cancel_button" />
+</androidx.constraintlayout.widget.ConstraintLayout>

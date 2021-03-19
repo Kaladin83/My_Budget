@@ -88,10 +88,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
 
         private MyViewHolder2(View v) {
             super(v);
-            cancelButton = v.findViewById(R.id.cancel_btn);
-            okButton = v.findViewById(R.id.ok_btn);
             descriptionEdit = v.findViewById(R.id.description_edit);
-            descriptionLayout = v.findViewById(R.id.description_layout);
             amountTxt = v.findViewById(R.id.amount_txt);
         }
     }

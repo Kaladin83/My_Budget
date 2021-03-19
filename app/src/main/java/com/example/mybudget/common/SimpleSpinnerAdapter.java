@@ -1,4 +1,4 @@
-package com.example.mybudget.adapters;
+package com.example.mybudget.common;
 
 import android.content.Context;
 import android.view.LayoutInflater;

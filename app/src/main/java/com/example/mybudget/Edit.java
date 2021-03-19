@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.mybudget.adapters.SimpleSpinnerAdapter;
+import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.DataHelper;

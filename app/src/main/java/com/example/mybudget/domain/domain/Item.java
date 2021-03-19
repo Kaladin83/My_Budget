@@ -10,7 +10,7 @@ public class Item {
     private String date;
     private String payDate;
     private String currency;
-    private String description;
+    private String description = "";
 
     public static Item copyItemWithAmount(Item item, double amount) {
         return new Builder(item.category, item.date, item.payDate)
@@ -20,13 +20,21 @@ public class Item {
                 .build();
     }
 
+    public static Item copyItemWithDescription(Item item, String description) {
+        return new Builder(item.category, item.date, item.payDate)
+                .withCurrency(item.currency)
+                .withDescription(description)
+                .withAmount(item.amount)
+                .build();
+    }
+
     public static class Builder{
         private final String category;
         private final String date;
         private final String payDate;
         private double amount;
         private String currency;
-        private String description;
+        private String description = "";
 
         public Builder(String category, String date, String payDate){
             this.category = category;

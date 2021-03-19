@@ -156,6 +156,11 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
         dbInstance.execSQL("UPDATE ITEM SET CATEGORY = ? WHERE CATEGORY = ?",  data);
     }
 
+    public void updateItemDescription(Item item) {
+        Object[] data = new Object[]{item.getDescription(), item.getCategory(), item.getAmount(), item.getDate()};
+        dbInstance.execSQL("UPDATE ITEM SET DESCRIPTION = ? WHERE CATEGORY = ? AND AMOUNT = ? AND DATE = ?",  data);
+    }
+
     public void updateItemsCategory(int payDate, double sum, String category)
     {
         Object[] data = new Object[]{payDate, sum, category};

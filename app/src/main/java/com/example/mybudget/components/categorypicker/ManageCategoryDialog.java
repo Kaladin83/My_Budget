@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 
 import com.example.mybudget.R;
-import com.example.mybudget.adapters.SimpleSpinnerAdapter;
+import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
 import com.example.mybudget.utils.Enums.Action;
