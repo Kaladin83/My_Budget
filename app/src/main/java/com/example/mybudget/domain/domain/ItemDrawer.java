@@ -27,7 +27,7 @@ public class ItemDrawer {
         this.item = item;
     }
 
-    public boolean getSelected() {
+    public boolean isSelected() {
         return isSelected;
     }
 

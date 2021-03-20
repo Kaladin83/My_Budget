@@ -161,12 +161,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
         dbInstance.execSQL("UPDATE ITEM SET DESCRIPTION = ? WHERE CATEGORY = ? AND AMOUNT = ? AND DATE = ?",  data);
     }
 
-    public void updateItemsCategory(int payDate, double sum, String category)
-    {
-        Object[] data = new Object[]{payDate, sum, category};
-        dbInstance.execSQL("UPDATE STATISTICS SET SUM = ? WHERE CATEGORY = ? AND PAY_DATE = ?",  data);
-    }
-
     public void updateStatistics(Statistics stats)
     {
         if (stats.getSum() == 0)
@@ -273,19 +267,4 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
         dataHelper.populateMonthlyStatistics(list);
     }
 
-    public double fetchCategoryAverage(String category)
-    {
-        double average = 0;
-        dbInstance = this.getReadableDatabase();
-        Cursor res =  dbInstance.rawQuery( "SELECT AVG(AMOUNT) AVERAGE FROM ITEM GROUP BY CATEGORY HAVING CATEGORY = ?",
-                new String[]{category});
-        res.moveToFirst();
-
-        while(!res.isAfterLast()){
-            average = res.getDouble(res.getColumnIndex("AVERAGE"));
-            res.moveToNext();
-        }
-        res.close();
-        return average;
-    }
 }

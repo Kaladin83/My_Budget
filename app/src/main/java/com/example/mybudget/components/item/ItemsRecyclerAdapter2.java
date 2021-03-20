@@ -346,7 +346,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
         ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
         int height = id.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setSelected(id.getSelected());
+        holder.mainLayout.setSelected(id.isSelected());
         holder.categorySumsLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
         //    holder.separator.setVisibility(id.isExtended()? View.VISIBLE: View.GONE);
         return height;
@@ -360,7 +360,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
         ItemDrawer id = dataHelper.getListOfCombinedItems().get(position);
         int height = id.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setSelected(id.getSelected());
+        holder.mainLayout.setSelected(id.isSelected());
         holder.descriptionLayout.setVisibility(id.isExtended() ? View.VISIBLE : View.GONE);
         return height;
     }

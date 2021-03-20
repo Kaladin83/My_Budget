@@ -1,6 +1,7 @@
-package com.example.mybudget;
+package com.example.mybudget.components;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import com.example.mybudget.R;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.Statistics;
@@ -26,6 +28,7 @@ import com.example.mybudget.utils.Utils;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
@@ -42,14 +45,17 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static android.widget.AdapterView.*;
 import static com.example.mybudget.utils.Enums.*;
+import static com.github.mikephil.charting.components.Legend.LegendForm.*;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -71,6 +77,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private Spinner monthSpinner, categorySpinner;
     private Activity activity;
     private DataHelper dataHelper;
+    private int textColor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +85,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
         activity = requireActivity();
         dataHelper = DataHelper.getDataHelper(getContext());
+        textColor = Utils.getAttrColor(activity, android.R.attr.textColorPrimary);
         FrameLayout noDataLayout = mainView.findViewById(R.id.no_data_layout);
         ConstraintLayout dataLayout = mainView.findViewById(R.id.data_layout);
         if (!dataHelper.getListOfItems().isEmpty())
@@ -97,8 +105,8 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
     private List<Item> getItemsOfNonParents() {
         return dataHelper.getListOfStatistics().stream()
-                .filter(s -> !Utils.getParentCategoryName(s.getCategory()).equals(""))
-                .filter(s -> !s.getCategory().equalsIgnoreCase("total"))
+                .filter(s -> !Utils.getParentCategoryName(s.getCategory()).equals("") ||
+                        s.getCategory().equalsIgnoreCase("total"))
                 .map(s -> new Item.Builder(s.getCategory(), Utils.findMaxDate(s.getCategory()), s.getPayDate())
                         .withAmount(s.getSum())
                         .build())
@@ -199,7 +207,6 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         pieChart.setHoleRadius(32);
         pieChart.setCenterTextSize(12);
         pieChart.setTransparentCircleAlpha(50);
-        pieChart.setDrawEntryLabels(true);
         pieChart.setRotationEnabled(false);
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
@@ -228,70 +235,66 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private void loadPieData(String selectedMonth) {
         List<Item> items = getItems();
         List<PieEntry> entryY = new ArrayList<>();
-        LegendEntry[] lEntries = new LegendEntry[items.size()];
-        int[] arrayOfColors = new int[items.size()];
+        LegendEntry[] lEntries = getLegendEntries(entryY, items);
 
-        getPieDataSet(entryY, lEntries, arrayOfColors, items);
         PieDataSet dataSet = new PieDataSet(entryY, "");
-        dataSet.setColors(arrayOfColors);
-        dataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) ->
-                value > 0 ? String.join("", String.valueOf(value).substring(0, String.valueOf(value).indexOf(".") + 2), "%") :
-                        "");
+        dataSet.setColors(getDataSetColors(lEntries));
+        dataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) -> value > 0 ? Utils.round(value) + "%" : "");
         dataSet.setSliceSpace(2);
         dataSet.setValueTextSize(13);
-        pieChart.getLegend().setCustom(lEntries);
-        pieChart.getLegend().setForm(Legend.LegendForm.CIRCLE);
-        pieChart.getLegend().setDirection(Legend.LegendDirection.LEFT_TO_RIGHT);
-        pieChart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        pieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-        pieChart.getLegend().setTextSize(12);
-        pieChart.getDescription().setText(String.join("", "Expenses for ", selectedMonth, " (shown in percents)"));
-        pieChart.getDescription().setTextSize(12);
-        pieChart.getDescription().setYOffset(-7);
-        PieData pieData = new PieData(dataSet);
-        pieChart.setData(pieData);
+        Legend legend = pieChart.getLegend();
+        legend.setCustom(lEntries);
+        legend.setTextSize(12);
+        legend.setTextColor(textColor);
+        setDescription(pieChart.getDescription(), "Expenses for " + selectedMonth + " (shown in percents)", -7, 0);
+
+        pieChart.setData(new PieData(dataSet));
         pieChart.invalidate();
     }
 
-    private void getPieDataSet(List<PieEntry> entryY, LegendEntry[] lEntries, int[] arrayOfColors, List<Item> items) {
+    private int[] getDataSetColors(LegendEntry[] lEntries) {
+       return Arrays.stream(lEntries)
+               .mapToInt(entry -> entry.formColor)
+               .toArray();
+    }
+
+    private void setDescription(Description description, String text, int yOffset, int xOffset) {
+        description.setText(text);
+        description.setTextSize(12);
+        description.setXOffset(xOffset);
+        description.setYOffset(yOffset);
+        description.setTextColor(textColor);
+    }
+
+    private LegendEntry[] getLegendEntries(List<PieEntry> entryY, List<Item> items) {
         double totalSum = items.stream()
                 .mapToDouble(Item::getAmount)
                 .sum();
 
-        String[] arrayOfCategories = new String[items.size()];
-        int i = 0;
-        for (Item item : items)
-        {
-            double percent = item.getAmount() / totalSum * 100;
-            mapOfPercents.put((float) Math.round(percent), item.getAmount());
-            entryY.add(new PieEntry(Math.round(percent)));
-            arrayOfColors[i] = Utils.findColor(item.getCategory());
-            arrayOfCategories[i] = item.getCategory();
-            LegendEntry entry = new LegendEntry();
-            entry.label = arrayOfCategories[i];
-            entry.formColor = arrayOfColors[i];
-            lEntries[i] = entry;
-            i++;
-        }
+        Function<Item, Double> calculatePercent = item -> item.getAmount() / totalSum * 100;
+        return items.stream()
+                .peek(itm -> mapOfPercents.put((float) Math.round(calculatePercent.apply(itm)), itm.getAmount()))
+                .peek(itm -> entryY.add(new PieEntry(Math.round(calculatePercent.apply(itm)))))
+                .map(itm -> new LegendEntry(itm.getCategory(), CIRCLE, Float.NaN, Float.NaN, null,
+                        Utils.findColor(itm.getCategory())))
+                .toArray(LegendEntry[]::new);
     }
 
     private void createBarChart() {
         barChart = mainView.findViewById(R.id.bar_chart);
-        barChart.setDrawValueAboveBar(true);
         barChart.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         barChart.setFitBars(true);
+        barChart.setBorderColor(textColor);
     }
 
     private void loadBarData(String selectedCategory) {
         List<BarEntry> barEntries = ImmutableList.of(new BarEntry(0, sumOfCategory(selectedCategory)), new BarEntry(1, 120f),
                 new BarEntry(2, 100f), new BarEntry(3, 35f), new BarEntry(4, 111f), new BarEntry(5, 78f));
 
-        final String[] dates = new String[]{"Jul 2018", "Aug 2018", "Sep 2018", "Oct 2018", "Nov 2018", "Dec 2018"};
-
-        BarDataSet dataSet = new BarDataSet(barEntries, "data set 1");
-        dataSet.setColor(BLUE_3);
+        BarDataSet dataSet = new BarDataSet(barEntries, "");
+        dataSet.setHighLightColor(textColor);
+        dataSet.setValueTextColor(textColor);
         BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.8f);
         barData.setValueTextSize(12);
 
         if (selectedCategory.equals(getString(R.string.total_sum)))
@@ -305,17 +308,24 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         }
 
         barChart.setData(barData);
-        barChart.getDescription().setYOffset(-55);
-        barChart.getDescription().setXOffset(-25);
-        barChart.getDescription().setText(String.join("", "Distribution by dates for ", selectedCategory));
+        dataSet.setFormSize(0);
+        setDescription(barChart.getDescription(), "Distribution by dates for " + selectedCategory, -65, -25);
+        setAxis();
+    }
+
+    private void setAxis() {
+        final String[] dates = {"Jul 2018", "Aug 2018", "Sep 2018", "Oct 2018", "Nov 2018", "Dec 2018"};
+        barChart.getAxisLeft().setAxisLineColor(textColor);
+        barChart.getAxisLeft().setTextColor(textColor);
+        barChart.getAxisRight().setAxisLineColor(textColor);
+        barChart.getAxisRight().setTextColor(textColor);
 
         XAxis xAxis = barChart.getXAxis();
+        xAxis.setAxisLineColor(textColor);
+        xAxis.setTextColor(textColor);
         xAxis.setLabelRotationAngle(45f);
-        xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f);
-        xAxis.setAxisLineWidth(1f);
         xAxis.setValueFormatter(new MyXAxisValueFormatter(dates));
     }
 

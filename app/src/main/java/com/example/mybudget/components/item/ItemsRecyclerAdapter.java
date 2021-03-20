@@ -172,7 +172,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         else
         {
             MyViewHolder2 holder2 = (MyViewHolder2) holder;
-            holder.mainLayout.setSelected(combinedItem.getSelected());
+            holder.mainLayout.setSelected(combinedItem.isSelected());
             holder2.amountTxt.setText(String.valueOf(combinedItem.getItem().getAmount()));
             holder2.amountTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
             holder2.descriptionImage.setOnClickListener(v ->
@@ -300,7 +300,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         ItemDrawer itemDrawer = dataHelper.getListOfCombinedItems().get(position);
         int height = itemDrawer.isExtended() ? largeHeight : smallHeight;
 
-        holder.mainLayout.setSelected(itemDrawer.getSelected());
+        holder.mainLayout.setSelected(itemDrawer.isSelected());
         holder.categorySumsLayout.setVisibility(itemDrawer.isExtended() ? View.VISIBLE : View.GONE);
         return height;
     }

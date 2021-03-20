@@ -19,6 +19,8 @@ import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.mybudget.components.Charts;
+import com.example.mybudget.components.Edit;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.DataHelper;

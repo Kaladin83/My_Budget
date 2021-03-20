@@ -142,6 +142,9 @@
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/custom_background_border_none_ellipse</item>
+<!--        <item name="android:textCursorDrawable">@drawable/custom_cursor</item>-->
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:cursorVisible">true</item>
     </style>
 
     <style name="SpinnerItemStyle" parent="Widget.AppCompat.TextView">

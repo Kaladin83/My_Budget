@@ -52,14 +52,14 @@ public class Utils implements Constants {
         return gd;
     }
 
-    public static int getThemeStrokeColor(Context context) {
+    public static int getThemeStrokeColor(Activity activity) {
         TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.colorOnSecondary, typedValue, true);
+        activity.getTheme().resolveAttribute(R.attr.colorOnSecondary, typedValue, true);
         return typedValue.data;
     }
-    public static int getAttrColor(Context context, int attrColor) {
+    public static int getAttrColor(Activity activity, int attrColor) {
         TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(attrColor, typedValue, true);
+        activity.getTheme().resolveAttribute(attrColor, typedValue, true);
         return typedValue.data;
     }
 

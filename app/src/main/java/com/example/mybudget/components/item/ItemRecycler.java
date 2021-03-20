@@ -9,12 +9,11 @@ import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mybudget.Charts;
+import com.example.mybudget.components.Charts;
 import com.example.mybudget.MainActivity;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
@@ -23,7 +22,6 @@ import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
-import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.Enums.Action;
 import com.example.mybudget.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
@@ -33,11 +31,9 @@ import java.util.List;
 
 import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Fragment.CHARTS;
-import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
 import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
 
 public class ItemRecycler extends Fragment implements RecyclerTouchHelper.RecyclerItemTouchHelperListener, Constants {
-    private View mainView;
     private final MainActivity mainActivity;
     private ItemsRecyclerAdapter parentItemAdapter;
     private LinearLayout mainLayout;
@@ -49,24 +45,20 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mainView = inflater.inflate(R.layout.recycler, container, false);
-        dataHelper = DataHelper.getDataHelper(getContext());
+        View mainView = inflater.inflate(R.layout.recycler, container, false);
+        dataHelper = DataHelper.getDataHelper(requireContext());
         mainLayout = mainView.findViewById(R.id.main_recycler_layout);
-        createRecycler();
-        return mainView;
-    }
 
-    public void createRecycler() {
         parentItemAdapter = new ItemsRecyclerAdapter(requireActivity());
-        LinearLayoutManager pLinearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager pLinearLayoutManager = new LinearLayoutManager(requireContext());
         RecyclerView recyclerView = mainView.findViewById(R.id.recycler_view);
         recyclerView.setAdapter(parentItemAdapter);
         recyclerView.setLayoutManager(pLinearLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 
         ItemTouchHelper.SimpleCallback parentSwiper = new RecyclerTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(parentSwiper).attachToRecyclerView(recyclerView);
+        return mainView;
     }
 
     public void refreshItems(Action action) {

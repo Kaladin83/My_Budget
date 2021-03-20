@@ -18,11 +18,12 @@
     <string name="total_sum">total</string>
     <string name="pie_chart_choice">Monthly expenses</string>
     <string name="bar_chart_choice">All expenses</string>
-    <string name="no_charts_data">I\'m sorry...\nThere are no expenses, thus...\nno statistics for you.</string>
+    <string name="no_charts_data">I\'m sorry…\nThere are no expenses, thus…\nno statistics for you.</string>
     <string name="radio_categories">Categories</string>
     <string name="radio_subcategories">Sub categories</string>
     <string name="category">Category</string>
     <string name="amount">Amount</string>
     <string name="description">Description</string>
     <string name="add_expense">Add expense</string>
+    <string name="date">Date</string>
 </resources>
