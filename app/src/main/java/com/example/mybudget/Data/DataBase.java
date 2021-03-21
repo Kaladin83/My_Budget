@@ -215,7 +215,7 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
     public void fetchAllMonthsFromStatistics()
     {
         List<String> list = new ArrayList<>();
-        Cursor res =  dbInstance.rawQuery( "SELECT DISTINCT PAY_DATE FROM STATISTICS", null);
+        Cursor res =  dbInstance.rawQuery( "SELECT DISTINCT PAY_DATE FROM STATISTICS ORDER BY PAY_DATE DESC", null);
         res.moveToFirst();
 
         while(!res.isAfterLast()){

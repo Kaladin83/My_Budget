@@ -117,8 +117,12 @@ public class DataHelper implements Constants {
         list.forEach(stat -> stat.setMean(Utils.getAverage(stat.getCategory())));
         if (list.size() > 0)
         {
-            setListOfStatisticItems(Utils.getParentStatisticsAsItems());
+            setListOfStatisticItems(Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE));
             setInitialListOfCombinedItems();
+            if (listOfMonths.isEmpty())
+            {
+                listOfMonths.add(list.get(0).getPayDate());
+            }
         }
     }
 

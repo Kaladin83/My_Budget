@@ -15,7 +15,7 @@
     <string name="category_average">Average:  %1$s</string>
   <!--  <string name="monthly_total">Entire month total</string>-->
     <string name="category_total">Total:  %1$s</string>
-    <string name="total_sum">total</string>
+    <string name="total_sum">Total</string>
     <string name="pie_chart_choice">Monthly expenses</string>
     <string name="bar_chart_choice">All expenses</string>
     <string name="no_charts_data">I\'m sorry…\nThere are no expenses, thus…\nno statistics for you.</string>
@@ -26,4 +26,7 @@
     <string name="description">Description</string>
     <string name="add_expense">Add expense</string>
     <string name="date">Date</string>
+    <string name="minimum_sum">Minimum</string>
+    <string name="maximum_sum">Maximum</string>
+    <string name="average_sum">Average</string>
 </resources>

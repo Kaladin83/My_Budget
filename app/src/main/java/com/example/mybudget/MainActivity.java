@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         itemRecycler = new ItemRecycler(this);
         dataHelper = DataHelper.getDataHelper(this);
         //dataHelper.deleteItems(Utils.getCurrentDate(PAY));
-        // dataHelper.populateInitialCategories();
+        //dataHelper.populateInitialCategories();
         dataHelper.fetchData(Utils.getCurrentDate(PAY));
 
         handleVoiceCommands();

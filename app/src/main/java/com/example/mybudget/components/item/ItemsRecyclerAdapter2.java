@@ -208,7 +208,7 @@ public class ItemsRecyclerAdapter2 extends RecyclerView.Adapter<ItemsRecyclerAda
                 GREEN_2 : Color.BLACK);
 
         holder.mainRowLayout.setOnClickListener(view -> {
-            dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems());
+            dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE));
             addToCombinedItems(position);
             notifyDataSetChanged();
         });

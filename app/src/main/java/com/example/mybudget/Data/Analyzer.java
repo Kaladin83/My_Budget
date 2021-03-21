@@ -104,9 +104,8 @@ public class Analyzer {
     }
 
     public Map<Statistics, Action> calculateStatisticSums(Item item) {
-        String total = "total";
         String category = item.getCategory();
-        List<String> categories = ImmutableList.of(Utils.getParentCategoryName(category), category, total);
+        List<String> categories = ImmutableList.of(Utils.getParentCategoryName(category), category, Utils.TOTAL);
 
         return categories.stream()
                 .filter(cat -> !cat.equals(""))

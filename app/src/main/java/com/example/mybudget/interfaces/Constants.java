@@ -7,7 +7,6 @@ import android.graphics.Color;
  */
 
 public interface Constants {
-
     int TOOLBAR = Color.parseColor("#eff2f7");
     int BLACK_1 = Color.parseColor("#716e72");
     int BLACK_2 = Color.parseColor("#767477");

@@ -199,11 +199,12 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         holder.mainLayout.setLayoutParams(fParams);
         holder.objectLayout.setLayoutParams(fParams);
         holder.backgroundLayout.setLayoutParams(fParams);
-        String date = combinedItem.getItem().getDate().substring(0, combinedItem.getItem().getDate().length() - 3);
-        holder.dateTxt.setText(date);
+        String date = combinedItem.getItem().getDate();
+        String formattedDate = date.length() > 3 ? date.substring(0, date.length() - 3): date;
+        holder.dateTxt.setText(formattedDate);
         holder.dateTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
         holder.mainRowLayout.setOnClickListener(view -> {
-            dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems());
+            dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE));
             addToCombinedItems(position);
             notifyDataSetChanged();
         });

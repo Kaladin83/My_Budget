@@ -20,6 +20,7 @@ import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ import static java.util.stream.Collectors.toList;
 public class Utils implements Constants {
 
     private static DataHelper dataHelper;
+    public static final String TOTAL = "Total";
+    public static final Predicate<Statistics> NO_TOTAL_PREDICATE = stat -> !stat.getCategory().equals(Utils.TOTAL);
 
     public static void setApplicationContext(Context context) {
 
@@ -143,10 +146,10 @@ public class Utils implements Constants {
         return dataHelper.getListOfItems(item -> item.getCategory().equals(category));
     }
 
-    public static List<Item> getParentStatisticsAsItems() {
+    public static List<Item> getParentStatisticsAsItems(Predicate<Statistics> predicate) {
         return dataHelper.getListOfStatistics().stream()
+                .filter(predicate)
                 .filter(stat -> Utils.getParentCategoryName(stat.getCategory()).equals(""))
-                .filter(stat -> !stat.getCategory().equals("total"))
                 .map(stat -> new Item.Builder(stat.getCategory(), findMaxDate(stat.getCategory()), stat.getPayDate())
                         .withAmount(stat.getSum()).build())
                 .collect(toList());
@@ -229,6 +232,10 @@ public class Utils implements Constants {
 
     public static String getCurrentDate(DateFormat dateFormat) {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateFormat.value));
+    }
+
+    public static String getDate(DateFormat dateFormat, LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern(dateFormat.value));
     }
 
     public static double firstFoundWordsToNumber(String input) {
