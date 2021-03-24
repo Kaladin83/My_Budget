@@ -12,14 +12,6 @@ public class Item {
     private String currency;
     private String description = "";
 
-    public static Item copyItemWithAmount(Item item, double amount) {
-        return new Builder(item.category, item.date, item.payDate)
-                .withCurrency(item.currency)
-                .withDescription(item.description)
-                .withAmount(amount)
-                .build();
-    }
-
     public static Item copyItemWithDescription(Item item, String description) {
         return new Builder(item.category, item.date, item.payDate)
                 .withCurrency(item.currency)

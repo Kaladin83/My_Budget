@@ -16,9 +16,11 @@ import androidx.core.content.ContextCompat;
 import com.example.mybudget.R;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
-import com.example.mybudget.domain.domain.Statistics;
+import com.example.mybudget.domain.dtos.MonthlyStatistics;
+import com.example.mybudget.domain.dtos.Statistics;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
+import com.google.common.collect.ImmutableMap;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,7 +31,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static com.example.mybudget.utils.Enums.*;
+import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Utilities. All functionality that is common to multiple classes
@@ -39,7 +43,6 @@ public class Utils implements Constants {
 
     private static DataHelper dataHelper;
     public static final String TOTAL = "Total";
-    public static final Predicate<Statistics> NO_TOTAL_PREDICATE = stat -> !stat.getCategory().equals(Utils.TOTAL);
 
     public static void setApplicationContext(Context context) {
 
@@ -82,17 +85,11 @@ public class Utils implements Constants {
     }
 
     public static int findColor(String category) {
-        int color = Color.parseColor("#FFFFFF");
-
-        for (Category cat : dataHelper.getListOfCategories())
-        {
-            if (cat.getName().equals(category))
-            {
-                color = cat.getColor();
-                break;
-            }
-        }
-        return color;
+        return dataHelper.getListOfCategories().stream()
+                .filter(cat -> cat.getName().equals(category))
+                .map(Category::getColor)
+                .findFirst()
+                .orElse(Color.parseColor("#FFFFFF"));
     }
 
     public static boolean validateTextInput(String string) {
@@ -128,33 +125,6 @@ public class Utils implements Constants {
         return combineSortedList;
     }
 
-    /**
-     * Gets all the items of a given category (including it's subcategories) or a given subcategory
-     * */
-    public static List<Item> getItemsOfCategories(String category) {
-        if (getParentCategoryName(category).equals(""))
-        {
-            List<String> list = getCategoriesNames(cat -> cat.getParent().equals(category));
-            return dataHelper.getListOfStatistics().stream()
-                    .filter(stat -> list.stream()
-                            .anyMatch(cat -> cat.equals(stat.getCategory())))
-                    .map(s -> new Item.Builder(s.getCategory(), findMaxDate(s.getCategory()), s.getPayDate())
-                            .withAmount(s.getSum())
-                            .build())
-                    .collect(toList());
-        }
-        return dataHelper.getListOfItems(item -> item.getCategory().equals(category));
-    }
-
-    public static List<Item> getParentStatisticsAsItems(Predicate<Statistics> predicate) {
-        return dataHelper.getListOfStatistics().stream()
-                .filter(predicate)
-                .filter(stat -> Utils.getParentCategoryName(stat.getCategory()).equals(""))
-                .map(stat -> new Item.Builder(stat.getCategory(), findMaxDate(stat.getCategory()), stat.getPayDate())
-                        .withAmount(stat.getSum()).build())
-                .collect(toList());
-    }
-
     public static String findMaxDate(String categoryName) {
         return dataHelper.getListOfItems().stream()
                 .filter(item -> isCategoryInSubCategories(item.getCategory(), categoryName )|| item.getCategory().equals(categoryName))
@@ -174,11 +144,70 @@ public class Utils implements Constants {
                 .anyMatch(cat -> cat.getParent().equals(parentCategory));
     }
 
-    public static Statistics getStatisticsByCategory(String category) {
-        return dataHelper.getListOfStatistics().stream()
-                .filter(s -> s.getCategory().equals(category))
-                .findFirst()
-                .orElse(null);
+    /**
+     * @param predicate
+     *      true: returns Categories and Subcategories
+     *      cat -> cat.getParent().equals(""):  returns only parent categories
+     *      cat -> !cat.getParent().equals(""): returns only subcategories
+     * @return combined items for categories or subcategories which created from statistics
+     * */
+    public static List<Item> getItemsFromStatistics(Predicate<Category> predicate) {
+        return Utils.getCategoriesStats(predicate).keySet().stream()
+                .map(cat -> new Item.Builder(cat, findMaxDate(cat), Utils.getCurrentDate(PAY)).build())
+                .collect(toList());
+    }
+
+    /**
+     * @param selectedCategory category to get statistics for
+     * @return Statistics for given category for current date
+     * */
+    public static Statistics getStatsForCategory(String selectedCategory) {
+        return getStatsForCategory(getCurrentDate(DateFormat.PAY), selectedCategory);
+    }
+
+    /**
+     * @param date statistics to fetch for
+     * @param selectedCategory category to get statistics for
+     * @return Statistics for given category for current date
+     * */
+    public static Statistics getStatsForCategory(String date, String selectedCategory) {
+        MonthlyStatistics monthlyStats = dataHelper.getMonthlyStatistics(date);
+        if (monthlyStats == null || monthlyStats.getStatistics().get(selectedCategory) == null)
+        {
+            return new Statistics(0, 0, 0, 0, 0);
+        }
+        return monthlyStats.getStatistics().get(selectedCategory);
+    }
+
+    /**
+     * Statistics for current date
+     * @param predicate
+     *          true: returns Categories and Subcategories
+     *          cat -> cat.getParent().equals(""):  returns only parent categories
+     *          cat -> !cat.getParent().equals(""): returns only subcategories
+     * @return the statistics of categories when key: Category name, Value: Statistics of that category
+     * */
+    public static Map<String, Statistics> getCategoriesStats(Predicate<Category> predicate) {
+        return getCategoriesStats(getCurrentDate(DateFormat.PAY), predicate);
+    }
+
+    /**
+     * @param date statistics to fetch for
+     * @param predicate
+     *          true: returns Categories and Subcategories
+     *          cat -> cat.getParent().equals(""):  returns only parent categories
+     *          cat -> !cat.getParent().equals(""): returns only subcategories
+     * @return the statistics of categories when key: Category name, Value: Statistics of that category
+     * */
+    public static Map<String, Statistics> getCategoriesStats(String date, Predicate<Category> predicate) {
+        MonthlyStatistics monthlyStatistics = dataHelper.getMonthlyStatistics(date);
+        if (monthlyStatistics == null)
+        {
+            return ImmutableMap.of();
+        }
+        List<String> categories = Utils.getCategoriesNames(predicate);
+        return monthlyStatistics.getStatistics().entrySet().stream().filter(e -> categories.contains(e.getKey()))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
@@ -238,6 +267,14 @@ public class Utils implements Constants {
         return date.format(DateTimeFormatter.ofPattern(dateFormat.value));
     }
 
+    public static String getDBMonthFormat(String date, Map<String, String> monthsMap) {
+        String month = monthsMap.entrySet().stream()
+                .filter(en -> en.getValue().equals(date.substring(0, 3)))
+                .map(Map.Entry::getKey)
+                .findFirst().orElse("");
+        return date.substring(4) + "/" + month;
+    }
+
     public static double firstFoundWordsToNumber(String input) {
         Map<String, String> validValues = JavaUtils.mapOf("zero", "0", "one", "1", "two", "2", "three", "3", "four", "4",
                 "five", "5", "six", "6", "seven", "7", "eight", "8", "nine", "9", "ten", "10", "eleven", "11", "twelve", "12",
@@ -260,21 +297,6 @@ public class Utils implements Constants {
             }
         }
         return result;
-    }
-
-    public static double getAverage(String category) {
-        List<String> subCategories = Utils.getCategoriesNames(cat -> cat.getParent().equals(category));
-        if (subCategories.isEmpty())
-        {
-            return round(dataHelper.getListOfItems().stream()
-                    .filter(cat -> cat.getCategory().equals(category))
-                    .mapToDouble(Item::getAmount)
-                    .average().orElse(0));
-        }
-        return round(dataHelper.getListOfItems().stream()
-                .filter(item -> subCategories.contains(item.getCategory()))
-                .mapToDouble(Item::getAmount)
-                .average().orElse(0));
     }
 
     public static double round(double val) {

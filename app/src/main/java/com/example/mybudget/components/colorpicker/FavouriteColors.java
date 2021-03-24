@@ -62,7 +62,7 @@ public class FavouriteColors extends Fragment implements RecyclerTouchHelper.Rec
             final Integer deletedItem = dataHelper.getListOfColors().get(position);
 
             colorAdapter.removeItem(position);
-            categoryPicker.restoreColorOption(deletedItem, position);
+            categoryPicker.restore(deletedItem, null, position, "The color removed from list");
             //   colorAdapter.notifyDataSetChanged();
             //DbHandler.removeColor(MainActivity.getDbInstance(), deletedItem);
             dataHelper.removeColor(deletedItem);
@@ -74,9 +74,8 @@ public class FavouriteColors extends Fragment implements RecyclerTouchHelper.Rec
         colorAdapter.notifyDataSetChanged();
     }
 
-    public void restoreDeletedColor(Integer deletedItem, int deletedIndex) {
+    public void restoreColor(Integer deletedItem, int deletedIndex) {
         colorAdapter.restoreItem(deletedItem, deletedIndex);
-        // DbHandler.populateColor(MainActivity.getDbInstance(), deletedItem);
         dataHelper.addColor(deletedItem);
         showData();
     }

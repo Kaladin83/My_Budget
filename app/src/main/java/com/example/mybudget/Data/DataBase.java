@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
-import com.example.mybudget.domain.domain.Statistics;
+import com.example.mybudget.domain.dtos.TableStatistics;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.interfaces.Constants;
 
@@ -38,12 +38,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
                         "PRIMARY KEY (CATEGORY, AMOUNT, DATE));");
         db.execSQL("CREATE INDEX ITEM_CATEGORY_IND ON ITEM (CATEGORY);");
         db.execSQL("CREATE INDEX ITEM_PAY_DATE_IND ON ITEM (PAY_DATE);");
-                // STATISTICS table
-        db.execSQL(
-                "CREATE TABLE STATISTICS (CATEGORY TEXT, SUM NUMBER, PAY_DATE TEXT, " +
-                        "PRIMARY KEY (PAY_DATE, CATEGORY));");
-        db.execSQL("CREATE INDEX STAT_CATEGORY_IND ON ITEM (CATEGORY);");
-        db.execSQL("CREATE INDEX STAT_PAY_DATE_IND ON ITEM (PAY_DATE);");
                // COLOR table
         db.execSQL(
                 "CREATE TABLE COLOR (NAME NUMBER, PRIMARY KEY(NAME));");
@@ -55,7 +49,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS ITEM");
-        db.execSQL("DROP TABLE IF EXISTS STATISTICS");
         db.execSQL("DROP TABLE IF EXISTS COLOR");
         db.execSQL("DROP TABLE IF EXISTS CATEGORY");
         onCreate(db);
@@ -65,12 +58,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
     {
         Object[] data = new Object[]{item.getCategory(), item.getDate(), item.getPayDate(), item.getAmount(), item.getCurrency()};
         dbInstance.execSQL("INSERT INTO ITEM (CATEGORY, DATE , PAY_DATE, AMOUNT, CURRENCY, DESCRIPTION) VALUES(?,?,?,?,?,?);",  data);
-    }
-
-    public void insertStatistics(Statistics stat)
-    {
-        Object[] data = new Object[]{stat.getCategory(), stat.getPayDate(), stat.getSum()};
-        dbInstance.execSQL("INSERT INTO STATISTICS (CATEGORY, PAY_DATE, SUM) VALUES(?,?,?);",  data);
     }
 
     public void insertColor(Integer color)
@@ -98,19 +85,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
         dbInstance.execSQL("DELETE FROM ITEM WHERE DATE = ? AND CATEGORY = ? AND AMOUNT = ?",  data);
     }
 
-    public void deleteStatistics(String payDate, String category)
-    {
-        Object[] data = new Object[]{payDate, category};
-        dbInstance.execSQL("DELETE FROM STATISTICS WHERE PAY_DATE = ? AND CATEGORY = ?",  data);
-
-    }
-
-    public void deleteMonthlyStatistics(int payDate)
-    {
-        Object[] data = new Object[]{payDate};
-        dbInstance.execSQL("DELETE FROM STATISTICS WHERE PAY_DATE = ?",  data);
-    }
-
     public void deleteCategory(Category category)
     {
         Object[] data = new Object[]{category.getName()};
@@ -122,11 +96,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
     {
         Object[] data = new Object[]{color};
         dbInstance.execSQL("DELETE FROM COLOR WHERE NAME = ?",  data);
-    }
-
-    public void clearAllStatistics()
-    {
-        dbInstance.execSQL("DELETE FROM STATISTICS");
     }
 
     public void clearAllColors()
@@ -159,23 +128,6 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
     public void updateItemDescription(Item item) {
         Object[] data = new Object[]{item.getDescription(), item.getCategory(), item.getAmount(), item.getDate()};
         dbInstance.execSQL("UPDATE ITEM SET DESCRIPTION = ? WHERE CATEGORY = ? AND AMOUNT = ? AND DATE = ?",  data);
-    }
-
-    public void updateStatistics(Statistics stats)
-    {
-        if (stats.getSum() == 0)
-        {
-            deleteStatistics(stats.getPayDate(), stats.getCategory());
-        }
-        else
-        {
-            updateStatistics(stats.getPayDate(), stats.getSum(), stats.getCategory());
-        }
-    }
-
-    private void updateStatistics(String payDate, double sum, String category) {
-        Object[] data = new Object[]{sum, category, payDate};
-        dbInstance.execSQL("UPDATE STATISTICS SET SUM = ? WHERE CATEGORY = ? AND PAY_DATE = ?",  data);
     }
 
     public void fetchCategories()
@@ -212,21 +164,7 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
         dataHelper.setListOfColors(list);
     }
 
-    public void fetchAllMonthsFromStatistics()
-    {
-        List<String> list = new ArrayList<>();
-        Cursor res =  dbInstance.rawQuery( "SELECT DISTINCT PAY_DATE FROM STATISTICS ORDER BY PAY_DATE DESC", null);
-        res.moveToFirst();
-
-        while(!res.isAfterLast()){
-            list.add(res.getString(res.getColumnIndex("PAY_DATE")));
-            res.moveToNext();
-        }
-        res.close();
-        dataHelper.setListOfMonths(list);
-    }
-
-    public void fetchAllItems(String payDate)
+    public List<Item> getAllItems(String payDate)
     {
         List<Item> list = new ArrayList<>();
         Cursor res =  dbInstance.rawQuery( "SELECT CATEGORY, AMOUNT, DATE, DESCRIPTION, CURRENCY FROM ITEM WHERE PAY_DATE = ?",
@@ -246,25 +184,59 @@ public class DataBase extends SQLiteOpenHelper implements Constants {
             res.moveToNext();
         }
         res.close();
-        dataHelper.setListOfItems(list);
+
+        return list;
     }
 
-    public void fetchMonthlyStatistics(String payDate)
+    public List<TableStatistics> getAllItemsStatistics()
     {
-        List<Statistics> list = new ArrayList<>();
-        dbInstance = this.getReadableDatabase();
-        Cursor res =  dbInstance.rawQuery( "SELECT CATEGORY, SUM FROM STATISTICS WHERE PAY_DATE = ?",
-                new String[]{payDate});
+        List<TableStatistics> list = new ArrayList<>();
+        Cursor res = dbInstance.rawQuery("SELECT SUM(AMOUNT) AS SUM, AVG(AMOUNT) AS AVG, MIN(AMOUNT) AS MIN, MAX(AMOUNT) AS " +
+                "MAX, COUNT(AMOUNT) AS CNT, PAY_DATE, CATEGORY FROM ITEM GROUP BY PAY_DATE, CATEGORY", null);
         res.moveToFirst();
 
         while(!res.isAfterLast()){
-            String category = res.getString(res.getColumnIndex("CATEGORY"));
             double sum = res.getDouble(res.getColumnIndex("SUM"));
-            list.add(new Statistics(payDate, sum, category));
+            double avg = res.getDouble(res.getColumnIndex("AVG"));
+            double min = res.getDouble(res.getColumnIndex("MIN"));
+            double max = res.getDouble(res.getColumnIndex("MAX"));
+            int cnt = res.getInt(res.getColumnIndex("CNT"));
+            String date = res.getString(res.getColumnIndex("PAY_DATE"));
+            String category = res.getString(res.getColumnIndex("CATEGORY"));
+            list.add(new TableStatistics(date, category, min, max, avg, sum, cnt));
             res.moveToNext();
         }
         res.close();
-        dataHelper.populateMonthlyStatistics(list);
+
+        return list;
+    }
+
+    public List<TableStatistics> getItemsStatistics(String payDate)
+    {
+        List<TableStatistics> list = new ArrayList<>();
+        Cursor res = dbInstance.rawQuery("SELECT SUM(AMOUNT) AS SUM, AVG(AMOUNT) AS AVG, MIN(AMOUNT) AS MIN, MAX(AMOUNT) AS " +
+                "MAX, COUNT(AMOUNT) AS CNT, PAY_DATE, CATEGORY FROM ITEM WHERE PAY_DATE = ? GROUP BY CATEGORY", new String[]{payDate});
+        res.moveToFirst();
+
+        while(!res.isAfterLast()){
+            double sum = res.getDouble(res.getColumnIndex("SUM"));
+            double avg = res.getDouble(res.getColumnIndex("AVG"));
+            double min = res.getDouble(res.getColumnIndex("MIN"));
+            double max = res.getDouble(res.getColumnIndex("MAX"));
+            int cnt = res.getInt(res.getColumnIndex("CNT"));
+            String date = res.getString(res.getColumnIndex("PAY_DATE"));
+            String category = res.getString(res.getColumnIndex("CATEGORY"));
+            list.add(new TableStatistics(date, category, min, max, avg, sum, cnt));
+            res.moveToNext();
+        }
+        res.close();
+
+        return list;
+    }
+
+    public void fetchAndPopulateAllItems(String payDate)
+    {
+        dataHelper.setListOfItems(getAllItems(payDate));
     }
 
 }

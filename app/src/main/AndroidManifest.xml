@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/NightTheme">
         <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>

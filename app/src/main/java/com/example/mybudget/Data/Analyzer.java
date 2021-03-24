@@ -1,23 +1,12 @@
 package com.example.mybudget.Data;
 
-import android.util.Pair;
-
 import com.example.mybudget.domain.domain.Category;
-import com.example.mybudget.domain.domain.Item;
-import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.ItemToAdd;
 import com.example.mybudget.utils.Utils;
-import com.google.common.collect.ImmutableList;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static com.example.mybudget.utils.Enums.Action.INSERT_STATISTICS;
-import static com.example.mybudget.utils.Enums.Action;
-import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 
 public class Analyzer {
 
@@ -95,32 +84,11 @@ public class Analyzer {
         {
             otherName = listOfCategories.stream()
                     .filter(cat -> cat.getName().equals(category))
-                    .filter(cat -> !cat.getOtherName().equals("") || Utils.getStatisticsByCategory(cat.getParent()) != null)
+                    .filter(cat -> !cat.getOtherName().equals("") || Utils.getStatsForCategory(cat.getParent()) != null)
                     .map(cat -> !cat.getOtherName().equals("") ? cat.getOtherName() : cat.getParent() + " (other)")
                     .findFirst().orElse("");
             parentName = Utils.getParentCategoryName(category);
         }
         return new ItemToAdd(otherName, parentName, addedCategoryName, amount, description);
-    }
-
-    public Map<Statistics, Action> calculateStatisticSums(Item item) {
-        String category = item.getCategory();
-        List<String> categories = ImmutableList.of(Utils.getParentCategoryName(category), category, Utils.TOTAL);
-
-        return categories.stream()
-                .filter(cat -> !cat.equals(""))
-                .map(cat -> getUpdateStatisticsPairs(Utils.getStatisticsByCategory(cat), cat, item))
-                .collect(Collectors.toMap(p -> p.first, p -> p.second));
-    }
-
-    private Pair<Statistics, Action> getUpdateStatisticsPairs(Statistics stats, String cat, Item item) {
-        if (stats == null)
-        {
-            return new Pair<>(new Statistics(Utils.getCurrentDate(PAY), item.getAmount(), cat),
-                    INSERT_STATISTICS);
-        }
-        stats.setSum(stats.getSum() + item.getAmount());
-        stats.setMean(Utils.getAverage(cat));
-        return new Pair<>(stats, Action.UPDATE_STATISTICS);
     }
 }

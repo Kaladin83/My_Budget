@@ -2,6 +2,7 @@ package com.example.mybudget.components;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mybudget.R;
 import com.example.mybudget.domain.domain.Category;
-import com.example.mybudget.domain.domain.Item;
-import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.common.SimpleSpinnerAdapter;
+import com.example.mybudget.domain.dtos.MonthlyStatistics;
+import com.example.mybudget.domain.dtos.Statistics;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.JavaUtils;
@@ -41,19 +42,18 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.common.collect.ImmutableList;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static android.widget.AdapterView.*;
 import static com.example.mybudget.utils.Enums.*;
@@ -66,8 +66,6 @@ import static java.util.stream.Collectors.toList;
 
 public class Charts extends Fragment implements View.OnClickListener, Constants {
     private View mainView;
-    private List<Item> parentItems;
-    private List<Item> nonParentItems;
     private List<String> months;
     private PieChart pieChart;
     private BarChart barChart;
@@ -75,12 +73,13 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private final Map<Float, Double> mapOfPercents = new HashMap<>();
     private final Map<String, String> monthsMap = JavaUtils.mapOf("01", "JEN", "02", "FEB", "03", "MAR", "04", "APR", "05",
             "MAY", "06", "JUN", "07", "JUL", "08", "AUG", "09", "SEP", "10", "OCT", "11", "NOV", "12", "DEC");
-    private ConstraintLayout pieLayout, barLayout, staticsLayout;
+    private ConstraintLayout pieLayout, barLayout;
     private TextView barTxt, pieTxt, minimumTxt, maximumTxt, averageTxt, totalTxt;
     private Spinner monthSpinner, categorySpinner;
     private Activity activity;
     private DataHelper dataHelper;
     private int textColor;
+    private String selectedDateDBFormat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -106,20 +105,13 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         return mainView;
     }
 
-    private List<Item> getItemsOfNonParents() {
-        return dataHelper.getListOfStatistics().stream()
-                .filter(s -> !Utils.getParentCategoryName(s.getCategory()).equals(""))
-                .map(s -> new Item.Builder(s.getCategory(), Utils.findMaxDate(s.getCategory()), s.getPayDate())
-                        .withAmount(s.getSum())
-                        .build())
-                .collect(toList());
-    }
-
-    private List<String> getCategoryValues() {
-        return Stream.concat(nonParentItems.stream(),
-                Utils.getParentStatisticsAsItems(stat -> true).stream())
-                .map(Item::getCategory)
-                .collect(toList());
+    private List<String> getAllCategoriesNamesWithStatistics() {
+        MonthlyStatistics monthlyStatistics = dataHelper.getMonthlyStatistics(selectedDateDBFormat);
+        if (monthlyStatistics == null)
+        {
+            return ImmutableList.of();
+        }
+        return new ArrayList<>(monthlyStatistics.getStatistics().keySet());
     }
 
     private List<String> getAllMonthsWithDummies() {
@@ -143,26 +135,6 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         return Utils.getDate(DateFormat.PAY, date.minusMonths(index));
     }
 
-    private List<Item> getItems() {
-        return categoryRadio.isChecked() ? Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE) : nonParentItems;
-    }
-
-    private DoubleSummaryStatistics getMonthlyStatisticsForCategories(String month) {
-        return parentItems.stream()
-                .filter(stat -> stat.getPayDate().equals(month))
-                .filter(stat -> !stat.getCategory().equals(Utils.TOTAL))
-                .mapToDouble(Item::getAmount)
-                .summaryStatistics();
-    }
-
-    private double getTotalForMonth(String month, String category) {
-        return parentItems.stream()
-                .filter(item -> item.getPayDate().equals(month))
-                .filter(item -> item.getCategory().equals(category))
-                .mapToDouble(Item::getAmount)
-                .findFirst().orElse(0);
-    }
-
     public void refreshCharts() {
         if (mainView != null && !dataHelper.getListOfItems().isEmpty())
         {
@@ -171,8 +143,6 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void populateDataLayout() {
-        parentItems = Utils.getParentStatisticsAsItems(stat -> true);
-        nonParentItems = getItemsOfNonParents();
         months = getAllMonthNoDummies();
 
         barTxt = mainView.findViewById(R.id.all_expenses_txt);
@@ -217,7 +187,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void createCategorySpinner() {
-        SimpleSpinnerAdapter categoryAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, getCategoryValues());
+        SimpleSpinnerAdapter categoryAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, getAllCategoriesNamesWithStatistics());
         categorySpinner = mainView.findViewById(R.id.columnSpinner);
         categorySpinner.setAdapter(categoryAdapter);
         categorySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -246,16 +216,18 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                displayPieData(e, getItems());
+                displayPieData(e, Utils.getCategoriesStats(selectedDateDBFormat,
+                        cat -> categoryRadio.isChecked() == cat.getParent().equals("")));
             }
 
-            private void displayPieData(Entry e, List<Item> list) {
-                Item selected = list.stream()
-                        .filter(item -> item.getAmount() == mapOfPercents.get(e.getY()))
+            private void displayPieData(Entry e, Map<String, Statistics> stats) {
+                Pair<String, Double> selected = stats.entrySet().stream()
+                        .filter(stat -> stat.getValue().getSum() == mapOfPercents.get(e.getY()))
+                        .map(stat -> new Pair<>(stat.getKey(), stat.getValue().getSum()))
                         .findFirst().orElse(null);
                 if (selected != null)
                 {
-                    String str = String.join("", selected.getCategory(), ": ", String.valueOf(selected.getAmount()), " " + "NIS");
+                    String str = String.join("", selected.first, ": ", String.valueOf(selected.second), " " + "NIS");
                     Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -268,9 +240,11 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void loadPieData(String selectedMonth) {
-        List<Item> items = getItems();
+        selectedDateDBFormat = Utils.getDBMonthFormat(selectedMonth, monthsMap);
+        Map<String ,Statistics> stats = Utils.getCategoriesStats(selectedDateDBFormat,
+                cat -> categoryRadio.isChecked() == cat.getParent().equals(""));
         List<PieEntry> entryY = new ArrayList<>();
-        LegendEntry[] lEntries = getLegendEntries(entryY, items);
+        LegendEntry[] lEntries = getLegendEntries(entryY, stats);
 
         PieDataSet dataSet = new PieDataSet(entryY, "");
         dataSet.setColors(getDataSetColors(lEntries));
@@ -301,38 +275,39 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         description.setTextColor(textColor);
     }
 
-    private LegendEntry[] getLegendEntries(List<PieEntry> entryY, List<Item> items) {
-        double totalSum = items.stream()
-                .mapToDouble(Item::getAmount)
+    private LegendEntry[] getLegendEntries(List<PieEntry> entryY, Map<String, Statistics> stats) {
+        double totalSum = stats.values().stream()
+                .mapToDouble(Statistics::getSum)
                 .sum();
 
-        Function<Item, Double> calculatePercent = item -> item.getAmount() / totalSum * 100;
-        return items.stream()
-                .peek(itm -> mapOfPercents.put((float) Math.round(calculatePercent.apply(itm)), itm.getAmount()))
-                .peek(itm -> entryY.add(new PieEntry(Math.round(calculatePercent.apply(itm)))))
-                .map(itm -> new LegendEntry(itm.getCategory(), CIRCLE, Float.NaN, Float.NaN, null,
-                        Utils.findColor(itm.getCategory())))
+        Function<Statistics, Double> calculatePercent = item -> item.getSum() / totalSum * 100;
+        return stats.entrySet().stream()
+                .peek(e -> mapOfPercents.put((float) Math.round(calculatePercent.apply(e.getValue())), e.getValue().getSum()))
+                .peek(e -> entryY.add(new PieEntry(Math.round(calculatePercent.apply(e.getValue())))))
+                .map(e -> new LegendEntry(e.getKey(), CIRCLE, Float.NaN, Float.NaN, null,
+                        Utils.findColor(e.getKey())))
                 .toArray(LegendEntry[]::new);
     }
 
     private void createBarChart() {
-        staticsLayout = mainView.findViewById(R.id.statics_layout);
         minimumTxt = mainView.findViewById(R.id.min_val);
         maximumTxt = mainView.findViewById(R.id.max_val);
         averageTxt = mainView.findViewById(R.id.avg_val);
         totalTxt = mainView.findViewById(R.id.total_val);
         barChart = mainView.findViewById(R.id.bar_chart);
-        barChart.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         barChart.setFitBars(true);
         barChart.setBorderColor(textColor);
         barChart.setSelected(false);
+        barChart.setPinchZoom(false);
+        barChart.setVerticalScrollBarEnabled(false);
         populateStatisticsTable("", "", "", "");
     }
 
     private void loadBarData(String selectedCategory) {
         List<String> monthsWithDummies = getAllMonthsWithDummies();
         List<BarEntry> barEntries = IntStream.range(0, monthsWithDummies.size())
-                .mapToObj(i -> new BarEntry(i, (float) getTotalForMonth(getDBMonthFormat(monthsWithDummies.get(i)), selectedCategory)))
+                .mapToObj(i -> new BarEntry(i, (float) Utils.getStatsForCategory(Utils.getDBMonthFormat(monthsWithDummies.get(i),
+                        monthsMap), selectedCategory).getSum()))
                 .collect(toList());
         BarDataSet dataSet = new BarDataSet(barEntries, "");
         dataSet.setHighLightColor(textColor);
@@ -349,7 +324,6 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
             dataSet.setColor(color);
         }
         barChart.setData(barData);
-        barChart.dispatchSetSelected(false);
         dataSet.setFormSize(0);
         setDescription(barChart.getDescription(), "Distribution by dates for " + selectedCategory, -65, -25);
         setAxis(monthsWithDummies);
@@ -357,25 +331,22 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 String tempDate = barChart.getXAxis().getFormattedLabel((int) e.getX()).toUpperCase();
-                String date = getDBMonthFormat(tempDate);
-                if (months.contains(tempDate))
-                {
-                    DoubleSummaryStatistics stats = getMonthlyStatisticsForCategories(date);
-                    populateStatisticsTable(stats.getMin() + " [ " + findCategoryNames(stats.getMin(), date) + " ]",
-                            stats.getMax() + " [ " + findCategoryNames(stats.getMax(), date) + " ]",
-                            String.valueOf(stats.getAverage()), String.valueOf(stats.getSum()));
+                String date = Utils.getDBMonthFormat(tempDate, monthsMap);
+                MonthlyStatistics monthlyStats = dataHelper.getMonthlyStatistics(date);
+                if (monthlyStats == null){
+                    populateStatisticsTable("", "", "", "");
                 }
                 else
                 {
-                    populateStatisticsTable("", "", "", "");
+                    Statistics stats = Objects.requireNonNull(monthlyStats.getStatistics().get(Utils.TOTAL));
+                    populateStatisticsTable(stats.getMin() + " [ " + joinCategories(monthlyStats.getCategoriesWithMinValue()) +
+                            " ]", stats.getMax() + " [ " + joinCategories(monthlyStats.getCategoriesWithMaxValue()) +
+                            " ]", String.valueOf(Utils.round(stats.getAvg())), String.valueOf(stats.getSum()));
                 }
             }
 
-            private String findCategoryNames(double amount, String date) {
-                return parentItems.stream()
-                        .filter(item -> item.getAmount() == amount && item.getPayDate().equals(date))
-                        .map(Item::getCategory)
-                        .collect(Collectors.joining(", "));
+            private String joinCategories(List<String> categories) {
+                return String.join(", ", categories);
             }
 
             @Override
@@ -390,14 +361,6 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         maximumTxt.setText(max);
         averageTxt.setText(avg);
         totalTxt.setText(total);
-    }
-
-    private String getDBMonthFormat(String date) {
-        String month = monthsMap.entrySet().stream()
-                .filter(en -> en.getValue().equals(date.substring(0, 3)))
-                .map(Map.Entry::getKey)
-                .findFirst().orElse("");
-        return date.substring(4) + "/" + month;
     }
 
     private void setAxis(List<String> monthsWithDummies) {
@@ -416,13 +379,6 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setAxisMaximum(5.5f);
         xAxis.setValueFormatter(new MyXAxisValueFormatter(dates));
-    }
-
-    public float sumOfCategory(String category) {
-        return (float) dataHelper.getListOfStatistics().stream()
-                .filter(s -> s.getCategory().equals(category))
-                .mapToDouble(Statistics::getSum)
-                .findFirst().orElse(0);
     }
 
     public int[] categoryColors(Predicate<Category> predicate) {
@@ -447,8 +403,16 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                 loadPieData(monthSpinner.getSelectedItem().toString());
                 break;
             case SUBCATEGORY_RADIO:
-                changeSelection(false, true, "Subcategories");
-                loadPieData(monthSpinner.getSelectedItem().toString());
+                if (!Utils.getCategoriesStats(selectedDateDBFormat, cat-> !cat.getParent().equals("")).isEmpty())
+                {
+                    changeSelection(false, true, "Subcategories");
+                    loadPieData(monthSpinner.getSelectedItem().toString());
+                }
+                else
+                {
+                    changeSelection(true, false, "Categories");
+                    Toast.makeText(activity, "No subcategories exist", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

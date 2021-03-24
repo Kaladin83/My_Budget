@@ -62,6 +62,7 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
     }
 
     public void refreshItems(Action action) {
+        dataHelper.setInitialListOfCombinedItems();
         parentItemAdapter.notifyDataSetChanged();
         ((Charts) ViewsHelper.getViewsHelper().getFragment(CHARTS)).refreshCharts();
         if (action == ADD_ITEM)

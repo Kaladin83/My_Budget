@@ -8,21 +8,26 @@ import com.example.mybudget.Data.DataBase;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
-import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.ItemToAdd;
+import com.example.mybudget.domain.dtos.MonthlyStatistics;
+import com.example.mybudget.domain.dtos.Statistics;
+import com.example.mybudget.domain.dtos.TableStatistics;
 import com.example.mybudget.interfaces.Constants;
-import com.example.mybudget.utils.Enums.Action;
 import com.example.mybudget.utils.Utils;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 import static com.example.mybudget.utils.Enums.DateFormat.TIMESTAMP;
 import static com.example.mybudget.utils.Enums.Level.CATEGORY_LVL;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 
@@ -36,32 +41,22 @@ public class DataHelper implements Constants {
     private Item lastAddedItem;
 
     private List<Item> listOfItems = new ArrayList<>();
-    private List<Item> listOfStatisticItems = new ArrayList<>();
     private List<Category> listOfCategories = new ArrayList<>();
-    private List<Statistics> listOfStatistics = new ArrayList<>();
     private List<String> listOfMonths = new ArrayList<>();
     private List<Integer> listOfColors = new ArrayList<>();
     private List<ItemDrawer> listOfCombinedItems = new ArrayList<>();
+    private final Map<String, MonthlyStatistics> monthlyStatisticsMap = new HashMap<>();
 
     public List<String> getListOfMonths() {
         return listOfMonths;
     }
 
-    public void setListOfMonths(List<String> list) {
-        listOfMonths = list;
+    public void setListOfMonths() {
+        listOfMonths = new ArrayList<>(monthlyStatisticsMap.keySet());
     }
 
     public List<Item> getListOfItems() {
         return listOfItems;
-    }
-
-    public List<Item> getListOfStatisticItems() {
-        return listOfStatisticItems;
-    }
-
-    public void setListOfStatisticItems(List<Item> items) {
-        this.listOfStatisticItems = items;
-        Utils.sortItemsByDate(items);
     }
 
     public List<Item> getListOfItems(Predicate<Item> predicate) {
@@ -82,7 +77,7 @@ public class DataHelper implements Constants {
     }
 
     public void setInitialListOfCombinedItems() {
-        listOfCombinedItems = listOfStatisticItems.stream()
+        listOfCombinedItems = Utils.getItemsFromStatistics(cat -> cat.getParent().equals("")).stream()
                 .map(item -> new ItemDrawer(item, false, false, CATEGORY_LVL))
                 .collect(toList());
     }
@@ -101,29 +96,6 @@ public class DataHelper implements Constants {
 
     public void setListOfColors(List<Integer> colors) {
         listOfColors = new ArrayList<>(colors);
-    }
-
-    public List<Statistics> getListOfStatistics() {
-        return listOfStatistics;
-    }
-
-    public void setListOfStatistics(List<Statistics> list) {
-        listOfStatistics = new ArrayList<>(list);
-    }
-
-    public void populateMonthlyStatistics(List<Statistics> list) {
-        setListOfStatistics(list);
-
-        list.forEach(stat -> stat.setMean(Utils.getAverage(stat.getCategory())));
-        if (list.size() > 0)
-        {
-            setListOfStatisticItems(Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE));
-            setInitialListOfCombinedItems();
-            if (listOfMonths.isEmpty())
-            {
-                listOfMonths.add(list.get(0).getPayDate());
-            }
-        }
     }
 
     private DataHelper(Context context) {
@@ -147,7 +119,6 @@ public class DataHelper implements Constants {
 
     public void deleteItems(String month) {
         dataBase.deleteAllMonthlyItems(month);
-        dataBase.clearAllStatistics();
     }
 
     public void populateInitialCategories() {
@@ -174,10 +145,11 @@ public class DataHelper implements Constants {
 
     public void fetchData(String payDate) {
         dataBase.fetchCategories();
-        dataBase.fetchAllItems(payDate);
+        dataBase.fetchAndPopulateAllItems(payDate);
         dataBase.fetchAllColors();
-        dataBase.fetchAllMonthsFromStatistics();
-        dataBase.fetchMonthlyStatistics(payDate);
+        prepareStatistics();
+        setInitialListOfCombinedItems();
+        setListOfMonths();
     }
 
     /* -----------------------   Category Manipulations   ----------------------- */
@@ -195,8 +167,9 @@ public class DataHelper implements Constants {
         dataBase.updateItemsCategory(newCategoryName, category.getName());
         dataBase.deleteCategory(category);
         dataBase.fetchCategories();
-        dataBase.fetchAllItems(Utils.getCurrentDate(PAY));
-        dataBase.fetchMonthlyStatistics(Utils.getCurrentDate(PAY));
+        updateMonthlyStatistics(Utils.getCurrentDate(PAY), dataBase.getItemsStatistics(Utils.getCurrentDate(PAY)));
+//        dataBase.fetchAndPopulateAllItems();
+//        dataBase.fetchMonthlyStatistics(Utils.getCurrentDate(PAY));
     }
 
     public void removeCategory(Category category) {
@@ -248,39 +221,35 @@ public class DataHelper implements Constants {
             dataBase.insertCategory(newCat);
             dataBase.updateItemsCategory(otherCategoryName, categoryName);
             dataBase.updateOtherCategoryName(otherCategoryName, categoryName);
-            dataBase.fetchAllItems(Utils.getCurrentDate(PAY));
             dataBase.fetchCategories();
-            double sum = listOfItems.stream().mapToDouble(Item::getAmount).sum();
-            Statistics statistics = new Statistics(Utils.getCurrentDate(PAY), sum, otherCategoryName);
-            Map<Statistics, Action> stats = ImmutableMap.of(statistics, Action.INSERT_STATISTICS);
-            updateStatistics(stats);
         }
 
+        String payDate = Utils.getCurrentDate(PAY);
         categoryName = otherExists && givenCategoryName.equals(categoryName) ? otherCategoryName : givenCategoryName;
-        Item item = new Item.Builder(categoryName, Utils.getCurrentDate(TIMESTAMP),
-                Utils.getCurrentDate(PAY))
+        Item item = new Item.Builder(categoryName, Utils.getCurrentDate(TIMESTAMP), payDate)
                 .withAmount(amount).withDescription(description).build();
         setLastAddedItem(item);
         dataBase.insertItem(item);
-        dataBase.fetchAllItems(item.getPayDate());
-        updateStatistics(analyzer.calculateStatisticSums(item));
+        dataBase.fetchAndPopulateAllItems(item.getPayDate());
+        updateMonthlyStatistics(payDate, dataBase.getItemsStatistics(payDate));
     }
 
     public void restoreItems(List<Item> itemsToRestore) {
-        itemsToRestore.forEach(itemToRestore -> {
-            dataBase.insertItem(itemToRestore);
-            updateStatistics(analyzer.calculateStatisticSums(itemToRestore));
-            listOfItems.add(itemToRestore);
+        String payDate = itemsToRestore.get(0).getPayDate();
+        itemsToRestore.forEach(item -> {
+            dataBase.insertItem(item);
+            listOfItems.add(item);
         });
+        updateMonthlyStatistics(payDate, dataBase.getItemsStatistics(payDate));
     }
 
     public void removeItems(List<Item> itemsToDelete) {
+        String payDate = itemsToDelete.get(0).getPayDate();
         itemsToDelete.forEach(item -> {
-            Item itemToDelete = Item.copyItemWithAmount(item, item.getAmount() * -1);
             dataBase.deleteItem(item);
-            updateStatistics(analyzer.calculateStatisticSums(itemToDelete));
             listOfItems.remove(item);
         });
+        updateMonthlyStatistics(payDate, dataBase.getItemsStatistics(payDate));
     }
 
     public void updateDescription(Item selectedItem, String description, int position) {
@@ -289,7 +258,7 @@ public class DataHelper implements Constants {
             Item item = Item.copyItemWithDescription(selectedItem, description);
             listOfCombinedItems.get(position).setItem(item);
             dataBase.updateItemDescription(item);
-            dataBase.fetchAllItems(item.getPayDate());
+            dataBase.fetchAndPopulateAllItems(item.getPayDate());
         }
     }
 
@@ -305,21 +274,78 @@ public class DataHelper implements Constants {
     }
 
     /* -----------------------   Statistics Manipulations   ----------------------- */
+    public void prepareStatistics() {
+        List<TableStatistics> statistics = dataBase.getAllItemsStatistics();
+        Map<String, List<TableStatistics>> groupedByMonth = statistics.stream()
+                .collect(groupingBy(TableStatistics::getPayDate));
+        groupedByMonth.entrySet().forEach(entry -> updateMonthlyStatistics(entry.getKey(), entry.getValue()));
+    }
 
-    private void updateStatistics(Map<Statistics, Action> statistics) {
-        String date = "";
-        for (Map.Entry<Statistics, Action> entry : statistics.entrySet())
-        {
-            date = entry.getKey().getPayDate();
-            if (entry.getValue().equals(Action.INSERT_STATISTICS) && entry.getKey().getSum() > 0)
+    private void updateMonthlyStatistics(String date, List<TableStatistics> statistics) {
+        double min = statistics.stream().mapToDouble(TableStatistics::getMin).min().orElse(0);
+        double max = statistics.stream().mapToDouble(TableStatistics::getMax).max().orElse(0);
+        List<String> minCategories = getCategoryNames(stat -> stat.getMin() == min, statistics);
+        List<String> maxCategories = getCategoryNames(stat -> stat.getMax() == max, statistics);
+
+        //Create a stats map with subcategories and categories without children (subcategories) only
+        Map<String, Statistics> stats = statistics.stream()
+                .collect(toMap(TableStatistics::getCategory,
+                        s -> new Statistics(s.getMin(), s.getMax(), Utils.round(s.getAvg()), s.getSum(), s.getCnt())));
+
+        //Add total for all categories to stats map
+        int count = (int) getSum(stats, Statistics::getCnt);
+        double sum = getSum(stats, Statistics::getSum);
+        stats.put(Utils.TOTAL, new Statistics(min, max, Utils.round(sum/count), sum, count));
+
+        //Add categories that have children to stats map
+        addParentCategoriesToStatisticsMap(stats);
+
+        monthlyStatisticsMap.put(date ,new MonthlyStatistics(stats, minCategories, maxCategories));
+    }
+
+    private void addParentCategoriesToStatisticsMap(Map<String, Statistics> stats) {
+        Map<String, Map<String, Statistics>> parentsAndStats = new HashMap<>();
+        for (Map.Entry<String, Statistics> stat: stats.entrySet()){
+            String parent = Utils.getParentCategoryName(stat.getKey());
+            if (!parent.equals(""))
             {
-                dataBase.insertStatistics(entry.getKey());
-            }
-            else
-            {
-                dataBase.updateStatistics(entry.getKey());
+                List<String> children = Utils.getCategoriesNames(cat -> cat.getParent().equals(parent));
+                Map<String, Statistics> statistic = Objects.requireNonNull(parentsAndStats.getOrDefault(parent, new HashMap<>()));
+                statistic.putAll(stats.entrySet().stream()
+                        .filter(s-> children.contains(s.getKey()))
+                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                parentsAndStats.put(parent, statistic);
             }
         }
-        dataBase.fetchMonthlyStatistics(date);
+
+        parentsAndStats.entrySet().forEach(s -> {
+            int sum = (int) getSum(s.getValue(), Statistics::getCnt);
+            double count = getSum(s.getValue(), Statistics::getSum);
+            stats.put(s.getKey(), new Statistics(getMin(s.getValue()), getMax(s.getValue()), Utils.round(count / sum), count,
+                    sum));
+        });
+    }
+
+    private double getMin(Map<String, Statistics> values) {
+        return values.values().stream().mapToDouble(Statistics::getMin).min().orElse(0);
+    }
+
+    private double getMax(Map<String, Statistics> values) {
+        return values.values().stream().mapToDouble(Statistics::getMax).max().orElse(0);
+    }
+
+    private double getSum(Map<String, Statistics> values, ToDoubleFunction<Statistics> func) {
+        return values.values().stream().mapToDouble(func).sum();
+    }
+
+    public MonthlyStatistics getMonthlyStatistics(String date) {
+        return monthlyStatisticsMap.get(date);
+    }
+
+    private List<String> getCategoryNames(Predicate<TableStatistics> predicate, List<TableStatistics> stats) {
+        return stats.stream()
+                .filter(predicate)
+                .map(TableStatistics::getCategory)
+                .collect(toList());
     }
 }

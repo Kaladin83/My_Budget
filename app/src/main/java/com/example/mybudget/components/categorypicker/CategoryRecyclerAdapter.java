@@ -94,8 +94,8 @@ public class CategoryRecyclerAdapter  extends RecyclerView.Adapter<CategoryRecyc
     }
 
     public void removeItem(int position) {
-        List<Category> combinedCategories = dataHelper.getListOfCategories();
-        combinedCategories.remove(position);
+        List<Category> categories = dataHelper.getListOfCategories();
+        categories.remove(position);
     }
 
     public void restoreItem(Category category, int position) {

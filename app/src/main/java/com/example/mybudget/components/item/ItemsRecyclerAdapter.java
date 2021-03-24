@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
-import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.R;
+import com.example.mybudget.domain.dtos.Statistics;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
@@ -124,7 +124,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         int strokeColor = Utils.getColor(R.color.light_black, activity);
         ItemDrawer combinedItem = dataHelper.getListOfCombinedItems().get(position);
         Item lastAddedItem = dataHelper.getLastAddedItem();
-        Statistics stats = Utils.getStatisticsByCategory(combinedItem.getItem().getCategory());
+        Statistics stats = Utils.getStatsForCategory(combinedItem.getItem().getCategory());
         if (holder instanceof MyViewHolder1)
         {
             MyViewHolder1 holder1 = (MyViewHolder1) holder;
@@ -138,7 +138,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             holder1.categorySumsLayout.setPadding(15, 0, 15, 0);
             holder1.categorySumsLayout.setBackground(Utils.createBorder(15, statisticsColor, 1, strokeColor));
             holder1.categorySumTxt.setText(activity.getString(R.string.category_total, String.valueOf(stats.getSum())));
-            holder1.categoryAverageTxt.setText(activity.getString(R.string.category_average, String.valueOf(stats.getMean())));
+            holder1.categoryAverageTxt.setText(activity.getString(R.string.category_average, String.valueOf(stats.getAvg())));
 
             if (combinedItem.getLevel() == SUB_CATEGORY_LVL)
             {
@@ -204,7 +204,7 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         holder.dateTxt.setText(formattedDate);
         holder.dateTxt.setSelected(combinedItem.getItem().getDate().equals(lastAddedItem.getDate()));
         holder.mainRowLayout.setOnClickListener(view -> {
-            dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE));
+            //dataHelper.setListOfStatisticItems(Utils.getParentStatisticsAsItems(Utils.NO_TOTAL_PREDICATE));
             addToCombinedItems(position);
             notifyDataSetChanged();
         });
@@ -239,20 +239,22 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
         if (Utils.getParentCategoryName(selectedCategory).equals(""))
         {
             parentName = selectedCategory;
-            listOfItems = Utils.sortItemsByDate(dataHelper.getListOfItems(item -> item.getCategory().equals(parentName)));
+            //listOfItems = Utils.sortItemsByDate(dataHelper.getListOfItems(item -> item.getCategory().equals(parentName)));
         }
         else
         {
             subCategoryName = selectedCategory;
             parentName = Utils.getParentCategoryName(subCategoryName);
-            listOfItems = Utils.sortItemsByDate(Utils.getItemsOfCategories(subCategoryName));
-        }
 
-        listOfSubs = Utils.sortItemsByDate(Utils.getItemsOfCategories(parentName));
+        }
+        listOfItems = Utils.sortItemsByDate(dataHelper.getListOfItems(item -> item.getCategory().equals(selectedCategory)));
+
+        listOfSubs = Utils.sortItemsByDate(Utils.getItemsFromStatistics(cat -> cat.getParent().equals(parentName)));
         dataHelper.setListOfCombinedItems(new ArrayList<>());
 
-        selectedParent = addToCombinedItems(dataHelper.getListOfStatisticItems(), combinedItems.get(position).getItem(), parentName.equals("") ? subCategoryName : parentName, isCategoryExpanded, isItemChosen,
-                -1, Level.CATEGORY_LVL);
+        selectedParent = addToCombinedItems(Utils.getItemsFromStatistics(cat -> cat.getParent().equals("")),
+                combinedItems.get(position).getItem(), parentName.equals("") ? subCategoryName : parentName, isCategoryExpanded,
+                isItemChosen, -1, Level.CATEGORY_LVL);
         if (!isCategoryExpanded)
         {
             selectedSub = addToCombinedItems(listOfSubs, combinedItems.get(position).getItem(), subCategoryName, isSubCategoryExpanded, isItemChosen,
