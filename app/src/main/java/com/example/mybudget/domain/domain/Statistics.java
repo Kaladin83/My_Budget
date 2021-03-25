@@ -1,4 +1,4 @@
-package com.example.mybudget.domain.dtos;
+package com.example.mybudget.domain.domain;
 
 public class Statistics {
     private final double min;

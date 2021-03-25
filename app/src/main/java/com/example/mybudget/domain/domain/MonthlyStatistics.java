@@ -1,4 +1,4 @@
-package com.example.mybudget.domain.dtos;
+package com.example.mybudget.domain.domain;
 
 import java.util.List;
 import java.util.Map;

@@ -6,6 +6,7 @@
     <string name="update">Update</string>
     <string name="new_category_layout">The Category is in use. \nMove items to:</string>
     <string name="sub_category_layout">Add a standalone category or a subcategory:</string>
+    <string name="description_dialog_title">Add/Edit description to your expense:</string>
     <string name="new_category">New category</string>
     <string name="existing_category">Existing category</string>
     <string name="standalone_category">A standalone category</string>
@@ -29,4 +30,5 @@
     <string name="minimum_sum">Minimum</string>
     <string name="maximum_sum">Maximum</string>
     <string name="average_sum">Average</string>
+    <string name="add_to_favourites">Add to favourites</string>
 </resources>

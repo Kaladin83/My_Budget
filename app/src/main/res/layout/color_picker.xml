@@ -1,53 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_color_picker_layout"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/dummy"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.08"
+        app:layout_constraintTop_toTopOf="parent" />
     <SeekBar
         android:id="@+id/red_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.20"
         android:layout_marginBottom="5dp"
         android:thumbTint="@color/red"
         style="@style/RedSeekBar"
         android:max="255"
         android:min="1"
         android:progress="1"
-        android:layout_weight="2"/>
+        app:layout_constraintTop_toBottomOf="@+id/dummy" />
 
     <SeekBar
         android:id="@+id/green_bar"
         style="@style/GreenSeekBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.20"
         android:layout_marginBottom="5dp"
         android:max="255"
         android:min="1"
         android:progress="1"
-        android:layout_weight="2"
-        android:thumbTint="@color/green" />
+        android:thumbTint="@color/green"
+        app:layout_constraintTop_toBottomOf="@+id/red_bar"/>
 
     <SeekBar
         android:id="@+id/blue_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.20"
         android:layout_marginBottom="5dp"
         android:thumbTint="@color/blue"
         android:max="255"
         android:min="1"
         android:layout_weight="2"
         android:progress="1"
-        style="@style/BlueSeekBar"/>
+        style="@style/BlueSeekBar"
+        app:layout_constraintTop_toBottomOf="@+id/green_bar"/>
 
     <Button
         android:id="@+id/update_color_btn"
         android:layout_width="130dp"
-        android:layout_height="25dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.15"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center"
         android:textAllCaps="false"
         android:padding="0dp"
-        android:layout_weight="1"
-        android:text="Add to favourites" />
-</LinearLayout>
+        android:text="@string/add_to_favourites"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/blue_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

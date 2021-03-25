@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -46,7 +45,7 @@ public abstract class DescriptionDialog extends Dialog implements View.OnClickLi
         window.setGravity(Gravity.CENTER);
 
         TextView title = findViewById(R.id.header_txt);
-        title.setText("Add/Edit description to your expense");
+        title.setText(activity.getString(R.string.description_dialog_title));
         descriptionEdit = findViewById(R.id.description_edit);
         descriptionEdit.setText(item.getDescription());
         descriptionEdit.requestFocus();
@@ -63,24 +62,6 @@ public abstract class DescriptionDialog extends Dialog implements View.OnClickLi
         okButton.setOnClickListener(this);
         cancelButton.setOnClickListener(this);
     }
-
-//    @Override
-//    public boolean onTouch(View view, MotionEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_DOWN)
-//        {
-//            return true;
-//        }
-//        else if (event.getAction() == MotionEvent.ACTION_UP)
-//        {
-//            Utils.closeKeyboard(descriptionEdit, activity);
-//            view.performClick();
-//            return false;
-//        }
-//        else
-//        {
-//            return false;
-//        }
-//    }
 
     @Override
     public void onClick(View v) {
@@ -100,5 +81,4 @@ public abstract class DescriptionDialog extends Dialog implements View.OnClickLi
     public void cancelButtonPressed() {
         this.dismiss();
     }
-
 }

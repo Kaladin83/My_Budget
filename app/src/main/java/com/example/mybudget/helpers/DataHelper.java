@@ -9,8 +9,8 @@ import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
 import com.example.mybudget.domain.dtos.ItemToAdd;
-import com.example.mybudget.domain.dtos.MonthlyStatistics;
-import com.example.mybudget.domain.dtos.Statistics;
+import com.example.mybudget.domain.domain.MonthlyStatistics;
+import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.TableStatistics;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
@@ -319,10 +319,10 @@ public class DataHelper implements Constants {
         }
 
         parentsAndStats.entrySet().forEach(s -> {
-            int sum = (int) getSum(s.getValue(), Statistics::getCnt);
-            double count = getSum(s.getValue(), Statistics::getSum);
-            stats.put(s.getKey(), new Statistics(getMin(s.getValue()), getMax(s.getValue()), Utils.round(count / sum), count,
-                    sum));
+            int count = (int) getSum(s.getValue(), Statistics::getCnt);
+            double sum = getSum(s.getValue(), Statistics::getSum);
+            stats.put(s.getKey(), new Statistics(getMin(s.getValue()), getMax(s.getValue()), Utils.round(count / sum), sum,
+                    count));
         });
     }
 

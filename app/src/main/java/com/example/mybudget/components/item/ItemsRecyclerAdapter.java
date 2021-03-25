@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
 import com.example.mybudget.R;
-import com.example.mybudget.domain.dtos.Statistics;
+import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
