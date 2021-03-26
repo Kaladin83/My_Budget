@@ -1,6 +1,7 @@
 package com.example.mybudget.components;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -34,7 +35,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.common.collect.ImmutableList;
@@ -198,7 +199,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
             private void displayPieData(Entry e, Map<String, Statistics> stats) {
                 Pair<String, Double> selected = stats.entrySet().stream()
-                        .filter(stat -> stat.getValue().getSum() == mapOfPercents.get(e.getY()))
+                        .filter(stat -> stat.getValue().getSum() == Objects.requireNonNull(mapOfPercents.get(e.getY())))
                         .map(stat -> new Pair<>(stat.getKey(), stat.getValue().getSum()))
                         .findFirst().orElse(null);
                 if (selected != null)
@@ -224,7 +225,12 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
 
         PieDataSet dataSet = new PieDataSet(entryY, "");
         dataSet.setColors(getDataSetColors(lEntries));
-        dataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) -> value > 0 ? Utils.round(value) + "%" : "");
+        dataSet.setValueFormatter((new ValueFormatter() {
+            @Override
+            public String getPieLabel(float value, PieEntry pieEntry) {
+                return value > 0 ? Utils.round(value) + "%" : "";
+            }
+        }));
         dataSet.setSliceSpace(2);
         dataSet.setValueTextSize(13);
         Legend legend = bind.pieChart.getLegend();
@@ -270,7 +276,10 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         bind.barChart.setBorderColor(textColor);
         bind.barChart.setSelected(false);
         bind.barChart.setPinchZoom(false);
+        bind.barChart.setDoubleTapToZoomEnabled(false);
         bind.barChart.setVerticalScrollBarEnabled(false);
+        bind.barChart.disableScroll();
+        bind.barChart.setExtraBottomOffset(20);
         populateStatisticsTable("", "", "", "");
     }
 
@@ -349,7 +358,12 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setAxisMaximum(5.5f);
-        xAxis.setValueFormatter(new MyXAxisValueFormatter(dates));
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return dates[(int) value % dates.length];
+            }
+        });
     }
 
     public int[] categoryColors(Predicate<Category> predicate) {
@@ -408,25 +422,5 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     public void onDestroyView() {
         super.onDestroyView();
         bind = null;
-    }
-
-    public static class MyXAxisValueFormatter implements IAxisValueFormatter {
-
-        private final String[] mValues;
-
-        public MyXAxisValueFormatter(String[] values) {
-            this.mValues = values;
-        }
-
-        @Override
-        public String getFormattedValue(float value, AxisBase axis) {
-            // "value" represents the position of the label on the axis (x or y)
-            String month = "";
-            if (value >= 0)
-            {
-                month = mValues[(int) value % mValues.length];
-            }
-            return month;
-        }
     }
 }

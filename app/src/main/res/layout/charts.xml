@@ -146,7 +146,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.75"
+                    app:layout_constraintHeight_percent="0.72"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -154,7 +154,7 @@
                     android:id="@+id/statics_layout"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    app:layout_constraintHeight_percent="0.25"
+                    app:layout_constraintHeight_percent="0.22"
                     app:layout_constraintTop_toBottomOf="@+id/bar_chart"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
