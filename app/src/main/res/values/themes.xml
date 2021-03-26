@@ -11,6 +11,8 @@
         <item name="colorSecondary">@color/orange</item>
         <item name="colorSecondaryVariant">@color/light_gray</item>
         <item name="colorOnSecondary">@color/very_light_black</item>
+        <item name="colorOnSurface">@color/super_light_green</item>
+        <item name="colorOnBackground">@color/red</item>
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:textColorSecondary">@color/white</item>
         <!-- Status bar color. -->
@@ -54,6 +56,8 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/turquoise</item>
         <item name="colorOnSecondary">@color/teal_200</item>
+        <item name="colorOnSurface">@color/turquoise</item>
+        <item name="colorOnBackground">@color/light_blue</item>
         <item name="android:textColorPrimary">@color/super_light_green</item>
         <item name="android:textColorSecondary">@color/super_light_green</item>
         <!-- Status bar color. -->

@@ -7,16 +7,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.example.mybudget.R;
 import com.example.mybudget.common.SimpleSpinnerAdapter;
+import com.example.mybudget.databinding.ChangeCategoryDialogBinding;
 import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
 import com.example.mybudget.utils.Enums.Action;
@@ -33,12 +29,9 @@ import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
  * Gives the option to move items to existing category or to move them to new one.
  */
 public abstract class ManageCategoryDialog extends Dialog implements View.OnClickListener, Constants {
-
+    private ChangeCategoryDialogBinding bind;
     private final Action action;
     private final Activity activity;
-    private EditText categoryEdit;
-    private Spinner categorySpinner;
-    private RadioButton firstChoiceRadio, secondChoiceRadio;
 
     public ManageCategoryDialog(Activity activity, Action action) {
         super(activity);
@@ -50,8 +43,9 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bind = ChangeCategoryDialogBinding.inflate(getLayoutInflater());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.change_category_dialog);
+        setContentView(bind.getRoot());
 
         Window window = this.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, (int)(Utils.getScreenHeight(activity)/2.3));
@@ -60,36 +54,28 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
         List<String> categories = Utils.getCategoriesNames(cat -> cat.getParent().equals(""));
         SimpleSpinnerAdapter adapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, categories);
 
-        TextView headerTxt = findViewById(R.id.header_txt);
-        View editPlaceHolder = findViewById(R.id.edit_place_holder);
-        Button okButton = findViewById(R.id.dialog_ok_button);
-        Button cancelButton = findViewById(R.id.dialog_cancel_button);
-        okButton.setOnClickListener(this);
-        cancelButton.setOnClickListener(this);
-        firstChoiceRadio = findViewById(R.id.new_category_radio);
-        firstChoiceRadio.setChecked(true);
-        firstChoiceRadio.setOnClickListener(this);
-        secondChoiceRadio = findViewById(R.id.existing_category_radio);
-        secondChoiceRadio.setOnClickListener(this);
-        categoryEdit = findViewById(R.id.category_edit);
-        categorySpinner =  findViewById(R.id.category_spinner);
-        categorySpinner.setAdapter(adapter);
+        bind.dialogOkButton.setOnClickListener(this);
+        bind.dialogCancelButton.setOnClickListener(this);
+        bind.newCategoryRadio.setOnClickListener(this);
+        bind.existingCategoryRadio.setOnClickListener(this);
+        bind.newCategoryRadio.setChecked(true);
+        bind.categorySpinner.setAdapter(adapter);
 
         if (action == ADD_CATEGORY)
         {
-            categoryEdit.setVisibility(View.INVISIBLE);
-            editPlaceHolder.setVisibility(View.VISIBLE);
-            headerTxt.setText(R.string.sub_category_layout);
-            firstChoiceRadio.setText(R.string.standalone_category);
-            secondChoiceRadio.setText(R.string.sub_category);
+            bind.categoryEdit.setVisibility(View.INVISIBLE);
+            bind.editPlaceHolder.setVisibility(View.VISIBLE);
+            bind.headerTxt.setText(R.string.sub_category_layout);
+            bind.newCategoryRadio.setText(R.string.standalone_category);
+            bind.existingCategoryRadio.setText(R.string.sub_category);
         }
         else
         {
-            categoryEdit.setVisibility(View.VISIBLE);
-            editPlaceHolder.setVisibility(View.INVISIBLE);
-            headerTxt.setText(R.string.new_category_layout);
-            firstChoiceRadio.setText(R.string.new_category);
-            secondChoiceRadio.setText(R.string.existing_category);
+            bind.categoryEdit.setVisibility(View.VISIBLE);
+            bind.editPlaceHolder.setVisibility(View.INVISIBLE);
+            bind.headerTxt.setText(R.string.new_category_layout);
+            bind.newCategoryRadio.setText(R.string.new_category);
+            bind.existingCategoryRadio.setText(R.string.existing_category);
         }
         enableFields(true, true, false, false);
     }
@@ -113,13 +99,13 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
     }
 
     private void getCategory() {
-        if (firstChoiceRadio.isChecked())
+        if (bind.newCategoryRadio.isChecked())
         {
             if (action == DELETE_CATEGORY)
             {
-                if (Utils.validateTextInput(categoryEdit.getText().toString()))
+                if (Utils.validateTextInput(bind.categoryEdit.getText().toString()))
                 {
-                    okButtonPressed(categoryEdit.getText().toString());
+                    okButtonPressed(bind.categoryEdit.getText().toString());
                 }
                 else
                 {
@@ -133,15 +119,15 @@ public abstract class ManageCategoryDialog extends Dialog implements View.OnClic
         }
         else
         {
-            okButtonPressed(categorySpinner.getSelectedItem().toString());
+            okButtonPressed(bind.categorySpinner.getSelectedItem().toString());
         }
     }
 
     private void enableFields(boolean b0, boolean b1, boolean b2, boolean b3) {
-        categoryEdit.setEnabled(b0);
-        firstChoiceRadio.setChecked(b1);
-        categorySpinner.setEnabled(b2);
-        secondChoiceRadio.setChecked(b3);
+        bind.categoryEdit.setEnabled(b0);
+        bind.newCategoryRadio.setChecked(b1);
+        bind.categorySpinner.setEnabled(b2);
+        bind.existingCategoryRadio.setChecked(b3);
     }
 
     public abstract void okButtonPressed(String categoryName);

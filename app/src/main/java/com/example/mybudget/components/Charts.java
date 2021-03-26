@@ -7,16 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.mybudget.R;
+import com.example.mybudget.databinding.ChartsBinding;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
@@ -25,8 +22,6 @@ import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
@@ -65,44 +60,36 @@ import static java.util.stream.Collectors.toList;
  */
 
 public class Charts extends Fragment implements View.OnClickListener, Constants {
-    private View mainView;
+    private ChartsBinding bind;
     private List<String> months;
-    private PieChart pieChart;
-    private BarChart barChart;
-    private RadioButton categoryRadio, subCategoryRadio;
     private final Map<Float, Double> mapOfPercents = new HashMap<>();
     private final Map<String, String> monthsMap = JavaUtils.mapOf("01", "JEN", "02", "FEB", "03", "MAR", "04", "APR", "05",
             "MAY", "06", "JUN", "07", "JUL", "08", "AUG", "09", "SEP", "10", "OCT", "11", "NOV", "12", "DEC");
-    private ConstraintLayout pieLayout, barLayout;
-    private TextView barTxt, pieTxt, minimumTxt, maximumTxt, averageTxt, totalTxt;
-    private Spinner monthSpinner, categorySpinner;
     private Activity activity;
     private DataHelper dataHelper;
     private int textColor;
     private String selectedDateDBFormat;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mainView = inflater.inflate(R.layout.charts, container, false);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        bind = ChartsBinding.inflate(inflater, container, false);
+        View view = bind.getRoot();
         activity = requireActivity();
         dataHelper = DataHelper.getDataHelper(getContext());
         textColor = Utils.getAttrColor(activity, android.R.attr.textColorPrimary);
-        FrameLayout noDataLayout = mainView.findViewById(R.id.no_data_layout);
-        ConstraintLayout dataLayout = mainView.findViewById(R.id.data_layout);
         if (!dataHelper.getListOfItems().isEmpty())
         {
             refreshCharts();
-            dataLayout.setVisibility(View.VISIBLE);
-            noDataLayout.setVisibility(View.GONE);
+            bind.dataLayout.setVisibility(View.VISIBLE);
+            bind.noDataLayout.setVisibility(View.GONE);
         }
         else
         {
-            noDataLayout.setVisibility(View.VISIBLE);
-            dataLayout.setVisibility(View.GONE);
+            bind.noDataLayout.setVisibility(View.VISIBLE);
+            bind.dataLayout.setVisibility(View.GONE);
         }
 
-        return mainView;
+        return view;
     }
 
     private List<String> getAllCategoriesNamesWithStatistics() {
@@ -136,7 +123,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     public void refreshCharts() {
-        if (mainView != null && !dataHelper.getListOfItems().isEmpty())
+        if (bind != null && !dataHelper.getListOfItems().isEmpty())
         {
             populateDataLayout();
         }
@@ -145,37 +132,28 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private void populateDataLayout() {
         months = getAllMonthNoDummies();
 
-        barTxt = mainView.findViewById(R.id.all_expenses_txt);
-        pieTxt = mainView.findViewById(R.id.monthly_expenses_txt);
-        barTxt.setOnClickListener(this);
-        pieTxt.setOnClickListener(this);
-
-        categoryRadio = mainView.findViewById(R.id.category_radio);
-        subCategoryRadio = mainView.findViewById(R.id.subcategory_radio);
-        categoryRadio.setOnClickListener(this);
-        subCategoryRadio.setOnClickListener(this);
+        bind.allExpensesTxt.setOnClickListener(this);
+        bind.monthlyExpensesTxt.setOnClickListener(this);
+        bind.categoryRadio.setOnClickListener(this);
+        bind.subcategoryRadio.setOnClickListener(this);
 
         createPieChart();
         createBarChart();
         createMonthSpinner();
         createCategorySpinner();
-
-        pieLayout = mainView.findViewById(R.id.pie_layout);
-        barLayout = mainView.findViewById(R.id.bar_layout);
         changeSelection(true, View.VISIBLE, View.VISIBLE, false, View.GONE, View.GONE);
     }
 
     private void createMonthSpinner() {
         SimpleSpinnerAdapter monthsAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, months);
-        monthSpinner = mainView.findViewById(R.id.pieSpinner);
-        monthSpinner.setAdapter(monthsAdapter);
-        monthSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+        bind.monthSpinner.setAdapter(monthsAdapter);
+        bind.monthSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                String selectedItem = monthSpinner.getItemAtPosition(position).toString();
+                String selectedItem = bind.monthSpinner.getItemAtPosition(position).toString();
                 loadPieData(selectedItem);
-                barChart.notifyDataSetChanged();
-                barChart.invalidate();
+                bind.barChart.notifyDataSetChanged();
+                bind.barChart.invalidate();
             }
 
             @Override
@@ -187,15 +165,15 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void createCategorySpinner() {
-        SimpleSpinnerAdapter categoryAdapter = new SimpleSpinnerAdapter(activity, R.layout.spinner_item, getAllCategoriesNamesWithStatistics());
-        categorySpinner = mainView.findViewById(R.id.columnSpinner);
-        categorySpinner.setAdapter(categoryAdapter);
-        categorySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+        SimpleSpinnerAdapter categoryAdapter = new
+                SimpleSpinnerAdapter(activity, R.layout.spinner_item, getAllCategoriesNamesWithStatistics());
+        bind.categorySpinner.setAdapter(categoryAdapter);
+        bind.categorySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                loadBarData(categorySpinner.getSelectedItem().toString());
-                barChart.notifyDataSetChanged();
-                barChart.invalidate();
+                loadBarData(bind.categorySpinner.getSelectedItem().toString());
+                bind.barChart.notifyDataSetChanged();
+                bind.barChart.invalidate();
             }
 
             @Override
@@ -207,17 +185,15 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void createPieChart() {
-        pieChart = mainView.findViewById(R.id.pie_chart);
-        pieChart.setCenterText("Category");
-        pieChart.setHoleRadius(32);
-        pieChart.setCenterTextSize(12);
-        pieChart.setTransparentCircleAlpha(50);
-        pieChart.setRotationEnabled(false);
-        pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+        bind.pieChart.setHoleRadius(35);
+        bind.pieChart.setCenterTextSize(13);
+        bind.pieChart.setTransparentCircleAlpha(50);
+        bind.pieChart.setRotationEnabled(false);
+        bind.pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 displayPieData(e, Utils.getCategoriesStats(selectedDateDBFormat,
-                        cat -> categoryRadio.isChecked() == cat.getParent().equals("")));
+                        cat -> bind.categoryRadio.isChecked() == cat.getParent().equals("")));
             }
 
             private void displayPieData(Entry e, Map<String, Statistics> stats) {
@@ -227,8 +203,8 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                         .findFirst().orElse(null);
                 if (selected != null)
                 {
-                    String str = String.join("", selected.first, ": ", String.valueOf(selected.second), " " + "NIS");
-                    Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+                    String str = String.join("", selected.first, "\n", String.valueOf(selected.second), " " + "NIS");
+                    bind.pieChart.setCenterText(str);
                 }
             }
 
@@ -242,7 +218,7 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     private void loadPieData(String selectedMonth) {
         selectedDateDBFormat = Utils.getDBMonthFormat(selectedMonth, monthsMap);
         Map<String ,Statistics> stats = Utils.getCategoriesStats(selectedDateDBFormat,
-                cat -> categoryRadio.isChecked() == cat.getParent().equals(""));
+                cat -> bind.categoryRadio.isChecked() == cat.getParent().equals(""));
         List<PieEntry> entryY = new ArrayList<>();
         LegendEntry[] lEntries = getLegendEntries(entryY, stats);
 
@@ -251,14 +227,14 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
         dataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) -> value > 0 ? Utils.round(value) + "%" : "");
         dataSet.setSliceSpace(2);
         dataSet.setValueTextSize(13);
-        Legend legend = pieChart.getLegend();
+        Legend legend = bind.pieChart.getLegend();
         legend.setCustom(lEntries);
         legend.setTextSize(12);
         legend.setTextColor(textColor);
-        setDescription(pieChart.getDescription(), "Expenses for " + selectedMonth + " (shown in percents)", -7, 0);
+        setDescription(bind.pieChart.getDescription(), "Expenses for " + selectedMonth + " (shown in percents)", -7, 0);
 
-        pieChart.setData(new PieData(dataSet));
-        pieChart.invalidate();
+        bind.pieChart.setData(new PieData(dataSet));
+        bind.pieChart.invalidate();
     }
 
     private int[] getDataSetColors(LegendEntry[] lEntries) {
@@ -290,16 +266,11 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void createBarChart() {
-        minimumTxt = mainView.findViewById(R.id.min_val);
-        maximumTxt = mainView.findViewById(R.id.max_val);
-        averageTxt = mainView.findViewById(R.id.avg_val);
-        totalTxt = mainView.findViewById(R.id.total_val);
-        barChart = mainView.findViewById(R.id.bar_chart);
-        barChart.setFitBars(true);
-        barChart.setBorderColor(textColor);
-        barChart.setSelected(false);
-        barChart.setPinchZoom(false);
-        barChart.setVerticalScrollBarEnabled(false);
+        bind.barChart.setFitBars(true);
+        bind.barChart.setBorderColor(textColor);
+        bind.barChart.setSelected(false);
+        bind.barChart.setPinchZoom(false);
+        bind.barChart.setVerticalScrollBarEnabled(false);
         populateStatisticsTable("", "", "", "");
     }
 
@@ -323,14 +294,14 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
             int color = Utils.findColor(selectedCategory);
             dataSet.setColor(color);
         }
-        barChart.setData(barData);
+        bind.barChart.setData(barData);
         dataSet.setFormSize(0);
-        setDescription(barChart.getDescription(), "Distribution by dates for " + selectedCategory, -65, -25);
+        setDescription(bind.barChart.getDescription(), "Distribution by dates for " + selectedCategory, -65, -5);
         setAxis(monthsWithDummies);
-        barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+        bind.barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                String tempDate = barChart.getXAxis().getFormattedLabel((int) e.getX()).toUpperCase();
+                String tempDate = bind.barChart.getXAxis().getFormattedLabel((int) e.getX()).toUpperCase();
                 String date = Utils.getDBMonthFormat(tempDate, monthsMap);
                 MonthlyStatistics monthlyStats = dataHelper.getMonthlyStatistics(date);
                 if (monthlyStats == null){
@@ -357,20 +328,20 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
     }
 
     private void populateStatisticsTable(String min, String max, String avg, String total) {
-        minimumTxt.setText(min);
-        maximumTxt.setText(max);
-        averageTxt.setText(avg);
-        totalTxt.setText(total);
+        bind.minVal.setText(min);
+        bind.maxVal.setText(max);
+        bind.avgVal.setText(avg);
+        bind.totalVal.setText(total);
     }
 
     private void setAxis(List<String> monthsWithDummies) {
         final String[] dates = monthsWithDummies.toArray(new String[0]);
-        barChart.getAxisLeft().setAxisLineColor(textColor);
-        barChart.getAxisLeft().setTextColor(textColor);
-        barChart.getAxisRight().setAxisLineColor(textColor);
-        barChart.getAxisRight().setTextColor(textColor);
+        bind.barChart.getAxisLeft().setAxisLineColor(textColor);
+        bind.barChart.getAxisLeft().setTextColor(textColor);
+        bind.barChart.getAxisRight().setAxisLineColor(textColor);
+        bind.barChart.getAxisRight().setTextColor(textColor);
 
-        XAxis xAxis = barChart.getXAxis();
+        XAxis xAxis = bind.barChart.getXAxis();
         xAxis.setAxisMaximum(dates.length);
         xAxis.setAxisLineColor(textColor);
         xAxis.setTextColor(textColor);
@@ -399,38 +370,44 @@ public class Charts extends Fragment implements View.OnClickListener, Constants 
                 changeSelection(false, View.GONE, View.GONE, true, View.VISIBLE, View.VISIBLE);
                 break;
             case CATEGORY_RADIO:
-                changeSelection(true, false, "Categories");
-                loadPieData(monthSpinner.getSelectedItem().toString());
+                changeSelection(true, false);
+                loadPieData(bind.monthSpinner.getSelectedItem().toString());
                 break;
             case SUBCATEGORY_RADIO:
                 if (!Utils.getCategoriesStats(selectedDateDBFormat, cat-> !cat.getParent().equals("")).isEmpty())
                 {
-                    changeSelection(false, true, "Subcategories");
-                    loadPieData(monthSpinner.getSelectedItem().toString());
+                    changeSelection(false, true);
+                    loadPieData(bind.monthSpinner.getSelectedItem().toString());
                 }
                 else
                 {
-                    changeSelection(true, false, "Categories");
+                    changeSelection(true, false);
                     Toast.makeText(activity, "No subcategories exist", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
-    private void changeSelection(boolean b, boolean b1, String pieChartHoleText) {
-        categoryRadio.setChecked(b);
-        subCategoryRadio.setChecked(b1);
-        pieChart.setCenterText(pieChartHoleText);
+    private void changeSelection(boolean b, boolean b1) {
+        bind.categoryRadio.setChecked(b);
+        bind.subcategoryRadio.setChecked(b1);
+        bind.pieChart.setCenterText("");
     }
 
     private void changeSelection(boolean selected1, int visibleChart1, int visibleSpinner1, boolean selected2,
                                  int visibleChart2, int visibleSpinner2) {
-        pieLayout.setVisibility(visibleChart1);
-        monthSpinner.setVisibility(visibleSpinner1);
-        pieTxt.setSelected(selected1);
-        barLayout.setVisibility(visibleChart2);
-        categorySpinner.setVisibility(visibleSpinner2);
-        barTxt.setSelected(selected2);
+        bind.pieLayout.setVisibility(visibleChart1);
+        bind.monthSpinner.setVisibility(visibleSpinner1);
+        bind.monthlyExpensesTxt.setSelected(selected1);
+        bind.barLayout.setVisibility(visibleChart2);
+        bind.categorySpinner.setVisibility(visibleSpinner2);
+        bind.allExpensesTxt.setSelected(selected2);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bind = null;
     }
 
     public static class MyXAxisValueFormatter implements IAxisValueFormatter {

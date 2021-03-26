@@ -7,13 +7,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
@@ -21,12 +17,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.mybudget.components.Edit;
+import com.example.mybudget.databinding.CategoryPickerBinding;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
-import com.example.mybudget.R;
 import com.example.mybudget.components.colorpicker.ColorPicker;
 import com.example.mybudget.components.colorpicker.FavouriteColors;
 import com.example.mybudget.components.item.ItemRecycler;
@@ -58,26 +53,22 @@ import static com.example.mybudget.utils.Enums.Fragment.FAVOURITE_COLORS;
  */
 public class CategoryPicker extends Fragment implements
         View.OnClickListener, RecyclerTouchHelper.RecyclerItemTouchHelperListener, View.OnTouchListener, Constants {
+    private CategoryPickerBinding bind;
     private int newSelectedColor = 0;
     private DataHelper dataHelper;
     private ViewsHelper viewsHelper;
     private Activity activity;
-    private View mainView;
     private ItemRecycler itemRecycler;
-    private EditText addCategoryEdit;
     private CategoryRecyclerAdapter categoryAdapter;
-    private ViewPager2 pager;
-    private TextView newColorTxt, currentColorTxt;
-    private ConstraintLayout mainLayout;
     private CategoryPicker categoryPicker;
     private FavouriteColors favoriteColors;
     private ManageCategoryDialog manageCategoryDialog;
     private int strokeColor;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mainView = inflater.inflate(R.layout.category_picker, container, false);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        bind = CategoryPickerBinding.inflate(inflater, container, false);
+        View mainView = bind.getRoot();
         activity = requireActivity();
         strokeColor = Utils.getThemeStrokeColor(activity);
         viewsHelper = ViewsHelper.getViewsHelper();
@@ -92,45 +83,33 @@ public class CategoryPicker extends Fragment implements
     }
 
     private void assignFields() {
-        mainLayout = mainView.findViewById(R.id.category_picker);
-        mainLayout.setOnTouchListener(this);
-        ConstraintLayout updateLayout = mainView.findViewById(R.id.update_layout);
-        updateLayout.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 2, strokeColor));
-        Button addCategoryBtn = mainView.findViewById(R.id.add_category_btn);
-        addCategoryBtn.setOnClickListener(this);
-        Button updateBtn = mainView.findViewById(R.id.update_btn);
-        updateBtn.setOnClickListener(this);
-
-        addCategoryEdit = mainView.findViewById(R.id.category_edit);
-        addCategoryEdit.clearFocus();
-        newColorTxt = mainView.findViewById(R.id.new_color_txt);
-        newColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
-        currentColorTxt = mainView.findViewById(R.id.current_color_txt);
-        currentColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
-
-        categoryAdapter = new CategoryRecyclerAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        RecyclerView categoryRecyclerView = mainView.findViewById(R.id.category_recycler_view);
-        categoryRecyclerView.setAdapter(categoryAdapter);
-        categoryRecyclerView.setLayoutManager(layoutManager);
+        categoryAdapter = new CategoryRecyclerAdapter(this);
+        bind.categoryPickerLayout.setOnTouchListener(this);
+        bind.updateLayout.setBackground(Utils.createBorder(10, Color.TRANSPARENT, 2, strokeColor));
+        bind.addCategoryBtn.setOnClickListener(this);
+        bind.updateBtn.setOnClickListener(this);
+        bind.categoryEdit.clearFocus();
+        bind.newColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
+        bind.currentColorTxt.setBackground(Utils.createBorder(15, Color.TRANSPARENT, 1, strokeColor));
+        bind.categoryRecyclerView.setAdapter(categoryAdapter);
+        bind.categoryRecyclerView.setLayoutManager(layoutManager);
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerTouchHelper(0, ItemTouchHelper.LEFT, this);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(categoryRecyclerView);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(bind.categoryRecyclerView);
 
         createTabs();
         refreshCategories();
     }
 
     private void createTabs() {
-        TabLayout tabLayout = mainView.findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab());
-        tabLayout.addTab(tabLayout.newTab());
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        pager = mainView.findViewById(R.id.pager);
         PagerAdapter adapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
-        pager.setAdapter(adapter);
+        bind.tabLayout.addTab(bind.tabLayout.newTab());
+        bind.tabLayout.addTab(bind.tabLayout.newTab());
+        bind.tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        bind.pager.setAdapter(adapter);
 
-        new TabLayoutMediator(tabLayout, pager, (tab, position) ->
+        new TabLayoutMediator(bind.tabLayout, bind.pager, (tab, position) ->
                 tab.setText(position == 0 ? "Color Picker" : "Favourites")).attach();
     }
 
@@ -143,7 +122,7 @@ public class CategoryPicker extends Fragment implements
     }
 
     private void addCategory() {
-        String categoryName = addCategoryEdit.getText().toString();
+        String categoryName = bind.categoryEdit.getText().toString();
         boolean isCategoryExists = dataHelper.getListOfCategories().stream().anyMatch(cat -> cat.getName().equals(categoryName));
         String message = isCategoryExists ? "The category already in the list" : categoryName.length() == 0 ?
                 "The category name must not be blank" : "";
@@ -157,11 +136,11 @@ public class CategoryPicker extends Fragment implements
             @Override
             public void okButtonPressed(String categoryName) {
                 int color = Utils.findColor(categoryName);
-                Category category = new Category(addCategoryEdit.getText().toString(), categoryName, color);
+                Category category = new Category(bind.categoryEdit.getText().toString(), categoryName, color);
 
                 dataHelper.addCategory(category);
-                addCategoryEdit.setText("");
-                Utils.closeKeyboard(addCategoryEdit, activity);
+                bind.categoryEdit.setText("");
+                Utils.closeKeyboard(bind.categoryEdit, activity);
 
                 Toast.makeText(categoryPicker.getContext(), "The category: " + category.getName() + " was added",
                         Toast.LENGTH_SHORT).show();
@@ -181,7 +160,7 @@ public class CategoryPicker extends Fragment implements
         }
 
         Category category = dataHelper.getListOfCategories().get(selectedPosition);
-        currentColorTxt.setBackgroundColor(newSelectedColor);
+        bind.currentColorTxt.setBackgroundColor(newSelectedColor);
         dataHelper.changeCategoryColor(category, newSelectedColor);
 
         Toast.makeText(getContext(), "The color of " + category.getName() + " was changed", Toast.LENGTH_SHORT).show();
@@ -235,13 +214,13 @@ public class CategoryPicker extends Fragment implements
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        Utils.closeKeyboard(addCategoryEdit, activity);
+        Utils.closeKeyboard(bind.categoryEdit, activity);
         return false;
     }
 
     public void updateColorField(int color) {
         newSelectedColor = color;
-        newColorTxt.setBackground(Utils.createBorder(15, color, 1, strokeColor));
+        bind.newColorTxt.setBackground(Utils.createBorder(15, color, 1, strokeColor));
     }
 
     public void restoreCategory(Category deleteCategory, int deletedIndex) {
@@ -251,7 +230,7 @@ public class CategoryPicker extends Fragment implements
     }
 
     public void restore(Integer deleteColor, Category deleteCategory, int deletedIndex, String message) {
-        Snackbar snackbar = Snackbar.make(mainLayout, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(bind.categoryPickerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.setAction("UNDO", view -> {
             if (deleteColor != null)
             {
@@ -268,12 +247,12 @@ public class CategoryPicker extends Fragment implements
 
 
     public void updateColor(String category) {
-        currentColorTxt.setBackground(Utils.createBorder(15, Utils.findColor(category), 1, strokeColor));
+        bind.currentColorTxt.setBackground(Utils.createBorder(15, Utils.findColor(category), 1, strokeColor));
         categoryAdapter.notifyDataSetChanged();
     }
 
     public void refreshFavouriteColors() {
-        pager.setCurrentItem(1);
+        bind.pager.setCurrentItem(1);
     }
 
     private class PagerAdapter extends FragmentStateAdapter {

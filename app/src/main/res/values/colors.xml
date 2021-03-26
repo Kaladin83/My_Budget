@@ -12,15 +12,16 @@
     <color name="ultra_light_black">#8C8A8A</color>
     <color name="super_light_black">#AAAAAA</color>
     <color name="light_gray">#C1C1C1</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#FFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">@color/teal_200</color>
-    <color name="red">#FF0E1D</color>
-    <color name="orange">#FDD4A8</color>
-    <color name="blue">#5d5ff7</color>
+    <color name="red">#CF4C54</color>
+    <color name="orange">#FFE6C9</color>
+    <color name="blue">#68A2FA</color>
+    <color name="light_blue">#C4C4FB</color>
     <color name="turquoise">#8CC5BF</color>
     <color name="very_dark_green">#01911C</color>
     <color name="dark_green">#0CA829</color>

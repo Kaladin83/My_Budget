@@ -295,7 +295,7 @@ public class DataHelper implements Constants {
         //Add total for all categories to stats map
         int count = (int) getSum(stats, Statistics::getCnt);
         double sum = getSum(stats, Statistics::getSum);
-        stats.put(Utils.TOTAL, new Statistics(min, max, Utils.round(sum/count), sum, count));
+        stats.put(Utils.TOTAL, new Statistics(min, max, Utils.round(sum / count), sum, count));
 
         //Add categories that have children to stats map
         addParentCategoriesToStatisticsMap(stats);
@@ -321,7 +321,7 @@ public class DataHelper implements Constants {
         parentsAndStats.entrySet().forEach(s -> {
             int count = (int) getSum(s.getValue(), Statistics::getCnt);
             double sum = getSum(s.getValue(), Statistics::getSum);
-            stats.put(s.getKey(), new Statistics(getMin(s.getValue()), getMax(s.getValue()), Utils.round(count / sum), sum,
+            stats.put(s.getKey(), new Statistics(getMin(s.getValue()), getMax(s.getValue()), Utils.round(sum / count), sum,
                     count));
         });
     }

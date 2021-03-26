@@ -7,11 +7,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.mybudget.R;
+import com.example.mybudget.databinding.DescriptionDialogBinding;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.utils.Utils;
 
@@ -23,9 +22,9 @@ import static com.example.mybudget.utils.Enums.Id;
  * Gives the option to move items to existing category or to move them to new one.
  */
 public abstract class DescriptionDialog extends Dialog implements View.OnClickListener {
+    private DescriptionDialogBinding bind;
     private final Activity activity;
     private final Item item;
-    private EditText descriptionEdit;
 
     public DescriptionDialog(Activity activity, Item item) {
         super(activity);
@@ -37,8 +36,9 @@ public abstract class DescriptionDialog extends Dialog implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bind = DescriptionDialogBinding.inflate(getLayoutInflater());
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.description_dialog);
+        setContentView(bind.getRoot());
 
         Window window = this.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, (int) (Utils.getScreenHeight(activity) / 2.3));
@@ -46,30 +46,25 @@ public abstract class DescriptionDialog extends Dialog implements View.OnClickLi
 
         TextView title = findViewById(R.id.header_txt);
         title.setText(activity.getString(R.string.description_dialog_title));
-        descriptionEdit = findViewById(R.id.description_edit);
-        descriptionEdit.setText(item.getDescription());
-        descriptionEdit.requestFocus();
+        bind.descriptionEdit.setText(item.getDescription());
+        bind.descriptionEdit.requestFocus();
 
         Utils.openKeyboard(activity);
-        TextView amount = findViewById(R.id.amount_column_val);
-        TextView category = findViewById(R.id.category_column_val);
-        TextView date = findViewById(R.id.date_column_val);
-        amount.setText(String.valueOf(item.getAmount()));
-        category.setText(item.getCategory());
-        date.setText(item.getDate());
-        Button okButton = findViewById(R.id.dialog_ok_button);
-        Button cancelButton = findViewById(R.id.dialog_cancel_button);
-        okButton.setOnClickListener(this);
-        cancelButton.setOnClickListener(this);
+
+        bind.amountVal.setText(String.valueOf(item.getAmount()));
+        bind.categoryVal.setText(item.getCategory());
+        bind.dateVal.setText(item.getDate());
+        bind.dialogOkButton.setOnClickListener(this);
+        bind.dialogCancelButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        Utils.closeKeyboard(descriptionEdit, activity);
+        Utils.closeKeyboard(bind.descriptionEdit, activity);
         switch (Id.getId(v.getId()))
         {
             case DIALOG_OK_BUTTON:
-                okButtonPressed(descriptionEdit.getText().toString());
+                okButtonPressed(bind.descriptionEdit.getText().toString());
                 break;
             case DIALOG_CANCEL_BUTTON:
                 cancelButtonPressed();

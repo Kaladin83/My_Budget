@@ -1,15 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_recycler_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-</LinearLayout>
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.89"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.11"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/number_expenses_txt"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/expenses"
+            android:gravity="center"
+            android:textColor="?colorOnBackground"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintBottom_toTopOf="@+id/number_expenses_val"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/number_expenses_val"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/total_sum_txt"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/total_sum"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:textColor="?colorOnBackground"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintStart_toEndOf="@+id/number_expenses_txt"
+            app:layout_constraintBottom_toTopOf="@+id/total_sum_val"
+            app:layout_constraintEnd_toStartOf="@id/average_txt"/>
+
+        <TextView
+            android:id="@+id/total_sum_val"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintStart_toEndOf="@+id/number_expenses_val"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/average_val"/>
+
+        <TextView
+            android:id="@+id/average_txt"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/average_sum"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:textColor="?colorOnBackground"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintBottom_toTopOf="@+id/average_val"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/average_val"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

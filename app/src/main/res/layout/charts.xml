@@ -62,7 +62,7 @@
             app:layout_constraintWidth_percent="0.40" />
 
         <Spinner
-            android:id="@+id/pieSpinner"
+            android:id="@+id/month_spinner"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:drawSelectorOnTop="true"
@@ -75,7 +75,7 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
         <Spinner
-            android:id="@+id/columnSpinner"
+            android:id="@+id/category_spinner"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:drawSelectorOnTop="true"

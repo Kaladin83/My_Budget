@@ -31,4 +31,5 @@
     <string name="maximum_sum">Maximum</string>
     <string name="average_sum">Average</string>
     <string name="add_to_favourites">Add to favourites</string>
+    <string name="expenses">Expenses</string>
 </resources>

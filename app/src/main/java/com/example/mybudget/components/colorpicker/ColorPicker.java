@@ -5,17 +5,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.mybudget.components.categorypicker.CategoryPicker;
 import com.example.mybudget.R;
+import com.example.mybudget.databinding.ColorPickerBinding;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.helpers.ViewsHelper;
-import com.example.mybudget.utils.Enums;
 
 import static com.example.mybudget.utils.Enums.*;
 import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
@@ -30,21 +30,16 @@ public class ColorPicker extends Fragment implements SeekBar.OnSeekBarChangeList
     private CategoryPicker categoryPicker;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mainView = inflater.inflate(R.layout.color_picker, container, false);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ColorPickerBinding bind = ColorPickerBinding.inflate(inflater, container, false);
+        View mainView = bind.getRoot();
         dataHelper = DataHelper.getDataHelper(getContext());
         categoryPicker = ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER));
 
-        SeekBar redSeekBar = mainView.findViewById(R.id.red_bar);
-        SeekBar greenSeekBar = mainView.findViewById(R.id.green_bar);
-        SeekBar blueSeekBar = mainView.findViewById(R.id.blue_bar);
-        redSeekBar.setOnSeekBarChangeListener(this);
-        greenSeekBar.setOnSeekBarChangeListener(this);
-        blueSeekBar.setOnSeekBarChangeListener(this);
-
-        Button updateColorBtn = mainView.findViewById(R.id.update_color_btn);
-        updateColorBtn.setOnClickListener(this);
+        bind.redBar.setOnSeekBarChangeListener(this);
+        bind.greenBar.setOnSeekBarChangeListener(this);
+        bind.blueBar.setOnSeekBarChangeListener(this);
+        bind.updateColorBtn.setOnClickListener(this);
 
         return mainView;
     }
