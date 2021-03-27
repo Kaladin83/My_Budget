@@ -30,4 +30,18 @@
     <color name="very_light_green">#CAF6D3</color>
     <color name="super_light_green">#ECFAEF</color>
     <color name="toolBar">#eff2f7</color>
+
+
+    <color name="blue_3">#CEEBEF</color>
+    <color name="blue_4">#dae3f2</color>
+    <color name="yellow_2">#e7f986</color>
+    <color name="yellow_3">#eff9bb</color>
+    <color name="purple_3">#ebc0f7</color>
+    <color name="purple_4">#eddcf2</color>
+    <color name="red_4">#f79491</color>
+    <color name="green_2">#28c745</color>
+    <color name="red_5">#fcd2d1</color>
+    <color name="green_3">#87f295</color>
+    <color name="green_4">#d5fcba</color>
+
 </resources>

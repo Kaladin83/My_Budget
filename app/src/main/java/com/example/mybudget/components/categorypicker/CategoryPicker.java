@@ -27,7 +27,6 @@ import com.example.mybudget.components.colorpicker.FavouriteColors;
 import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
@@ -52,7 +51,7 @@ import static com.example.mybudget.utils.Enums.Fragment.FAVOURITE_COLORS;
  * Class that gives to user the tools to add new category, and manage them.
  */
 public class CategoryPicker extends Fragment implements
-        View.OnClickListener, RecyclerTouchHelper.RecyclerItemTouchHelperListener, View.OnTouchListener, Constants {
+        View.OnClickListener, RecyclerTouchHelper.RecyclerItemTouchHelperListener, View.OnTouchListener {
     private CategoryPickerBinding bind;
     private int newSelectedColor = 0;
     private DataHelper dataHelper;
@@ -253,6 +252,12 @@ public class CategoryPicker extends Fragment implements
 
     public void refreshFavouriteColors() {
         bind.pager.setCurrentItem(1);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bind = null;
     }
 
     private class PagerAdapter extends FragmentStateAdapter {

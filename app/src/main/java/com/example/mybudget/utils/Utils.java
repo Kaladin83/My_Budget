@@ -18,7 +18,6 @@ import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.google.common.collect.ImmutableMap;
 
@@ -39,7 +38,7 @@ import static java.util.stream.Collectors.toMap;
  * Utilities. All functionality that is common to multiple classes
  */
 
-public class Utils implements Constants {
+public class Utils {
 
     private static DataHelper dataHelper;
     public static final String TOTAL = "Total";

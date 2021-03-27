@@ -22,7 +22,6 @@ import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.Enums.Action;
 import com.example.mybudget.utils.Utils;
@@ -37,7 +36,7 @@ import static com.example.mybudget.utils.Enums.DateFormat.*;
 import static com.example.mybudget.utils.Enums.Fragment.CHARTS;
 import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
 
-public class ItemRecycler extends Fragment implements RecyclerTouchHelper.RecyclerItemTouchHelperListener, Constants {
+public class ItemRecycler extends Fragment implements RecyclerTouchHelper.RecyclerItemTouchHelperListener{
     private RecyclerBinding bind;
     private final MainActivity mainActivity;
     private ItemsRecyclerAdapter parentItemAdapter;
@@ -78,10 +77,21 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
 
     private void populateTotals() {
         MonthlyStatistics monthlyStats = dataHelper.getMonthlyStatistics(Utils.getCurrentDate(PAY));
-        Statistics stats = Objects.requireNonNull(monthlyStats.getStatistics().get(Utils.TOTAL));
-        bind.averageVal.setText(String.valueOf(stats.getAvg()));
-        bind.totalSumVal.setText(String.valueOf(stats.getSum()));
-        bind.numberExpensesVal.setText(String.valueOf(stats.getCnt()));
+        if (monthlyStats == null)
+        {
+            populateTotals("", "", "");
+        }
+        else
+        {
+            Statistics stats = Objects.requireNonNull(monthlyStats.getStatistics().get(Utils.TOTAL));
+            populateTotals(String.valueOf(stats.getAvg()), String.valueOf(stats.getSum()), String.valueOf(stats.getCnt()));
+        }
+    }
+
+    private void populateTotals(String average, String sum, String expenses) {
+        bind.averageVal.setText(average);
+        bind.totalSumVal.setText(sum);
+        bind.numberExpensesVal.setText(expenses);
     }
 
     @Override

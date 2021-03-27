@@ -1,7 +1,6 @@
 package com.example.mybudget.components;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
@@ -60,7 +58,7 @@ import static java.util.stream.Collectors.toList;
  * Charts class - create charts
  */
 
-public class Charts extends Fragment implements View.OnClickListener, Constants {
+public class Charts extends Fragment implements View.OnClickListener{
     private ChartsBinding bind;
     private List<String> months;
     private final Map<Float, Double> mapOfPercents = new HashMap<>();

@@ -104,4 +104,10 @@ public class Edit extends Fragment implements View.OnClickListener, View.OnTouch
             return false;
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bind = null;
+    }
 }

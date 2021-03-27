@@ -89,6 +89,6 @@ public class Analyzer {
                     .findFirst().orElse("");
             parentName = Utils.getParentCategoryName(category);
         }
-        return new ItemToAdd(otherName, parentName, addedCategoryName, amount, description);
+        return new ItemToAdd(otherName.equals(" (other)") ? "": otherName, parentName, addedCategoryName, amount, description);
     }
 }

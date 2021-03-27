@@ -77,7 +77,7 @@
                     android:textAlignment="center"
                     android:gravity="center"
                     android:textColor="@color/recycle_item_selector"
-                    android:layout_width="120dp"
+                    android:layout_width="140dp"
                     android:layout_height="28dp" />
 
                 <ImageView

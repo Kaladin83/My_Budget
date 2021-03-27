@@ -34,4 +34,97 @@
     <style name="SpinnerTheme" parent="android:Widget.Spinner">
         <item name="android:background">@drawable/custom_spinner</item>
     </style>
+
+    <style name="actionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:drawableTint">@color/white</item>
+    </style>
+
+    <style name="ActionBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle</item>
+        <item name="background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="ActionBarTitleTextStyle" >
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">?android:attr/textColorSecondary</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:actionMenuTextColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/custom_button</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">8pt</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TabsStyle" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">?attr/colorSecondary</item>
+        <item name="tabSelectedTextColor">?attr/colorSecondary</item>
+        <item name="tabTextColor">?android:attr/textColorSecondary</item>
+        <item name="tabBackground">?attr/colorPrimary</item>
+    </style>
+
+    <style name="ImageButtonStyle">
+        <item name="tint">@color/image_buttons_selector</item>
+    </style>
+
+    <style name="NavigationLayoutStyle">
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="BorderStyle" parent="">
+        <item name="android:background">@drawable/custom_background_border_ellipse</item>
+    </style>
+
+    <style name="HalfBorderStyle" parent="">
+        <item name="android:background">@drawable/custom_half_border</item>
+    </style>
+
+    <style name="RecyclerItemStyle">
+        <item name="android:background">@drawable/custom_recycler_item_selector</item>
+    </style>
+
+    <style name="RecyclerDecoratorStyle">
+        <item name="android:background">?attr/colorSecondaryVariant</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/custom_background_border_none_ellipse</item>
+<!--        <item name="android:textCursorDrawable">@drawable/custom_cursor</item>-->
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:cursorVisible">true</item>
+    </style>
+
+    <style name="SpinnerItemStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:background">@drawable/custom_background_border_none_selected_not</item>
+        <item name="android:layout_height">40dp</item>
+    </style>
+
+    <style name="ToggleViewStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:background">@drawable/custom_toggle_view_selector</item>
+        <item name="android:textColor">@color/toggle_view_selector</item>
+    </style>
+
+    <style name="MenuTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">9pt</item>
+    </style>
+
+    <style name="RadioStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="buttonTint">?attr/colorSecondary</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">8pt</item>
+    </style>
+
+    <style name="HeaderStyle" >
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textSize">8pt</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="SpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="backgroundTint">?android:attr/textColorPrimary</item>
+    </style>
 </resources>

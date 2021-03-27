@@ -3,8 +3,11 @@ package com.example.mybudget.helpers;
 import android.content.Context;
 import android.graphics.Color;
 
+import androidx.core.content.ContextCompat;
+
 import com.example.mybudget.Data.Analyzer;
 import com.example.mybudget.Data.DataBase;
+import com.example.mybudget.R;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
@@ -12,7 +15,6 @@ import com.example.mybudget.domain.dtos.ItemToAdd;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.TableStatistics;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 
-public class DataHelper implements Constants {
+public class DataHelper{
 
     private final DataBase dataBase;
     private final Analyzer analyzer;
@@ -121,26 +123,26 @@ public class DataHelper implements Constants {
         dataBase.deleteAllMonthlyItems(month);
     }
 
-    public void populateInitialCategories() {
+    public void populateInitialCategories(Context context) {
         dataBase.clearAllColors();
-        dataBase.insertColor(BLUE_3);
-        dataBase.insertColor(BLUE_4);
-        dataBase.insertColor(RED_4);
-        dataBase.insertColor(RED_5);
-        dataBase.insertColor(GREEN_3);
-        dataBase.insertColor(GREEN_4);
-        dataBase.insertColor(YELLOW_3);
-        dataBase.insertColor(YELLOW_4);
-        dataBase.insertColor(PURPLE_3);
-        dataBase.insertColor(PURPLE_4);
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.blue_3));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.blue_4));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.red_4));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.red_5));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.green_3));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.green_4));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.yellow_3));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.yellow_2));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.purple_3));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.purple_4));
 
         dataBase.clearAllCategories();
-        dataBase.insertCategory(new Category("home", "", BLUE_3));
-        dataBase.insertCategory(new Category("food", "", BLUE_4));
-        dataBase.insertCategory(new Category("cafes", "", RED_4));
-        dataBase.insertCategory(new Category("clothes", "", YELLOW_4));
-        dataBase.insertCategory(new Category("car", "", GREEN_4));
-        dataBase.insertCategory(new Category("other", "", PURPLE_4));
+        dataBase.insertCategory(new Category("home", "", ContextCompat.getColor(context, R.color.blue_3)));
+        dataBase.insertCategory(new Category("food", "", ContextCompat.getColor(context, R.color.blue_4)));
+        dataBase.insertCategory(new Category("cafes", "", ContextCompat.getColor(context, R.color.red_4)));
+        dataBase.insertCategory(new Category("clothes", "", ContextCompat.getColor(context, R.color.yellow_3)));
+        dataBase.insertCategory(new Category("car", "", ContextCompat.getColor(context, R.color.green_4)));
+        dataBase.insertCategory(new Category("other", "", ContextCompat.getColor(context, R.color.purple_4)));
     }
 
     public void fetchData(String payDate) {
@@ -149,7 +151,6 @@ public class DataHelper implements Constants {
         dataBase.fetchAllColors();
         prepareStatistics();
         setInitialListOfCombinedItems();
-        setListOfMonths();
     }
 
     /* -----------------------   Category Manipulations   ----------------------- */
@@ -301,6 +302,7 @@ public class DataHelper implements Constants {
         addParentCategoriesToStatisticsMap(stats);
 
         monthlyStatisticsMap.put(date ,new MonthlyStatistics(stats, minCategories, maxCategories));
+        setListOfMonths();
     }
 
     private void addParentCategoriesToStatisticsMap(Map<String, Statistics> stats) {

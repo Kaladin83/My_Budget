@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.example.mybudget.R;
 import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.databinding.ChangeCategoryDialogBinding;
-import com.example.mybudget.interfaces.Constants;
 import com.example.mybudget.utils.Utils;
 import com.example.mybudget.utils.Enums.Action;
 
@@ -28,7 +27,7 @@ import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
  * Class creates dialog of category delete confirmation.
  * Gives the option to move items to existing category or to move them to new one.
  */
-public abstract class ManageCategoryDialog extends Dialog implements View.OnClickListener, Constants {
+public abstract class ManageCategoryDialog extends Dialog implements View.OnClickListener{
     private ChangeCategoryDialogBinding bind;
     private final Action action;
     private final Activity activity;

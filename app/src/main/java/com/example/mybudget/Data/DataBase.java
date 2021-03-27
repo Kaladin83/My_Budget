@@ -9,7 +9,6 @@ import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.dtos.TableStatistics;
 import com.example.mybudget.helpers.DataHelper;
-import com.example.mybudget.interfaces.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
  * Class that handles all database queries
  */
 
-public class DataBase extends SQLiteOpenHelper implements Constants {
+public class DataBase extends SQLiteOpenHelper{
     public static SQLiteDatabase dbInstance;
     public static final String DATABASE_NAME = "MyDBName.db";
     public final DataHelper dataHelper;

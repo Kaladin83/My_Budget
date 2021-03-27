@@ -28,10 +28,11 @@ public class ColorPicker extends Fragment implements SeekBar.OnSeekBarChangeList
     private int red = 0, green = 0, blue = 0, selectedColor;
     private DataHelper dataHelper;
     private CategoryPicker categoryPicker;
+    private ColorPickerBinding bind;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ColorPickerBinding bind = ColorPickerBinding.inflate(inflater, container, false);
+        bind = ColorPickerBinding.inflate(inflater, container, false);
         View mainView = bind.getRoot();
         dataHelper = DataHelper.getDataHelper(getContext());
         categoryPicker = ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER));
@@ -87,5 +88,11 @@ public class ColorPicker extends Fragment implements SeekBar.OnSeekBarChangeList
 
             Toast.makeText(this.getContext(), "The color was added", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bind = null;
     }
 }

@@ -28,10 +28,11 @@ public class FavouriteColors extends Fragment implements RecyclerTouchHelper.Rec
     private ColorRecyclerAdapter colorAdapter;
     private DataHelper dataHelper;
     private CategoryPicker categoryPicker;
+    private FavouriteColorsBinding bind;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        FavouriteColorsBinding bind = FavouriteColorsBinding.inflate(inflater, container, false);
+        bind = FavouriteColorsBinding.inflate(inflater, container, false);
         View mainView = bind.getRoot();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         dataHelper = DataHelper.getDataHelper(getContext());
@@ -74,5 +75,11 @@ public class FavouriteColors extends Fragment implements RecyclerTouchHelper.Rec
 
     public void updateColorField(Integer color) {
         categoryPicker.updateColorField(color);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bind = null;
     }
 }
