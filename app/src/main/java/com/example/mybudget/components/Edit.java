@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.mybudget.R;
 import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
-import com.example.mybudget.components.item.ItemRecycler;
+import com.example.mybudget.components.item.ApplicationViewMainContainer;
 import com.example.mybudget.databinding.EditBinding;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.helpers.ViewsHelper;
@@ -74,7 +74,7 @@ public class Edit extends Fragment implements View.OnClickListener, View.OnTouch
             {
                 DataHelper.getDataHelper(getContext()).addItemFromText(bind.categorySpinner.getSelectedItem().toString(),
                         Double.parseDouble(bind.amountEdit.getText().toString()), bind.descriptionEdit.getText().toString());
-                ((ItemRecycler) ViewsHelper.getViewsHelper().getFragment(MAIN_RECYCLER)).refreshItems(ADD_ITEM);
+                ((ApplicationViewMainContainer) ViewsHelper.getViewsHelper().getFragment(MAIN_RECYCLER)).refreshItems(ADD_ITEM);
                 ((CategoryPicker) ViewsHelper.getViewsHelper().getFragment(CATEGORY_PICKER)).refreshCategories();
                 clearFields();
             }

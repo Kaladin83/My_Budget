@@ -15,12 +15,16 @@ public class Enums {
     }
 
     public enum Action {
-        DELETE_CATEGORY, ADD_CATEGORY, RESTORE_CATEGORY, UPDATE_CATEGORY, ADD_ITEM, REMOVE_ITEM, UPDATE_STATISTICS,
-        INSERT_STATISTICS
+        DELETE_CATEGORY, ADD_CATEGORY, RESTORE_CATEGORY, UPDATE_CATEGORY, ADD_ITEM, DELETE_ITEM, RESTORE_ITEM
+    }
+
+    public enum MessageType {
+        INFO, WARNING, ERROR
     }
 
     public enum DateFormat {
         TIMESTAMP("yyyy/MM/dd HH:mm:ss"),
+        DATE("yyyy/MM/dd"),
         PAY("yyyy/MM");
 
         final String value;

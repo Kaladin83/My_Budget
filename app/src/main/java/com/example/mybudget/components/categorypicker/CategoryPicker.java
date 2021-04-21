@@ -19,12 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.mybudget.components.Edit;
+import com.example.mybudget.components.item.ApplicationViewMainContainer;
 import com.example.mybudget.databinding.CategoryPickerBinding;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.components.colorpicker.ColorPicker;
 import com.example.mybudget.components.colorpicker.FavouriteColors;
-import com.example.mybudget.components.item.ItemRecycler;
 import com.example.mybudget.helpers.RecyclerTouchHelper;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.helpers.DataHelper;
@@ -43,9 +43,9 @@ import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Action.ADD_CATEGORY;
 import static com.example.mybudget.utils.Enums.Action.DELETE_CATEGORY;
 import static com.example.mybudget.utils.Enums.Fragment.EDIT;
-import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
 import static com.example.mybudget.utils.Enums.Fragment.COLOR_PICKER;
 import static com.example.mybudget.utils.Enums.Fragment.FAVOURITE_COLORS;
+import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
 
 /**
  * Class that gives to user the tools to add new category, and manage them.
@@ -57,7 +57,7 @@ public class CategoryPicker extends Fragment implements
     private DataHelper dataHelper;
     private ViewsHelper viewsHelper;
     private Activity activity;
-    private ItemRecycler itemRecycler;
+    private ApplicationViewMainContainer applicationRecycler;
     private CategoryRecyclerAdapter categoryAdapter;
     private CategoryPicker categoryPicker;
     private FavouriteColors favoriteColors;
@@ -72,7 +72,7 @@ public class CategoryPicker extends Fragment implements
         strokeColor = Utils.getThemeStrokeColor(activity);
         viewsHelper = ViewsHelper.getViewsHelper();
         dataHelper = DataHelper.getDataHelper(getContext());
-        itemRecycler = ((ItemRecycler) viewsHelper.getFragment(MAIN_RECYCLER));
+        applicationRecycler = ((ApplicationViewMainContainer) viewsHelper.getFragment(MAIN_RECYCLER));
         categoryPicker = new CategoryPicker();
         categoryPicker = this;
 
@@ -135,7 +135,7 @@ public class CategoryPicker extends Fragment implements
             @Override
             public void okButtonPressed(String categoryName) {
                 int color = Utils.findColor(categoryName);
-                Category category = new Category(bind.categoryEdit.getText().toString(), categoryName, color);
+                Category category = new Category(Utils.toTitleCase(bind.categoryEdit.getText().toString()), categoryName, color);
 
                 dataHelper.addCategory(category);
                 bind.categoryEdit.setText("");
@@ -164,7 +164,7 @@ public class CategoryPicker extends Fragment implements
 
         Toast.makeText(getContext(), "The color of " + category.getName() + " was changed", Toast.LENGTH_SHORT).show();
         refreshCategories();
-        itemRecycler.refreshItems(UPDATE_CATEGORY);
+        applicationRecycler.refreshItems(UPDATE_CATEGORY);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class CategoryPicker extends Fragment implements
                                 Toast.LENGTH_SHORT).show();
                         manageCategoryDialog.dismiss();
                         refreshCategories();
-                        itemRecycler.refreshItems(REMOVE_ITEM);
+                        applicationRecycler.refreshItems(DELETE_ITEM);
                     }
                 };
                 manageCategoryDialog.show();

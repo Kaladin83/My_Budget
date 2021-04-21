@@ -1,8 +1,12 @@
 package com.example.mybudget.utils;
 
+import androidx.fragment.app.Fragment;
+
 import com.google.gson.Gson;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -70,13 +74,29 @@ public class JavaUtils {
     }
 
     /**
+     * Creates a map.
+     *
+     * @param keys a list of keys
+     * @param values a list of values
+     * @return a map.
+     */
+    public static <K, V> Map<K, V> mapOf(List<K> keys, List<V> values) {
+        Map<K, V> map = new HashMap<>();
+        for (int i = 0; i < keys.size() ; i++)
+        {
+            map.put(keys.get(i), values.get(i));
+        }
+        return map;
+    }
+
+    /**
      * create a map of Fragment while generating integer keys.
      * The user should pass any number of fragments only.
      *
      * @param values any number of fragments
      * @return a map with generated keys with corresponding fragments
      */
-    public static Map<Integer, androidx.fragment.app.Fragment> mapOf(androidx.fragment.app.Fragment... values) {
+    public static Map<Integer, Fragment> mapOf(Fragment... values) {
         return IntStream.range(0, values.length)
                 .boxed()
                 .collect(Collectors.toMap(i -> i, (Integer i) -> values[i]));

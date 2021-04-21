@@ -65,7 +65,7 @@
             app:layout_constraintHeight_percent="0.11"
             android:gravity="center"
             style="?headerBackground"
-            android:text="@string/Categories"
+            android:text="@string/categories"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <View

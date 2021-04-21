@@ -1,47 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
     <color name="black">#252525</color>
-    <color name="light_black">#676565</color>
+    <color name="light_black">#616161</color>
+    <color name="very_light_black_1">#686868</color>
     <color name="very_light_black">#787878</color>
     <color name="ultra_light_black">#8C8A8A</color>
     <color name="super_light_black">#AAAAAA</color>
     <color name="light_gray">#C1C1C1</color>
+    <color name="super_light_gray">#CCCACA</color>
     <color name="white">#FFFFFF</color>
+    <color name="white_transparent">#59FFFFFF</color>
+    <color name="white_transparent_1">#33FFFFFF</color>
+    <color name="white_transparent_2">#CCFFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
 
-    <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">@color/teal_200</color>
-    <color name="red">#CF4C54</color>
-    <color name="orange">#FFE6C9</color>
-    <color name="blue">#68A2FA</color>
-    <color name="light_blue">#C4C4FB</color>
+    <color name="blue">#4D64E1</color>
+    <color name="blue_2">#68A2FA</color>
+    <color name="blue_3">#B5B5EF</color>
+    <color name="blue_4">#C2EAEF</color>
+    <color name="blue_5">#dae3f2</color>
+
+    <color name="teal">#FF018786</color>
+    <color name="teal_2">#FF03DAC5</color>
     <color name="turquoise">#8CC5BF</color>
-    <color name="very_dark_green">#01911C</color>
-    <color name="dark_green">#0CA829</color>
-    <color name="green">#28c745</color>
+
+    <color name="red">#FA1D2C</color>
+    <color name="red_2">#CC545B</color>
+    <color name="red_3">#FA9097</color>
+    <color name="orange_1">#F8A45D</color>
+    <color name="red_5">#fcd2d1</color>
+
+    <color name="very_dark_green">#028E1C</color>
+    <color name="dark_green">#0DB62C</color>
+    <color name="green">#2AE14B</color>
     <color name="light_green">#73B57C</color>
+    <color name="green_3">#87f295</color>
+    <color name="green_4">#d5fcba</color>
     <color name="very_light_green">#CAF6D3</color>
     <color name="super_light_green">#ECFAEF</color>
     <color name="toolBar">#eff2f7</color>
 
+    <color name="yellow">#FBE621</color>
+    <color name="yellow_2">#F8F05D</color>
+    <color name="yellow_3">#E8F4A7</color>
+    <color name="orange">#FFE6C9</color>
 
-    <color name="blue_3">#CEEBEF</color>
-    <color name="blue_4">#dae3f2</color>
-    <color name="yellow_2">#e7f986</color>
-    <color name="yellow_3">#eff9bb</color>
+    <color name="purple">#FFBB86FC</color>
     <color name="purple_3">#ebc0f7</color>
     <color name="purple_4">#eddcf2</color>
-    <color name="red_4">#f79491</color>
-    <color name="green_2">#28c745</color>
-    <color name="red_5">#fcd2d1</color>
-    <color name="green_3">#87f295</color>
-    <color name="green_4">#d5fcba</color>
-
 </resources>

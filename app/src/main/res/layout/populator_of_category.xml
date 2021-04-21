@@ -2,121 +2,94 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/object_layout"
-    android:gravity="center"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:gravity="center">
 
-    <RelativeLayout
-        android:id="@+id/background_layout"
+    <include
+        android:id="@+id/delete_layout"
+        layout="@layout/delete_item"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:background="@color/red">
+        android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/delete_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/delete_white"/>
-
-        <TextView
-            android:layout_width="70dp"
-            android:layout_height="20dp"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/delete_icon"
-            android:text="@string/delete"
-            android:textColor="#fff"
-            android:textSize="18sp" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/main_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:gravity="center"
-        style="?recyclerItem">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/main_row_layout"
-            android:orientation="horizontal"
+            style="?recyclerItem"
             android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_marginStart="10dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="10dp"
-            android:layout_height="45dp">
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/arrow_image"
-                android:layout_alignParentStart="true"
-                android:layout_gravity="center"
                 android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginStart="5dp"
-                android:visibility="gone"
+                android:contentDescription="@null"
                 android:src="@drawable/icon_bending_arrow"
                 app:tint="?android:attr/textColorPrimary"
-                android:layout_height="20dp"
-                android:contentDescription="@null" />
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/category_txt"
-                android:textAlignment="center"
-                android:gravity="center"
-                android:layout_toEndOf="@+id/arrow_image"
+            <com.example.mybudget.components.custom.CategoryIcon
+                android:id="@+id/categories_icon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/arrow_image"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_marginStart="10dp"
-                android:paddingHorizontal="5dp"
-                android:layout_gravity="center"
-                android:layout_width="135dp"
-                android:layout_height="28dp"/>
+                app:layout_constraintWidth_percent="0.3"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/categories_icon">
 
-            <TextView
-                android:id="@+id/date_added_txt"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="20dp"
-                android:gravity="center"
-                android:textColor="@color/recycle_item_selector"
-                android:textAlignment="center"
-                android:layout_width="140dp"
-                android:layout_height="28dp" />
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/category_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/apollo_family"
+                    android:gravity="start"
+                    android:textSize="13pt"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="15dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_below="@+id/main_row_layout"
-            android:id="@+id/category_sums_layout"
-            app:layout_scrollFlags="scroll|enterAlways">
+                <TextView
+                    android:id="@+id/category_total_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="7pt" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/category_total_txt"
-                android:layout_alignParentStart="true"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:textSize="7pt"/>
-
-            <TextView
-                android:id="@+id/category_average_txt"
-                android:layout_alignParentEnd="true"
-                android:textAlignment="textStart"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:textSize="7pt"/>
-        </RelativeLayout>
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/icon_info"
+                app:tint="?android:attr/textColorPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
+            android:id="@+id/separator"
             style="?attr/separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_alignParentBottom="true"/>
-    </RelativeLayout>
+            android:layout_marginHorizontal="10dp"
+            android:visibility="invisible"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </FrameLayout>

@@ -1,18 +1,20 @@
 package com.example.mybudget;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
@@ -22,18 +24,19 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.mybudget.components.Charts;
 import com.example.mybudget.components.Edit;
 import com.example.mybudget.components.categorypicker.CategoryPicker;
-import com.example.mybudget.components.item.ItemRecycler;
+import com.example.mybudget.components.item.ApplicationViewMainContainer;
 import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.Data.Preferences;
 import com.example.mybudget.helpers.ViewsHelper;
 import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Mode;
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 import static com.example.mybudget.utils.Enums.Fragment.CATEGORY_PICKER;
@@ -41,32 +44,56 @@ import static com.example.mybudget.utils.Enums.Fragment.EDIT;
 import static com.example.mybudget.utils.Enums.Fragment.MAIN_RECYCLER;
 import static com.example.mybudget.utils.Enums.Fragment.CHARTS;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private ItemRecycler itemRecycler;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private ViewPager2 pager;
-    private ImageButton categoriesButton, chartsButton, voiceButton, editButton;
     private ActivityResultLauncher<Intent> startActivityForResult;
     private DataHelper dataHelper;
+    private BottomNavigationView navigationView;
+    private ApplicationViewMainContainer appView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setGlobalVariables();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        JavaUtils.addToMapIds(R.id.categories_btn, 0, R.id.charts_btn, 1, R.id.voice_btn, 2, R.id.edit_btn, 3,
-                R.id.night_theme, 0, R.id.day_theme, 1);
-
-        itemRecycler = new ItemRecycler(this);
+        JavaUtils.addToMapIds(R.id.edit_category, 0, R.id.view_charts, 1, R.id.view_entries, 2, R.id.add_entry, 3,
+                R.id.share_entries, 4, R.id.night_theme, 0, R.id.day_theme, 1);
         dataHelper = DataHelper.getDataHelper(this);
-        dataHelper.deleteItems(Utils.getCurrentDate(PAY));
-        dataHelper.populateInitialCategories(this);
+       //dataHelper.deleteItems(Utils.getCurrentDate(PAY));
+       //dataHelper.populateInitialCategories(this);
         dataHelper.fetchData(Utils.getCurrentDate(PAY));
-
+        //Map<String, Integer> target =
+        //        ImmutableMap.of(Utils.TOTAL, 1500, "Cafes", 350, "Home", 200, "Car", 500, "Clothes", 250);
+        //dataHelper.updateTarget(target, Utils.getCurrentDate(PAY));
+        appView = new ApplicationViewMainContainer(this);
+        navigationView = findViewById(R.id.bottom_navigation_view);
+        dimNavigationView(false);
         handleVoiceCommands();
-        createButtons();
         createPager();
+        navigationView.setOnNavigationItemSelectedListener(this::onItemSelected);
+    }
+
+    public ConstraintLayout getRoot(){
+        return findViewById(R.id.main_layout);
+    }
+
+    private boolean onItemSelected(MenuItem item) {
+        Integer tabNumber = JavaUtils.getId(item.getItemId());
+        if (tabNumber != null)
+        {
+            pager.setCurrentItem(tabNumber);
+//            if (tabNumber == 2 && pager.getCurrentItem() == 2)
+//            {
+//                startVoiceRecognitionActivity();
+//            }
+//            else
+//            {
+//                pager.setCurrentItem(tabNumber);
+//            }
+            return true;
+        }
+        return false;
     }
 
     private void setGlobalVariables() {
@@ -86,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         {
                             List<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                             dataHelper.addItemFromVoice(matches);
-                            itemRecycler.refreshItems(ADD_ITEM);
+                            //itemRecycler.refreshItems(ADD_ITEM);
                         }
                     }
                 }
@@ -95,31 +122,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createPager() {
         final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
-        changeSelection(false, false, true, false);
+        changeSelection(2);
         Integer currentPage = Preferences.getValue("CurrentPage", Integer.class);
 
         pager = findViewById(R.id.pager);
         pager.setAdapter(adapter);
-        pager.setCurrentItem(currentPage == null? 2: currentPage, false);
+        pager.setCurrentItem(currentPage == null ? 2 : currentPage, false);
         setRefreshPage(2);
         pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                switch (position)
-                {
-                    case 0:
-                        changeSelection(true, false, false, false);
-                        break;
-                    case 1:
-                        changeSelection(false, true, false, false);
-                        break;
-                    case 2:
-                        changeSelection(false, false, true, false);
-                        break;
-                    case 3:
-                        changeSelection(false, false, false, true);
-                        break;
-                }
+                changeSelection(position);
             }
         });
     }
@@ -128,29 +141,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Preferences.putValue("CurrentPage", pageNumber);
     }
 
-    private void changeSelection(boolean b, boolean b1, boolean b2, boolean b3) {
-        categoriesButton.setSelected(b);
-        chartsButton.setSelected(b1);
-        voiceButton.setSelected(b2);
-        editButton.setSelected(b3);
+    private void changeSelection(int position) {
+        View v = ((BottomNavigationMenuView) navigationView.getChildAt(0)).getChildAt(position);
+        navigationView.setSelectedItemId(v.getId());
     }
 
     public boolean hasNavBar(Resources resources) {
         int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
         return id > 0 && resources.getBoolean(id);
-    }
-
-    private void createButtons() {
-        categoriesButton = findViewById(R.id.categories_btn);
-        categoriesButton.setOnClickListener(this);
-        chartsButton = findViewById(R.id.charts_btn);
-        chartsButton.setOnClickListener(this);
-        voiceButton = findViewById(R.id.voice_btn);
-        voiceButton.setOnClickListener(this);
-        editButton = findViewById(R.id.edit_btn);
-        editButton.setOnClickListener(this);
-        ImageButton syncButton = findViewById(R.id.sync_btn);
-        syncButton.setOnClickListener(this);
     }
 
     public void startVoiceRecognitionActivity() {
@@ -159,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
                 "Speech recognition demo");
-
         startActivityForResult.launch(intent);
     }
 
@@ -203,6 +200,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pager.setCurrentItem(2);
     }
 
+    public void dimNavigationView(boolean dimScreen) {
+        int selected = Utils.getAttrColor(this, R.attr.colorSecondary);
+        int pressed = ContextCompat.getColor(this, R.color.light_gray);
+        int notSelected = Utils.getAttrColor(this, R.attr.colorOnSurface);
+
+        int tintSelected = dimScreen ? Utils.getBackgroundDimColor(selected) : selected;
+        int tintPressed = dimScreen ? Utils.getBackgroundDimColor(pressed) : pressed;
+        int tintNotSelected = dimScreen ? Utils.getBackgroundDimColor(notSelected) : notSelected;
+
+        int[][] states = {{android.R.attr.state_selected}, {android.R.attr.state_pressed}, {-android.R.attr.state_selected}};
+        int[] colors = {tintSelected, tintPressed, tintNotSelected};
+
+        navigationView.setItemIconTintList(new ColorStateList(states, colors));
+        navigationView.setItemTextColor(new ColorStateList(states, colors));
+    }
+
     private class PagerAdapter extends FragmentStateAdapter {
         private final Map<Integer, Fragment> fragments;
 
@@ -211,10 +224,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             CategoryPicker categoryPicker = new CategoryPicker();
             Charts charts = new Charts();
             Edit edit = new Edit();
+
             ViewsHelper.getViewsHelper().registerFragment(CATEGORY_PICKER, categoryPicker)
-                    .registerFragment(EDIT, edit).registerFragment(MAIN_RECYCLER, itemRecycler)
+                    .registerFragment(EDIT, edit).registerFragment(MAIN_RECYCLER, appView)
                     .registerFragment(CHARTS, charts);
-            fragments = JavaUtils.mapOf(categoryPicker, charts, itemRecycler, edit);
+            fragments = JavaUtils.mapOf(categoryPicker, charts, appView, edit);
+//            ViewsHelper.getViewsHelper().registerFragment(CATEGORY_PICKER, categoryPicker)
+//                    .registerFragment(EDIT, edit).registerFragment(MAIN_RECYCLER, itemRecycler)
+//                    .registerFragment(CHARTS, charts);
+//            fragments = JavaUtils.mapOf(categoryPicker, charts, itemRecycler, edit);
         }
 
         @NonNull

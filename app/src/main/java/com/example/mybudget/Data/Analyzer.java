@@ -31,7 +31,7 @@ public class Analyzer {
                 {
                     String parentCategory = categories.get(0);
                     newCategoryName = Utils.getCategoriesNames(cat -> cat.getParent().equals(parentCategory)).isEmpty() ?
-                            parentCategory : parentCategory + " (other)";
+                            parentCategory : Utils.getDefaultCategoryName(parentCategory);
                     return new ItemToAdd(newCategoryName, parentCategory, parentCategory, amount, "");
                 }
             }
@@ -67,28 +67,25 @@ public class Analyzer {
     }
 
     /**
-     * Adding item from Edit form
-     * Preparing data to handle 3 different cases:
-     * 1. Adding item that has no subcategories
-     * 2. Adding item to a subcategory when parent category already has items
-     * 3. Adding item to a parent category when subcategory exists
+     * <h4>Preparing the data to add an item from form.<h4/>
+     * <p>If given category has a parent category or has children categories, parentName (previous parent name) and defaultName
+     * (new default
+     * parent name) are populated accordingly. <p/>
+     *
+     * @param category given category
+     * @param amount given amount
+     * @param description given description
      * */
-    public ItemToAdd getItemFromEdit(String category, double amount, String description, List<Category> listOfCategories) {
-        String otherName, parentName = category, addedCategoryName = category;
-        if (!Utils.getCategoriesNames(cat -> cat.getParent().equals(category)).isEmpty())
+    public ItemToAdd getItemFromEdit(String category, double amount, String description) {
+        String defaultName = "", parentName = "";
+
+        Category parent = Utils.getParentCategory(category);
+        if (parent != null || !Utils.getCategoriesNames(cat -> cat.getParent().equals(category)).isEmpty())
         {
-            otherName = category + " (other)";
-            addedCategoryName = otherName;
+            parentName = parent == null ? category : parent.getName();
+            defaultName = parent == null || parent.getOtherName().equals("") ? Utils.getDefaultCategoryName(parentName) :
+                parent.getOtherName();
         }
-        else
-        {
-            otherName = listOfCategories.stream()
-                    .filter(cat -> cat.getName().equals(category))
-                    .filter(cat -> !cat.getOtherName().equals("") || Utils.getStatsForCategory(cat.getParent()) != null)
-                    .map(cat -> !cat.getOtherName().equals("") ? cat.getOtherName() : cat.getParent() + " (other)")
-                    .findFirst().orElse("");
-            parentName = Utils.getParentCategoryName(category);
-        }
-        return new ItemToAdd(otherName.equals(" (other)") ? "": otherName, parentName, addedCategoryName, amount, description);
+        return new ItemToAdd(defaultName, parentName, category, amount, description);
     }
 }

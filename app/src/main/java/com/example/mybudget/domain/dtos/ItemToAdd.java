@@ -1,23 +1,23 @@
 package com.example.mybudget.domain.dtos;
 
 public class ItemToAdd {
-    private final String otherCategoryName;
+    private final String defaultCategoryName;
     private final String parentCategoryName;
     private final String givenCategoryName;
     private final double amount;
     private final String description;
 
-    public ItemToAdd(String otherCategoryName, String parentCategoryName, String givenCategoryName, double amount,
+    public ItemToAdd(String defaultCategoryName, String parentCategoryName, String givenCategoryName, double amount,
                      String description) {
-        this.otherCategoryName = otherCategoryName;
+        this.defaultCategoryName = defaultCategoryName;
         this.parentCategoryName = parentCategoryName;
         this.givenCategoryName = givenCategoryName;
         this.amount = amount;
         this.description = description;
     }
 
-    public String getOtherCategoryName() {
-        return otherCategoryName;
+    public String getDefaultCategoryName() {
+        return defaultCategoryName;
     }
 
     public String getParentCategoryName() {

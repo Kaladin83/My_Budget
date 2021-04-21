@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mybudget.components.categorypicker.CategoryRecyclerAdapter;
 import com.example.mybudget.components.colorpicker.ColorRecyclerAdapter;
-import com.example.mybudget.components.item.ItemsRecyclerAdapter;
+import com.example.mybudget.components.item.ExpensesListAdapter;
+import com.example.mybudget.components.item.ExpensesListDialog;
+import com.example.mybudget.components.item.ItemsRecyclerTreeAdapter;
 
 /**
  * Class that responsible of swiping the item off
@@ -41,13 +43,13 @@ public class RecyclerTouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         final View foregroundView;
-        if (viewHolder instanceof ItemsRecyclerAdapter.MyViewHolder1)
+        if (viewHolder instanceof ExpensesListAdapter.MyViewHolder1)
         {
-            foregroundView = ((ItemsRecyclerAdapter.MyViewHolder1) viewHolder).mainLayout;
+            foregroundView = ((ExpensesListAdapter.MyViewHolder1) viewHolder).mainExpenseLayout;
         }
-        else if (viewHolder instanceof ItemsRecyclerAdapter.MyViewHolder2)
+        else if (viewHolder instanceof ExpensesListAdapter.MyViewHolder2)
         {
-            foregroundView = ((ItemsRecyclerAdapter.MyViewHolder2) viewHolder).mainLayout;
+            foregroundView = ((ExpensesListAdapter.MyViewHolder2) viewHolder).mainExpenseLayout;
         }
         else if (viewHolder instanceof ColorRecyclerAdapter.MyViewHolder)
         {
@@ -65,13 +67,13 @@ public class RecyclerTouchHelper extends ItemTouchHelper.SimpleCallback {
                             @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
         final View foregroundView;
-        if (viewHolder instanceof ItemsRecyclerAdapter.MyViewHolder1)
+        if (viewHolder instanceof ExpensesListAdapter.MyViewHolder1)
         {
-            foregroundView = ((ItemsRecyclerAdapter.MyViewHolder1) viewHolder).mainLayout;
+            foregroundView = ((ExpensesListAdapter.MyViewHolder1) viewHolder).mainExpenseLayout;
         }
-        else if (viewHolder instanceof ItemsRecyclerAdapter.MyViewHolder2)
+        else if (viewHolder instanceof ExpensesListAdapter.MyViewHolder2)
         {
-            foregroundView = ((ItemsRecyclerAdapter.MyViewHolder2) viewHolder).mainLayout;
+            foregroundView = ((ExpensesListAdapter.MyViewHolder2) viewHolder).mainExpenseLayout;
         }
         else if (viewHolder instanceof  ColorRecyclerAdapter.MyViewHolder)
         {

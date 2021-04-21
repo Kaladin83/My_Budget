@@ -10,4 +10,9 @@
     <attr name="toggleView" format="reference" />
     <attr name="menuColor" format="reference" />
     <attr name="dialogBackground" format="reference" />
+    <attr name="colorRed" format="reference" />
+    <attr name="colorGreen" format="reference" />
+    <attr name="colorYellow" format="reference" />
+    <attr name="colorBlue" format="reference" />
+    <attr name="expenseTextColor" format="reference" />
 </resources>

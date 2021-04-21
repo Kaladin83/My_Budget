@@ -7,30 +7,45 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mybudget.Data.Preferences;
+import com.example.mybudget.IAction;
 import com.example.mybudget.R;
+import com.example.mybudget.components.item.ExpensesListDialog;
+import com.example.mybudget.domain.domain.AppCategoryItem;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
+import com.example.mybudget.domain.domain.MonthName;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.helpers.DataHelper;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableMap;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.example.mybudget.utils.Enums.*;
+import static com.example.mybudget.utils.Enums.Action.DELETE_ITEM;
+import static com.example.mybudget.utils.Enums.Action.RESTORE_ITEM;
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -41,11 +56,16 @@ import static java.util.stream.Collectors.toMap;
 public class Utils {
 
     private static DataHelper dataHelper;
+    public static final Predicate<Category> NO_PARENT_PREDICATE = cat -> cat.getParent().equals("");
     public static final String TOTAL = "Total";
 
     public static void setApplicationContext(Context context) {
-
         dataHelper = DataHelper.getDataHelper(context);
+
+    }
+
+    public static Drawable cutCorners(int radius, int color) {
+        return createBorder(radius, color, 0, color);
     }
 
     public static Drawable createBorder(int radius, int color, int stroke, int strokeColor) {
@@ -55,6 +75,20 @@ public class Utils {
         gd.setCornerRadius(radius);
         gd.setStroke(stroke, strokeColor);
         return gd;
+    }
+
+    public static int getTintDimColor(Activity activity) {
+        int[] colors = Utils.parseColor(Utils.getAttrColor(activity, android.R.attr.windowBackground));
+        colors[0] = colors[0] - 25;
+        colors[1] = colors[1] - 25;
+        colors[2] = colors[2] - 25;
+        return Color.argb(colors[3], colors[0], colors[1], colors[2]);
+    }
+
+    public static int getBackgroundDimColor(int background) {
+        int[] colors = Utils.parseColor(background);
+        colors[3] = 40;
+        return Color.argb(colors[3], colors[0], colors[1], colors[2]);
     }
 
     public static int getThemeStrokeColor(Activity activity) {
@@ -72,10 +106,31 @@ public class Utils {
         return ContextCompat.getColor(context, color);
     }
 
+    public static int getContrastTextColor(int backgroundColor, Context context) {
+        int[] colors = parseColor(backgroundColor);
+        return colors[0] + colors[1] + colors[2] > 550 ? ContextCompat.getColor(context, R.color.light_black) : Color.WHITE;
+    }
+
+    /**
+     * @return a color number of each of 4 values in the next order: red, green, blue, alpha.
+     */
+    public static int[] parseColor(int backgroundColor) {
+        int red = Color.red(backgroundColor);
+        int green = Color.green(backgroundColor);
+        int blue = Color.blue(backgroundColor);
+        int alpha = Color.alpha(backgroundColor);
+        return new int[]{red, green, blue, alpha};
+    }
+
     public static void closeKeyboard(EditText edit, Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(edit.getWindowToken(), 0);
+    }
+
+    public static void hideKeyboard(Activity activity, RecyclerView recyclerView) {
+        InputMethodManager inputManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(recyclerView.getWindowToken(), 0);
     }
 
     public static void openKeyboard(Activity activity) {
@@ -209,6 +264,13 @@ public class Utils {
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    public static List<Category> getCategoryItems(Predicate<Category> predicate) {
+        Map<String, Statistics> stats = Utils.getCategoriesStats(predicate);
+        return dataHelper.getListOfCategories().stream()
+                .filter(cat -> stats.containsKey(cat.getName()))
+                .collect(toList());
+    }
+
     /**
      * Gets the categories names according to predicate.
      * cat -> true : returns all the categories names (categories and sub categories)
@@ -266,12 +328,34 @@ public class Utils {
         return date.format(DateTimeFormatter.ofPattern(dateFormat.value));
     }
 
-    public static String getDBMonthFormat(String date, Map<String, String> monthsMap) {
+    public static String getDBMonthFormat(String date, Map<String, MonthName> monthsMap) {
         String month = monthsMap.entrySet().stream()
-                .filter(en -> en.getValue().equals(date.substring(0, 3)))
+                .filter(en -> en.getValue().getShortName().equals(date.substring(0, 3)))
                 .map(Map.Entry::getKey)
                 .findFirst().orElse("");
         return date.substring(4) + "/" + month;
+    }
+
+    public static String toTitleCase(String text) {
+        String[] texts = text.split(" ");
+        Function<String, Integer> indexOfFirstLetter = word -> word.indexOf(Utils.getFirstLetter(word));
+        return Arrays.stream(texts)
+                .map(w -> w.substring(0, indexOfFirstLetter.apply(w)) +
+                        String.valueOf(Utils.getFirstLetter(w)).toUpperCase() + w.substring(indexOfFirstLetter.apply(w) + 1))
+                .collect(joining(" "));
+    }
+
+    public static String getCategoryInitials(String categoryName) {
+        String[] names = categoryName.split(" ");
+        return Arrays.stream(names).filter(w -> !(w.equalsIgnoreCase("of") || w.equalsIgnoreCase("or")
+                || w.equalsIgnoreCase("and") || w.equalsIgnoreCase("&")))
+                .map(w -> String.valueOf(getFirstLetter(w)))
+                .collect(joining());
+    }
+
+    private static char getFirstLetter(String name) {
+        return name == null? ' ' :
+                Arrays.stream(name.split("")).map(l -> l.charAt(0)).filter(Character::isLetter).findFirst().orElse(' ');
     }
 
     public static double firstFoundWordsToNumber(String input) {
@@ -300,5 +384,43 @@ public class Utils {
 
     public static double round(double val) {
         return ((int) (val * 100)) / 100d;
+    }
+
+    public static String getDefaultCategoryName(String category) {
+        return "All " + category;
+    }
+
+    public static Category getParentCategory(String subcategory) {
+        String parentName = Utils.getParentCategoryName(subcategory);
+        return parentName.equals("") ? null : dataHelper.getListOfCategories().stream()
+                .filter(cat -> cat.getName().equals(parentName))
+                .findFirst().orElse(null);
+    }
+
+    public static String monthNameToMonth(String monthName) {
+        return dataHelper.getAllMonths().entrySet().stream()
+                .filter(e -> e.getValue().getFullName().equals(monthName))
+                .map(Map.Entry::getKey).findFirst().orElse(null);
+    }
+
+    public static void deleteItems(List<Item> itemsToDelete, Window window, ConstraintLayout rootView, IAction iAction) {
+        if (window != null && window.isActive())
+        {
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        }
+        Snackbar snackbar = Snackbar.make(rootView, "The item was removed", Snackbar.LENGTH_LONG);
+        snackbar.setAction("UNDO", view -> {
+            dataHelper.restoreItems(itemsToDelete);
+            iAction.refreshItems(RESTORE_ITEM);
+            if (window != null && window.isActive())
+            {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+            }
+
+        });
+        snackbar.setActionTextColor(Color.YELLOW);
+        snackbar.show();
+        dataHelper.removeItems(itemsToDelete);
+        iAction.refreshItems(DELETE_ITEM);
     }
 }

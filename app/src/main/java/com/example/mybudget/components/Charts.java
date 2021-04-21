@@ -19,7 +19,6 @@ import com.example.mybudget.common.SimpleSpinnerAdapter;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.helpers.DataHelper;
-import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -62,8 +61,6 @@ public class Charts extends Fragment implements View.OnClickListener{
     private ChartsBinding bind;
     private List<String> months;
     private final Map<Float, Double> mapOfPercents = new HashMap<>();
-    private final Map<String, String> monthsMap = JavaUtils.mapOf("01", "JEN", "02", "FEB", "03", "MAR", "04", "APR", "05",
-            "MAY", "06", "JUN", "07", "JUL", "08", "AUG", "09", "SEP", "10", "OCT", "11", "NOV", "12", "DEC");
     private Activity activity;
     private DataHelper dataHelper;
     private int textColor;
@@ -104,13 +101,13 @@ public class Charts extends Fragment implements View.OnClickListener{
         List<String> tempMonths = dataHelper.getListOfMonths();
         return IntStream.range(0, 6)
                 .mapToObj(i -> i < tempMonths.size() ? tempMonths.get(i) : getPrevMonth(i, tempMonths.get(0)))
-                .map(d -> monthsMap.get(d.substring(5)) + " " + d.substring(0, 4))
+                .map(d -> dataHelper.getMonthNames(d.substring(5)).getShortName() + " " + d.substring(0, 4))
                 .collect(toList());
     }
 
     private List<String> getAllMonthNoDummies() {
         return dataHelper.getListOfMonths().stream()
-                .map(d -> monthsMap.get(d.substring(5)) + " " + d.substring(0, 4))
+                .map(d -> dataHelper.getMonthNames(d.substring(5)).getShortName() + " " + d.substring(0, 4))
                 .collect(toList());
     }
 
@@ -215,7 +212,7 @@ public class Charts extends Fragment implements View.OnClickListener{
     }
 
     private void loadPieData(String selectedMonth) {
-        selectedDateDBFormat = Utils.getDBMonthFormat(selectedMonth, monthsMap);
+        selectedDateDBFormat = Utils.getDBMonthFormat(selectedMonth, dataHelper.getAllMonths());
         Map<String ,Statistics> stats = Utils.getCategoriesStats(selectedDateDBFormat,
                 cat -> bind.categoryRadio.isChecked() == cat.getParent().equals(""));
         List<PieEntry> entryY = new ArrayList<>();
@@ -285,7 +282,7 @@ public class Charts extends Fragment implements View.OnClickListener{
         List<String> monthsWithDummies = getAllMonthsWithDummies();
         List<BarEntry> barEntries = IntStream.range(0, monthsWithDummies.size())
                 .mapToObj(i -> new BarEntry(i, (float) Utils.getStatsForCategory(Utils.getDBMonthFormat(monthsWithDummies.get(i),
-                        monthsMap), selectedCategory).getSum()))
+                        dataHelper.getAllMonths()), selectedCategory).getSum()))
                 .collect(toList());
         BarDataSet dataSet = new BarDataSet(barEntries, "");
         dataSet.setHighLightColor(textColor);
@@ -309,7 +306,7 @@ public class Charts extends Fragment implements View.OnClickListener{
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 String tempDate = bind.barChart.getXAxis().getFormattedLabel((int) e.getX()).toUpperCase();
-                String date = Utils.getDBMonthFormat(tempDate, monthsMap);
+                String date = Utils.getDBMonthFormat(tempDate, dataHelper.getAllMonths());
                 MonthlyStatistics monthlyStats = dataHelper.getMonthlyStatistics(date);
                 if (monthlyStats == null){
                     populateStatisticsTable("", "", "", "");

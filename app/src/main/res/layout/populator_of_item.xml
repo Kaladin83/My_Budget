@@ -2,99 +2,76 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/object_layout"
-    android:gravity="center"
     style="?recyclerItem"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="35dp">
 
-    <RelativeLayout
-        android:id="@+id/background_layout"
+    <include
+        android:id="@+id/delete_layout"
+        layout="@layout/delete_item"
+        android:layout_width="match_parent"
+        android:layout_height="35dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_row_layout"
+        style="?recyclerItem"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:background="@color/red">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
-            android:id="@+id/delete_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/delete_white"/>
+            android:id="@+id/arrow_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/icon_bending_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?android:attr/textColorPrimary" />
+
+        <ImageView
+            android:id="@+id/description_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_note"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/arrow_image"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?android:attr/textColorPrimary" />
 
         <TextView
-            android:layout_width="70dp"
-            android:layout_height="20dp"
-            android:layout_centerVertical="true"
+            android:id="@+id/amount_txt"
+            android:layout_width="60dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/recycle_item_selector"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/description_image"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/date_added_txt"
+            android:layout_width="120dp"
+            android:layout_height="28dp"
             android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/delete_icon"
-            android:text="@string/delete"
-            android:textColor="#fff"
-            android:textSize="18sp" />
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/recycle_item_selector"
+            android:textSize="7pt"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/main_layout"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:gravity="center"
-        style="?recyclerItem">
-
-            <RelativeLayout
-                android:id="@+id/main_row_layout"
-                android:layout_alignParentTop="true"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:gravity="center"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_height="45dp">
-
-                <ImageView
-                    android:id="@+id/arrow_image"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/icon_bending_arrow"
-                    app:tint="?android:attr/textColorPrimary"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp" />
-
-                <TextView
-                    android:id="@+id/amount_txt"
-                    android:layout_toEndOf="@+id/description_image"
-                    android:layout_marginStart="10dp"
-                    android:textColor="@color/recycle_item_selector"
-                    android:gravity="center_vertical"
-                    android:layout_width="60dp"
-                    android:layout_height="28dp"/>
-
-                <TextView
-                    android:id="@+id/date_added_txt"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginStart="5dp"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:textColor="@color/recycle_item_selector"
-                    android:layout_width="140dp"
-                    android:layout_height="28dp" />
-
-                <ImageView
-                    android:id="@+id/description_image"
-                    android:layout_toEndOf="@+id/arrow_image"
-                    android:layout_width="30dp"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_note"
-                    app:tint="?android:attr/textColorPrimary"
-                    android:layout_height="30dp"/>
-            </RelativeLayout>
-
-        <View
-            style="?attr/separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true"/>
-    </RelativeLayout>
-
+<!--        <View-->
+<!--            android:id="@+id/separator"-->
+<!--            style="?attr/separator"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent" />-->
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

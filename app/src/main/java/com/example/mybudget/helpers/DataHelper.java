@@ -8,15 +8,22 @@ import androidx.core.content.ContextCompat;
 import com.example.mybudget.Data.Analyzer;
 import com.example.mybudget.Data.DataBase;
 import com.example.mybudget.R;
+import com.example.mybudget.domain.domain.AppCategoryItem;
 import com.example.mybudget.domain.domain.Category;
+import com.example.mybudget.domain.domain.CategoryTarget;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
+import com.example.mybudget.domain.domain.MonthName;
 import com.example.mybudget.domain.dtos.ItemToAdd;
 import com.example.mybudget.domain.domain.MonthlyStatistics;
 import com.example.mybudget.domain.domain.Statistics;
 import com.example.mybudget.domain.dtos.TableStatistics;
+import com.example.mybudget.utils.JavaUtils;
 import com.example.mybudget.utils.Utils;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 import static com.example.mybudget.utils.Enums.DateFormat.TIMESTAMP;
@@ -32,22 +40,28 @@ import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
-
-public class DataHelper{
-
+public class DataHelper {
     private final DataBase dataBase;
     private final Analyzer analyzer;
-
     private static DataHelper dataHelper;
-
     private Item lastAddedItem;
-
     private List<Item> listOfItems = new ArrayList<>();
     private List<Category> listOfCategories = new ArrayList<>();
     private List<String> listOfMonths = new ArrayList<>();
     private List<Integer> listOfColors = new ArrayList<>();
     private List<ItemDrawer> listOfCombinedItems = new ArrayList<>();
+    private List<AppCategoryItem> listOfCategoryItems = new ArrayList<>();
     private final Map<String, MonthlyStatistics> monthlyStatisticsMap = new HashMap<>();
+    private Map<String, CategoryTarget> categoryTargets = new HashMap<>();
+    private Map<String, MonthName> monthsMap = new HashMap<>();
+
+    public Map<String, MonthName> getAllMonths() {
+        return monthsMap;
+    }
+
+    public MonthName getMonthNames(String monthNumber) {
+        return Objects.requireNonNull(monthsMap.get(monthNumber));
+    }
 
     public List<String> getListOfMonths() {
         return listOfMonths;
@@ -55,6 +69,14 @@ public class DataHelper{
 
     public void setListOfMonths() {
         listOfMonths = new ArrayList<>(monthlyStatisticsMap.keySet());
+    }
+
+    public CategoryTarget getTargetPerCategory(String category) {
+        return categoryTargets.get(category) == null ? new CategoryTarget("", 0) : categoryTargets.get(category);
+    }
+
+    public void setCategoryTargets(Map<String, CategoryTarget> categoryTargets) {
+        this.categoryTargets = categoryTargets;
     }
 
     public List<Item> getListOfItems() {
@@ -84,6 +106,16 @@ public class DataHelper{
                 .collect(toList());
     }
 
+    public void setListOfCategoryItems() {
+        listOfCategoryItems = Utils.getItemsFromStatistics(cat -> true).stream()
+                .map(item -> new AppCategoryItem(item.getCategory(), Utils.findColor(item.getCategory())))
+                .collect(toList());
+    }
+
+    public List<AppCategoryItem> getListOfCategoryItems() {
+        return listOfCategoryItems;
+    }
+
     public List<Category> getListOfCategories() {
         return listOfCategories;
     }
@@ -103,6 +135,7 @@ public class DataHelper{
     private DataHelper(Context context) {
         this.dataBase = new DataBase(this, context);
         this.analyzer = new Analyzer();
+        setAllMonths();
     }
 
     public static DataHelper getDataHelper(Context context) {
@@ -119,15 +152,27 @@ public class DataHelper{
         return dataHelper;
     }
 
+    private void setAllMonths() {
+        List<MonthName> values = ImmutableList.of(new MonthName("January", "JEN"),
+                new MonthName("February", "FEB"), new MonthName("March", "MAR"),
+                new MonthName("April", "APR"), new MonthName("May", "MAY"),
+                new MonthName("June", "JUN"), new MonthName("July", "JUL"),
+                new MonthName("August", "AUG"), new MonthName("September", "SEP"),
+                new MonthName("October", "OCT"), new MonthName("November", "NOV"),
+                new MonthName("December", "DEC"));
+        monthsMap = JavaUtils.mapOf(ImmutableList.of("01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12"), values);
+    }
+
     public void deleteItems(String month) {
         dataBase.deleteAllMonthlyItems(month);
+        //dataBase.deleteTarget();
     }
 
     public void populateInitialCategories(Context context) {
         dataBase.clearAllColors();
         dataBase.insertColor(ContextCompat.getColor(context, R.color.blue_3));
         dataBase.insertColor(ContextCompat.getColor(context, R.color.blue_4));
-        dataBase.insertColor(ContextCompat.getColor(context, R.color.red_4));
+        dataBase.insertColor(ContextCompat.getColor(context, R.color.red_3));
         dataBase.insertColor(ContextCompat.getColor(context, R.color.red_5));
         dataBase.insertColor(ContextCompat.getColor(context, R.color.green_3));
         dataBase.insertColor(ContextCompat.getColor(context, R.color.green_4));
@@ -137,35 +182,45 @@ public class DataHelper{
         dataBase.insertColor(ContextCompat.getColor(context, R.color.purple_4));
 
         dataBase.clearAllCategories();
-        dataBase.insertCategory(new Category("home", "", ContextCompat.getColor(context, R.color.blue_3)));
-        dataBase.insertCategory(new Category("food", "", ContextCompat.getColor(context, R.color.blue_4)));
-        dataBase.insertCategory(new Category("cafes", "", ContextCompat.getColor(context, R.color.red_4)));
-        dataBase.insertCategory(new Category("clothes", "", ContextCompat.getColor(context, R.color.yellow_3)));
-        dataBase.insertCategory(new Category("car", "", ContextCompat.getColor(context, R.color.green_4)));
-        dataBase.insertCategory(new Category("other", "", ContextCompat.getColor(context, R.color.purple_4)));
+        dataBase.insertCategory(new Category("Home", "", ContextCompat.getColor(context, R.color.blue_3)),
+                "icon_cat_home");
+        dataBase.insertCategory(new Category("Food", "", ContextCompat.getColor(context, R.color.blue_4)), "icon_cat_food");
+        dataBase.insertCategory(new Category("Cafes", "", ContextCompat.getColor(context, R.color.red_3)), "icon_cat_restaurant");
+        dataBase.insertCategory(new Category("Clothes", "", ContextCompat.getColor(context, R.color.yellow_3)),
+                "icon_cat_clothes");
+        dataBase.insertCategory(new Category("Car", "", ContextCompat.getColor(context, R.color.green_4)), "icon_cat_car");
+        dataBase.insertCategory(new Category("Fuel", "", ContextCompat.getColor(context, R.color.blue)), "icon_cat_fuel");
+        dataBase.insertCategory(new Category("Pets", "", ContextCompat.getColor(context, R.color.yellow_2)), "icon_cat_pets");
+        dataBase.insertCategory(new Category("Transportation", "", ContextCompat.getColor(context, R.color.red)),
+                "icon_cat_transportation");
+        dataBase.insertCategory(new Category("Vacation", "", ContextCompat.getColor(context, R.color.green)),
+                "icon_cat_vacation");
+        dataBase.insertCategory(new Category("Other", "", ContextCompat.getColor(context, R.color.purple_4)), null);
     }
 
     public void fetchData(String payDate) {
         dataBase.fetchCategories();
         dataBase.fetchAndPopulateAllItems(payDate);
         dataBase.fetchAllColors();
+        dataBase.fetchTargets();
         prepareStatistics();
+        setListOfCategoryItems();
         setInitialListOfCombinedItems();
     }
 
     /* -----------------------   Category Manipulations   ----------------------- */
 
     public void addCategory(Category category) {
-        dataBase.insertCategory(category);
+        dataBase.insertCategory(category, null);
     }
 
     public void changeCategoryColor(Category category, int newColorColor) {
-        category.setColor(newColorColor);
-        dataBase.updateCategoryColor(category);
+        dataBase.updateCategoryColor(category.getName(), newColorColor);
+        dataBase.fetchCategories();
     }
 
     public void changeCategoryName(Category category, String newCategoryName) {
-        dataBase.updateItemsCategory(newCategoryName, category.getName());
+        dataBase.updateItemsCategory(Utils.toTitleCase(newCategoryName), category.getName());
         dataBase.deleteCategory(category);
         dataBase.fetchCategories();
         updateMonthlyStatistics(Utils.getCurrentDate(PAY), dataBase.getItemsStatistics(Utils.getCurrentDate(PAY)));
@@ -193,41 +248,46 @@ public class DataHelper{
         ItemToAdd itemToAdd = analyzer.getItemFromVoice(matches);
         if (itemToAdd != null)
         {
-            addItem(itemToAdd.getOtherCategoryName(), itemToAdd.getParentCategoryName(), itemToAdd.getGivenCategoryName(),
+            addItem(itemToAdd.getDefaultCategoryName(), itemToAdd.getParentCategoryName(), itemToAdd.getGivenCategoryName(),
                     itemToAdd.getAmount(), itemToAdd.getDescription());
         }
     }
 
     public void addItemFromText(String category, double amount, String description) {
-        ItemToAdd itemToAdd = analyzer.getItemFromEdit(category, amount, description, listOfCategories);
-        addItem(itemToAdd.getOtherCategoryName(), itemToAdd.getParentCategoryName(), itemToAdd.getGivenCategoryName(),
+        ItemToAdd itemToAdd = analyzer.getItemFromEdit(category, amount, description);
+        addItem(itemToAdd.getDefaultCategoryName(), itemToAdd.getParentCategoryName(), itemToAdd.getGivenCategoryName(),
                 itemToAdd.getAmount(), itemToAdd.getDescription());
     }
 
     /**
      * Handling the add item from Edit form and through Voice
-     *
-     * Inserting the item and if 'parentName + (other)' exists:
-     *  1. Creating 'parentName + (other)' (if not exists) and copying items from parent to it
-     *  2. Updating otherName column with 'parentName + (other)' of Category table, inserting new category and updating statistics
-     *  3. Updating the list with updated data
-     * */
-    public void addItem(String otherCategoryName, String categoryName, String givenCategoryName, double amount,
-                        String description) {
-        boolean otherExists = dataHelper.getListOfCategories().stream()
-                .anyMatch(cat -> cat.getName().equals(otherCategoryName));
-        if (!otherCategoryName.equals("") && !otherExists)
+     * <p>
+     * Inserting the item and if 'All parentName' exists:
+     * 1. Creating 'All parentName' (if not exists) and changing the parent name of child categories with 'All parentName'
+     * 2. Updating defaultName column with 'All parentName' of Category table, inserting new category and updating statistics
+     * 3. Updating the list with updated data
+     */
+    public void addItem(String defaultCategoryName, String categoryName, String givenCategoryName, double amount, String description) {
+        boolean defaultExists = listOfCategories.stream().anyMatch(cat -> cat.getName().equals(defaultCategoryName));
+        if (!defaultCategoryName.equals("") && !defaultExists)
         {
-            Category newCat = new Category(otherCategoryName, categoryName, Color.WHITE);
-            dataBase.insertCategory(newCat);
-            dataBase.updateItemsCategory(otherCategoryName, categoryName);
-            dataBase.updateOtherCategoryName(otherCategoryName, categoryName);
+            listOfCategories.stream()
+                    .filter(cat -> cat.getParent().equals(categoryName))
+                    .forEach(cat -> dataBase.updateChildCategoryParentName(cat.getName(), defaultCategoryName));
+            Category allCat = new Category(defaultCategoryName, "", Color.WHITE);
+            dataBase.insertCategory(allCat, null);
+            CategoryTarget t = categoryTargets.get(categoryName);
+            updateTarget(ImmutableMap.of(defaultCategoryName, t == null ? 0 : t.getSum()), Utils.getCurrentDate(PAY));
+            dataBase.updateDefaultCategoryName(defaultCategoryName, defaultCategoryName);
+            if (!givenCategoryName.equals(categoryName))
+            {
+                dataBase.updateChildCategoryParentName(givenCategoryName, defaultCategoryName);
+            }
+            dataBase.updateChildCategoryParentName(categoryName, defaultCategoryName);
             dataBase.fetchCategories();
         }
-
         String payDate = Utils.getCurrentDate(PAY);
-        categoryName = otherExists && givenCategoryName.equals(categoryName) ? otherCategoryName : givenCategoryName;
-        Item item = new Item.Builder(categoryName, Utils.getCurrentDate(TIMESTAMP), payDate)
+        Item item = new Item.Builder(givenCategoryName, Utils.getCurrentDate(TIMESTAMP), payDate)
                 .withAmount(amount).withDescription(description).build();
         setLastAddedItem(item);
         dataBase.insertItem(item);
@@ -289,9 +349,8 @@ public class DataHelper{
         List<String> maxCategories = getCategoryNames(stat -> stat.getMax() == max, statistics);
 
         //Create a stats map with subcategories and categories without children (subcategories) only
-        Map<String, Statistics> stats = statistics.stream()
-                .collect(toMap(TableStatistics::getCategory,
-                        s -> new Statistics(s.getMin(), s.getMax(), Utils.round(s.getAvg()), s.getSum(), s.getCnt())));
+        Map<String, Statistics> stats = statistics.stream().collect(Collectors.toMap(TableStatistics::getCategory,
+                s -> new Statistics(s.getMin(), s.getMax(), Utils.round(s.getAvg()), s.getSum(), s.getCnt())));
 
         //Add total for all categories to stats map
         int count = (int) getSum(stats, Statistics::getCnt);
@@ -301,20 +360,21 @@ public class DataHelper{
         //Add categories that have children to stats map
         addParentCategoriesToStatisticsMap(stats);
 
-        monthlyStatisticsMap.put(date ,new MonthlyStatistics(stats, minCategories, maxCategories));
+        monthlyStatisticsMap.put(date, new MonthlyStatistics(stats, minCategories, maxCategories));
         setListOfMonths();
     }
 
     private void addParentCategoriesToStatisticsMap(Map<String, Statistics> stats) {
         Map<String, Map<String, Statistics>> parentsAndStats = new HashMap<>();
-        for (Map.Entry<String, Statistics> stat: stats.entrySet()){
+        for (Map.Entry<String, Statistics> stat : stats.entrySet())
+        {
             String parent = Utils.getParentCategoryName(stat.getKey());
             if (!parent.equals(""))
             {
                 List<String> children = Utils.getCategoriesNames(cat -> cat.getParent().equals(parent));
                 Map<String, Statistics> statistic = Objects.requireNonNull(parentsAndStats.getOrDefault(parent, new HashMap<>()));
                 statistic.putAll(stats.entrySet().stream()
-                        .filter(s-> children.contains(s.getKey()))
+                        .filter(s -> children.contains(s.getKey()))
                         .collect(toMap(Map.Entry::getKey, Map.Entry::getValue)));
                 parentsAndStats.put(parent, statistic);
             }
@@ -349,5 +409,19 @@ public class DataHelper{
                 .filter(predicate)
                 .map(TableStatistics::getCategory)
                 .collect(toList());
+    }
+
+    public void updateTarget(Map<String, Integer> targets, String payDate) {
+        targets.entrySet().forEach(e -> {
+            if (categoryTargets.get(e.getKey()) == null)
+            {
+                dataBase.insertTarget(e.getKey(), e.getValue());
+            }
+            else
+            {
+                dataBase.updateTarget(e.getKey(), e.getValue(), payDate);
+            }
+        });
+        dataBase.fetchTargets();
     }
 }

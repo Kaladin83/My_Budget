@@ -43,7 +43,7 @@ public class Preferences {
         String className = classs.getSimpleName();
         switch (className) {
             case "Integer":
-                return (T) Integer.valueOf(pref.getInt(key, -1));
+                return (T) Integer.valueOf(pref.getInt(key, 0));
             case "String":
                 return (T) pref.getString(key, "");
             case "Boolean":

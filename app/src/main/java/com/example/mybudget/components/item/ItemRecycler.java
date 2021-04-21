@@ -39,7 +39,7 @@ import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
 public class ItemRecycler extends Fragment implements RecyclerTouchHelper.RecyclerItemTouchHelperListener{
     private RecyclerBinding bind;
     private final MainActivity mainActivity;
-    private ItemsRecyclerAdapter parentItemAdapter;
+    private ItemsRecyclerTreeAdapter parentItemAdapter;
     private DataHelper dataHelper;
 
     public ItemRecycler(MainActivity mainActivity) {
@@ -51,7 +51,7 @@ public class ItemRecycler extends Fragment implements RecyclerTouchHelper.Recycl
         bind = RecyclerBinding.inflate(inflater, container, false);
         View mainView = bind.getRoot();
         dataHelper = DataHelper.getDataHelper(requireContext());
-        parentItemAdapter = new ItemsRecyclerAdapter(requireActivity());
+        parentItemAdapter = new ItemsRecyclerTreeAdapter(requireActivity());
         LinearLayoutManager pLinearLayoutManager = new LinearLayoutManager(requireContext());
         bind.recyclerView.setAdapter(parentItemAdapter);
         bind.recyclerView.setLayoutManager(pLinearLayoutManager);

@@ -54,7 +54,7 @@
             android:id="@+id/category_txt"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="@string/category"
+            android:text=""
             android:textColor="?attr/colorOnBackground"
             android:gravity="center"
             app:layout_constraintHeight_percent="0.24"

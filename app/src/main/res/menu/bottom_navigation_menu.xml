@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/add_category"
+        android:id="@+id/edit_category"
+
+        android:icon="@drawable/icon_edit_categories"/>
+
+    <item android:title="@string/charts"
+        android:id="@+id/view_charts"
+        android:icon="@drawable/icon_charts"/>
+
+    <item android:title="@string/categories"
+        android:id="@+id/view_entries"
+        android:icon="@drawable/icon_categories"/>
+
+    <item android:title="@string/add_entry"
+        android:id="@+id/add_entry"
+        android:icon="@drawable/icon_edit"/>
+
+    <item android:title="@string/share"
+        android:id="@+id/share_entries"
+        android:icon="@drawable/icon_sync"/>
+
+</menu>

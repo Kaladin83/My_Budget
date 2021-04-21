@@ -3,11 +3,10 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimaryDark</item>
         <item name="android:textColorSecondary">@color/white</item>
-        <item name="actionBarSize">@dimen/tool_bar</item>
         <item name="colorControlNormal">@color/toolBar</item>
     </style>
 
@@ -39,12 +38,6 @@
         <item name="android:drawableTint">@color/white</item>
     </style>
 
-    <style name="ActionBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:titleTextStyle">@style/ActionBarTitleTextStyle</item>
-        <item name="background">?attr/colorPrimary</item>
-        <item name="titleTextColor">?android:attr/textColorSecondary</item>
-    </style>
-
     <style name="ActionBarTitleTextStyle" >
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorPrimary">?android:attr/textColorSecondary</item>
@@ -66,11 +59,17 @@
         <item name="tabBackground">?attr/colorPrimary</item>
     </style>
 
-    <style name="ImageButtonStyle">
-        <item name="tint">@color/image_buttons_selector</item>
+    <!-- deprecated -> to remove if not needed-->
+        <style name="ImageButtonStyle">
+            <item name="tint">@color/image_buttons_selector</item>
+        </style>
+
+    <style name="NavigationLayoutFont" parent="Widget.Design.BottomNavigationView">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="fontFamily">@font/apollo_family</item>
     </style>
 
-    <style name="NavigationLayoutStyle">
+    <style name="NavigationLayoutBackground">
         <item name="android:background">?attr/colorPrimary</item>
     </style>
 
@@ -126,5 +125,25 @@
 
     <style name="SpinnerStyle" parent="Widget.AppCompat.Spinner">
         <item name="backgroundTint">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="height">40dp</item>
+        <item name="background">?attr/colorPrimary</item>
+        <item name="titleTextStyle">@style/TitleBarTextAppearance</item>
+    </style>
+
+    <style name="TitleBarTextAppearance" parent="">
+        <item name="android:fontFamily">@font/apollo_family</item>
+        <item name="android:textSize">12pt</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="expenseSummary">
+        <item name="android:fontFamily">@font/apollo_family</item>
+        <item name="android:textSize">10pt</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/colorSecondaryVariant</item>
     </style>
 </resources>

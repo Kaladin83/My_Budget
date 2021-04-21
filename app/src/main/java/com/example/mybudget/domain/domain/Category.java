@@ -4,15 +4,29 @@ package com.example.mybudget.domain.domain;
  * Category class - Holds all the data of categories
  */
 public class Category {
-    private String name;
-    private String parent;
+    private final String name;
+    private final String parent;
+    private final int color;
+    private Integer icon;
     private String otherName;
-    private int color;
+    private int id;
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
 
     public Category(String name, String parent, int color) {
-        setName(name);
-        setParent(parent);
-        setColor(color);
+        this.name = name;
+        this.parent = parent;
+        this.color = color;
+    }
+
+    public void setOtherName(String otherName) {
+        this.otherName = otherName;
     }
 
     public String getName() {
@@ -27,23 +41,15 @@ public class Category {
         return color;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setParent(String parent) {
-        this.parent = parent;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
+    public Integer getIcon() {
+        return icon;
     }
 
     public String getOtherName() {
         return otherName;
     }
 
-    public void setOtherName(String otherName) {
-        this.otherName = otherName;
+    public void setIcon(Integer icon) {
+        this.icon = icon;
     }
 }

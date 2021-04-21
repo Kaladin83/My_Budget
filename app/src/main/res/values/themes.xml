@@ -13,16 +13,18 @@
         <item name="colorOnSecondary">@color/very_light_black</item>
         <item name="colorOnSurface">@color/super_light_green</item>
         <item name="colorOnBackground">@color/red</item>
-        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorPrimary">@color/light_black</item>
         <item name="android:textColorSecondary">@color/white</item>
+        <item name="expenseTextColor">@color/teal</item>
+        <item name="colorRed">@color/red</item>
+        <item name="colorYellow">@color/yellow</item>
+        <item name="colorGreen">@color/dark_green</item>
+        <item name="colorBlue">@color/blue_2</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="android:windowBackground" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!--         actionBar. very_light_green-->
-        <item name="titleTextColor">?android:attr/textColorSecondary</item>
-        <item name="actionMenuTextColor">?android:attr/textColorSecondary</item>
-        <item name="actionBarSize">@dimen/tool_bar</item>
-        <item name="android:itemTextAppearance">@style/MenuTextStyle</item>
+        <!--         actionBar. -->
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:listPreferredItemHeightSmall">40dp</item>
         <!--To change the background of options menu-->
         <item name="android:itemBackground">?attr/colorPrimaryVariant</item>
@@ -30,8 +32,9 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="buttonStyle">@style/ButtonStyle</item>
         <item name="tabStyle">@style/TabsStyle</item>
-        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
-        <item name="navLayoutBackground">@style/NavigationLayoutStyle</item>
+<!--        <item name="imageButtonStyle">@style/ImageButtonStyle</item>-->
+        <item name="bottomNavigationStyle">@style/NavigationLayoutFont</item>
+        <item name="navLayoutBackground">@style/NavigationLayoutBackground</item>
         <item name="borderedBackground">@style/BorderStyle</item>
         <item name="tabStyleBorderedBackground">@style/HalfBorderStyle</item>
         <item name="headerBackground">@style/HeaderStyle</item>
@@ -51,23 +54,25 @@
         <item name="colorPrimaryVariant">@color/very_light_black</item>
         <item name="colorOnPrimary">@color/super_light_black</item>
         <item name="colorAccent">@color/light_black</item>
-        <item name="colorSurface">@color/ultra_light_black</item>
+        <item name="colorSurface">@color/very_light_black_1</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/teal_2</item>
         <item name="colorSecondaryVariant">@color/turquoise</item>
-        <item name="colorOnSecondary">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/teal_2</item>
         <item name="colorOnSurface">@color/turquoise</item>
-        <item name="colorOnBackground">@color/light_blue</item>
+        <item name="colorOnBackground">@color/blue_3</item>
         <item name="android:textColorPrimary">@color/super_light_green</item>
         <item name="android:textColorSecondary">@color/super_light_green</item>
+        <item name="expenseTextColor">@color/blue_4</item>
+        <item name="colorRed">@color/red_3</item>
+        <item name="colorYellow">@color/yellow_3</item>
+        <item name="colorGreen">@color/green_3</item>
+        <item name="colorBlue">@color/blue_3</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="android:windowBackground" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!--         actionBar. -->
-        <item name="titleTextColor">?android:attr/textColorSecondary</item>
-        <item name="actionMenuTextColor">?android:attr/textColorSecondary</item>
-        <item name="actionBarSize">@dimen/tool_bar</item>
-        <item name="android:itemTextAppearance">@style/MenuTextStyle</item>
+        <item name="actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:listPreferredItemHeightSmall">40dp</item>
         <!--To change the background of options menu-->
         <item name="android:itemBackground">?attr/colorOnPrimary</item>
@@ -76,7 +81,7 @@
         <item name="buttonStyle">@style/ButtonStyle</item>
         <item name="tabStyle">@style/TabsStyle</item>
         <item name="imageButtonStyle">@style/ImageButtonStyle</item>
-        <item name="navLayoutBackground">@style/NavigationLayoutStyle</item>
+        <item name="navLayoutBackground">@style/NavigationLayoutFont</item>
         <item name="borderedBackground">@style/BorderStyle</item>
         <item name="tabStyleBorderedBackground">@style/HalfBorderStyle</item>
         <item name="headerBackground">@style/HeaderStyle</item>

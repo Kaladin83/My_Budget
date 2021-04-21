@@ -1,19 +1,18 @@
 package com.example.mybudget.components.item;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mybudget.components.custom.CategoryIcon;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.domain.domain.ItemDrawer;
 import com.example.mybudget.R;
@@ -30,13 +29,13 @@ import static com.example.mybudget.utils.Enums.Level.ITEM_LVL;
 import static com.example.mybudget.utils.Enums.Level.CATEGORY_LVL;
 import static com.example.mybudget.utils.Enums.Level.SUB_CATEGORY_LVL;
 
-public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdapter.MyViewHolder> {
+public class ItemsRecyclerTreeAdapter extends RecyclerView.Adapter<ItemsRecyclerTreeAdapter.MyViewHolder> {
     private final int screenWidth, logicalDensity;
     private final DataHelper dataHelper;
     private final Activity activity;
     private DescriptionDialog descriptionDialog;
 
-    public ItemsRecyclerAdapter(Activity activity) {
+    public ItemsRecyclerTreeAdapter(Activity activity) {
         this.activity = activity;
         this.dataHelper = DataHelper.getDataHelper(this.activity);
         this.screenWidth = Utils.getScreenWidth(activity);
@@ -44,44 +43,42 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public RelativeLayout mainLayout;
-        FrameLayout objectLayout;
-        RelativeLayout backgroundLayout, mainRowLayout;
-        TextView dateTxt;
+        public ConstraintLayout mainRowLayout;
+
         ImageView arrowImage;
 
         private MyViewHolder(View v) {
             super(v);
-            objectLayout = v.findViewById(R.id.object_layout);
-            mainLayout = v.findViewById(R.id.main_layout);
             mainRowLayout = v.findViewById(R.id.main_row_layout);
-            backgroundLayout = v.findViewById(R.id.background_layout);
-            dateTxt = v.findViewById(R.id.date_added_txt);
             arrowImage = v.findViewById(R.id.arrow_image);
         }
     }
 
     public class MyViewHolder1 extends MyViewHolder {
-        RelativeLayout categorySumsLayout;
-        TextView categoryTxt, categorySumTxt, categoryAverageTxt;
+        //RelativeLayout categorySumsLayout;
+        TextView categoryTxt, categorySumTxt;
+        CategoryIcon categoryIcon;
+        View separator;
 
         private MyViewHolder1(View v) {
             super(v);
             categoryTxt = v.findViewById(R.id.category_txt);
-            categorySumsLayout = v.findViewById(R.id.category_sums_layout);
             categorySumTxt = v.findViewById(R.id.category_total_txt);
-            categoryAverageTxt = v.findViewById(R.id.category_average_txt);
+            separator = v.findViewById(R.id.separator);
+            categoryIcon = v.findViewById(R.id.categories_icon);
         }
     }
 
     public class MyViewHolder2 extends MyViewHolder {
         TextView amountTxt;
         ImageView descriptionImage;
+        TextView dateTxt;
 
         private MyViewHolder2(View v) {
             super(v);
             descriptionImage = v.findViewById(R.id.description_image);
             amountTxt = v.findViewById(R.id.amount_txt);
+            dateTxt = v.findViewById(R.id.date_added_txt);
         }
     }
 
@@ -114,84 +111,53 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        int categoryItemWidth = (int) ((screenWidth) * 0.92);
-        int subCategoryItemWidth = (int) ((screenWidth) * 0.82);
-        int height = 45;
-        int basicHeight = 45;
-        int subTotalLine = 25;
-        int inset = 10 * logicalDensity;
         ItemDrawer combinedItem = dataHelper.getListOfCombinedItems().get(position);
         Item item = combinedItem.getItem();
         String lastAddedItemDate = dataHelper.getLastAddedItem().getDate();
-        String date = item.getDate();
-        holder.mainLayout.setSelected(combinedItem.isSelected());
         if (holder instanceof MyViewHolder1)
         {
-            height = createRow((MyViewHolder1) holder, position, basicHeight, basicHeight + subTotalLine + 10);
-            renderCategoryItem(holder, subTotalLine, basicHeight, combinedItem, subCategoryItemWidth, categoryItemWidth, inset);
+            renderCategoryItem(holder, combinedItem);
         }
         else
         {
-            renderItem(holder, item, lastAddedItemDate, position, basicHeight, inset, subCategoryItemWidth, categoryItemWidth);
+            renderItem(holder, item, lastAddedItemDate, position);
         }
-        FrameLayout.LayoutParams fParams = new FrameLayout.LayoutParams(screenWidth, height * logicalDensity);
-        holder.mainLayout.setLayoutParams(fParams);
-        holder.objectLayout.setLayoutParams(fParams);
-        holder.backgroundLayout.setLayoutParams(fParams);
-        holder.dateTxt.setText(date.length() > 3 ? date.substring(0, date.length() - 3) : "No date");
-        holder.dateTxt.setText(date);
-        holder.dateTxt.setSelected(date.equals(lastAddedItemDate));
         holder.mainRowLayout.setOnClickListener(view -> {
             addToCombinedItems(position);
             notifyDataSetChanged();
         });
     }
 
-    private void renderCategoryItem(MyViewHolder holder, int subTotalLine, int basicHeight, ItemDrawer combinedItem,
-                                    int subCategoryItemWidth, int categoryItemWidth, int inset) {
+    private void renderCategoryItem(MyViewHolder holder, ItemDrawer combinedItem) {
         MyViewHolder1 holder1 = (MyViewHolder1) holder;
         Item item = combinedItem.getItem();
         Level level = combinedItem.getLevel();
         Statistics stats = Utils.getStatsForCategory(item.getCategory());
         int color = Utils.findColor(item.getCategory());
-        int strokeColor = Utils.getColor(R.color.light_black, activity);
-        int statisticsColor = Utils.getAttrColor(activity, R.attr.colorPrimaryVariant);
+        int iconSize = 56 * logicalDensity;
 
         holder1.categoryTxt.setText(item.getCategory());
-        holder1.categoryTxt.setBackground(Utils.createBorder(20, Color.TRANSPARENT, 6, color));
-        holder1.categorySumsLayout.setPadding(inset, 0, inset, 0);
-        holder1.categorySumsLayout.setBackground(Utils.createBorder(15, statisticsColor, 1, strokeColor));
         holder1.categorySumTxt.setText(activity.getString(R.string.category_total, String.valueOf(stats.getSum())));
-        holder1.categoryAverageTxt.setText(activity.getString(R.string.category_average, String.valueOf(stats.getAvg())));
         holder1.arrowImage.setVisibility(level == SUB_CATEGORY_LVL ? View.VISIBLE : View.GONE);
+        holder1.separator.setVisibility(level == CATEGORY_LVL ? View.VISIBLE : View.GONE);
+        int radius = level == CATEGORY_LVL ? iconSize / 2 : (int) (iconSize / 2.4);
+        //holder1.categoryIcon.setParams(item.getCategory(), color, activity);
 
-        int width = level == SUB_CATEGORY_LVL ? subCategoryItemWidth : categoryItemWidth;
-        holder1.categorySumsLayout.setLayoutParams(getRLP(width, subTotalLine, RelativeLayout.ALIGN_PARENT_BOTTOM,
-                RelativeLayout.ALIGN_PARENT_END, inset, inset));
-        width = level == CATEGORY_LVL ? screenWidth : categoryItemWidth;
-        int rule = level == CATEGORY_LVL ? RelativeLayout.CENTER_HORIZONTAL : RelativeLayout.ALIGN_PARENT_END;
-        holder1.mainRowLayout.setLayoutParams(getRLP(width, basicHeight, rule, -1, inset, 0));
+        int leftPadding = level == CATEGORY_LVL ? 25 : 50;
+        holder.mainRowLayout.setPadding(leftPadding, 0 ,0,0);
     }
 
-    private void renderItem(MyViewHolder holder, Item item, String lastAddedItemDate, int position, int basicHeight, int inset,
-                            int subCategoryItemWidth, int categoryItemWidth) {
-
+    private void renderItem(MyViewHolder holder, Item item, String lastAddedItemDate, int position) {
         MyViewHolder2 holder2 = (MyViewHolder2) holder;
         holder2.amountTxt.setText(String.valueOf(item.getAmount()));
         holder2.amountTxt.setSelected(item.getDate().equals(lastAddedItemDate));
         holder2.descriptionImage.setOnClickListener(v -> ShowDescriptionDialog(item, position));
+        holder2.dateTxt.setText(item.getDate().length() > 3 ? item.getDate().substring(0, item.getDate().length() - 3) : "No date");
+        holder2.dateTxt.setSelected(item.getDate().equals(lastAddedItemDate));
 
         String parentCategoryName = Utils.getParentCategoryName(item.getCategory());
-        int width = !parentCategoryName.equals("") ? subCategoryItemWidth : categoryItemWidth;
-        holder2.mainRowLayout.setLayoutParams(getRLP(width, basicHeight, RelativeLayout.ALIGN_PARENT_END, -1, inset, 0));
-    }
-
-    private RelativeLayout.LayoutParams getRLP(int width, int height, int rule1, int rule2, int marginH, int marginV) {
-        RelativeLayout.LayoutParams rParams = new RelativeLayout.LayoutParams(width, height * logicalDensity);
-        rParams.addRule(rule1);
-        rParams.addRule(rule2 == -1 ? rule1 : rule2);
-        rParams.setMargins(marginH, marginV, marginH, marginV);
-        return rParams;
+        int paddingLeft = !parentCategoryName.equals("") ? 140 : 50;
+        holder.mainRowLayout.setPadding(paddingLeft, 0 ,0,0);
     }
 
     private void ShowDescriptionDialog(Item selectedItem, int position) {
@@ -271,18 +237,5 @@ public class ItemsRecyclerAdapter extends RecyclerView.Adapter<ItemsRecyclerAdap
             i++;
         }
         return selectedSub;
-    }
-
-    private int createRow(MyViewHolder1 holder, int position, int smallHeight, int largeHeight) {
-        if (position == -1)
-        {
-            return smallHeight;
-        }
-        ItemDrawer itemDrawer = dataHelper.getListOfCombinedItems().get(position);
-        int height = itemDrawer.isExtended() ? largeHeight : smallHeight;
-
-        holder.mainLayout.setSelected(itemDrawer.isSelected());
-        holder.categorySumsLayout.setVisibility(itemDrawer.isExtended() ? View.VISIBLE : View.GONE);
-        return height;
     }
 }
