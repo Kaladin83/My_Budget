@@ -41,7 +41,7 @@ public class ApplicationViewBuilder implements IAction {
         this.dataHelper = DataHelper.getDataHelper(activity);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(activity, category.equals(Utils.TOTAL) ? 4 : 3);
-        categoryItemAdapter = new ItemsRecyclerAppViewAdapter(mainActivity, this, this, window, Utils.getCategoryItems(predicate));
+        categoryItemAdapter = new ItemsRecyclerAppViewAdapter(mainActivity, this, this, Utils.getCategoryItems(predicate));
 
         RecyclerView recyclerView = mainLayout.findViewById(R.id.app_view_recycler);
         recyclerView.setAdapter(categoryItemAdapter);

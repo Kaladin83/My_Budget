@@ -6,6 +6,7 @@ public class Statistics {
     private final double avg;
     private final double sum;
     private final int cnt;
+
     public Statistics(double min, double max, double avg, double sum, int cnt) {
         this.min = min;
         this.max = max;

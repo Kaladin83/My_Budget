@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mybudget.Data.Preferences;
 import com.example.mybudget.IAction;
+import com.example.mybudget.MainActivity;
 import com.example.mybudget.R;
+import com.example.mybudget.components.item.ApplicationViewBuilder;
 import com.example.mybudget.components.item.ExpensesListDialog;
 import com.example.mybudget.domain.domain.AppCategoryItem;
 import com.example.mybudget.domain.domain.Category;
@@ -422,5 +424,11 @@ public class Utils {
         snackbar.show();
         dataHelper.removeItems(itemsToDelete);
         iAction.refreshItems(DELETE_ITEM);
+    }
+
+    public static boolean dimScreen(boolean isToDim, ApplicationViewBuilder viewBuilder, MainActivity main) {
+        viewBuilder.dimMainScreen(isToDim);
+        main.dimNavigationView(isToDim);
+        return isToDim;
     }
 }
