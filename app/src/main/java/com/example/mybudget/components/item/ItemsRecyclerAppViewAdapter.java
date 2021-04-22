@@ -48,18 +48,17 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
     private final List<Category> categoryItems;
     private final MainActivity activity;
     private final ApplicationViewBuilder viewBuilder;
-    private final IAction iAction;
     private boolean dimScreen = false;
+    private boolean deleteItems = false;
     private Mode mode;
     private Map<String, Boolean> categoriesToDelete = new HashMap<>();
 
     public ItemsRecyclerAppViewAdapter(MainActivity mainActivity, ApplicationViewBuilder viewBuilder,
-                                       IAction iAction, List<Category> categoryItems) {
+                                       List<Category> categoryItems) {
         this.activity = mainActivity;
         this.viewBuilder = viewBuilder;
         this.categoryItems = categoryItems;
         this.parentsAndChildren = getChildrenAndParents(categoryItems);
-        this.iAction = iAction;
         this.setHasStableIds(true);
         mode = Mode.VIEW;
     }
@@ -136,6 +135,7 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         }
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Category parent = categoryItems.get(position);
@@ -178,14 +178,19 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         ViewGroup viewGroup = (ViewGroup) view.getParent();
         Boolean isToBlur = categoriesToDelete.get(categoryName);
         holder.deleteLayout.setVisibility(isToBlur == null || !isToBlur? INVISIBLE: VISIBLE);
-        if (isToBlur == null || !isToBlur)
-        {
-            Blurry.delete(viewGroup);
-        }
-        else if (isToBlur && viewGroup.getChildCount() == 3)
-        {
-            Blurry.with(activity).radius(16).sampling(1).onto(viewGroup);
-        }
+//        if (isToBlur != null && !isToBlur )
+//        {
+//            Blurry.delete(viewGroup);
+//        }
+//        else if (isToBlur != null && viewGroup.getChildCount() == 3)
+//        {
+//            Blurry.with(activity).radius(16).sampling(1).onto(viewGroup);
+//        }
+    }
+
+    @Override
+    public void setHasStableIds(boolean hasStableIds) {
+        super.setHasStableIds(true);
     }
 
     @Override
@@ -326,6 +331,13 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         dialog.show();
         dialog.setOnDismissListener(v -> {
             switchToViewMode();
+
+            if (deleteItems)
+            {
+                DataHelper.getDataHelper(activity).removeItems(expenses);
+                viewBuilder.refreshItems(DELETE_ITEM, false);
+                deleteItems = false;
+            }
             dimScreen = Utils.dimScreen(false, viewBuilder, activity);
         });
     }
@@ -346,8 +358,9 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
 
         @Override
         protected void okPressed() {
-            DataHelper.getDataHelper(activity).removeItems(expenses);
-            iAction.refreshItems(DELETE_ITEM);
+            deleteItems = true;
+            notifyItemRemoved(4);
+            dismiss();
         }
     }
 

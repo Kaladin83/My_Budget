@@ -1,5 +1,6 @@
 package com.example.mybudget.components.item;
 
+import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,16 +25,18 @@ import com.example.mybudget.utils.Utils;
 
 import java.util.function.Predicate;
 
+import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Action.ADD_ITEM;
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 
-public class ApplicationViewBuilder implements IAction {
+public class ApplicationViewBuilder{
     private final MainActivity activity;
     private final DataHelper dataHelper;
     private final String category;
     private final ItemsRecyclerAppViewAdapter categoryItemAdapter;
     private final StatisticsBuilder statBuilder;
 
+    @SuppressLint("ClickableViewAccessibility")
     public ApplicationViewBuilder(MainActivity mainActivity, ConstraintLayout mainLayout, Window window,
                                   Statistics statistics, String category, Predicate<Category> predicate)  {
         this.activity = mainActivity;
@@ -41,37 +44,41 @@ public class ApplicationViewBuilder implements IAction {
         this.dataHelper = DataHelper.getDataHelper(activity);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(activity, category.equals(Utils.TOTAL) ? 4 : 3);
-        categoryItemAdapter = new ItemsRecyclerAppViewAdapter(mainActivity, this, this, Utils.getCategoryItems(predicate));
+        categoryItemAdapter = new ItemsRecyclerAppViewAdapter(mainActivity, this, Utils.getCategoryItems(predicate));
 
         RecyclerView recyclerView = mainLayout.findViewById(R.id.app_view_recycler);
         recyclerView.setAdapter(categoryItemAdapter);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.addItemDecoration(new SpacesItemDecoration());
         recyclerView.setItemAnimator(new MyItemAnimator());
-        recyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    categoryItemAdapter.removeDeletionMarking();
-                }
-                return false;
+        recyclerView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                categoryItemAdapter.removeDeletionMarking();
             }
+            return true;
         });
 
         statBuilder = new StatisticsBuilder(activity, mainLayout, statistics, category);
     }
 
-    @Override
-    public void refreshItems(Enums.Action action) {
+    public void refreshItems(Enums.Action action, boolean isToRefresh) {
         dataHelper.setListOfCategoryItems();
         categoryItemAdapter.updateData(Utils.getCategoryItems(Utils.NO_PARENT_PREDICATE));
-        categoryItemAdapter.notifyDataSetChanged();
+        if (isToRefresh)
+        {
+            categoryItemAdapter.notifyDataSetChanged();
+        }
         MonthlyStatistics statistics = DataHelper.getDataHelper(activity).getMonthlyStatistics(Utils.getCurrentDate(PAY));
         statBuilder.populateStatistics(statistics.getStatistics().get(category));
         if (action == ADD_ITEM)
         {
             activity.moveToMainPage();
         }
+//        if (action == DELETE_ITEM)
+//        {
+//            categoryItemAdapter.rec
+//        }
     }
 
     public void dimMainScreen(boolean dimScreen) {

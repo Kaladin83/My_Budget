@@ -33,7 +33,7 @@ public class ApplicationViewMainContainer extends Fragment {
     }
 
     public void refreshItems(Enums.Action action) {
-        appViewBuilder.refreshItems(action);
+        appViewBuilder.refreshItems(action, true);
     }
 
     public ApplicationViewMainContainer(MainActivity mainActivity) {
