@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.State;
 
-import com.example.mybudget.IAction;
 import com.example.mybudget.MainActivity;
 import com.example.mybudget.R;
 import com.example.mybudget.domain.domain.Category;
@@ -23,9 +22,9 @@ import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.Utils;
 
+import java.util.List;
 import java.util.function.Predicate;
 
-import static com.example.mybudget.utils.Enums.Action.*;
 import static com.example.mybudget.utils.Enums.Action.ADD_ITEM;
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 
@@ -33,8 +32,9 @@ public class ApplicationViewBuilder{
     private final MainActivity activity;
     private final DataHelper dataHelper;
     private final String category;
-    private final ItemsRecyclerAppViewAdapter categoryItemAdapter;
+    private ItemsRecyclerAppViewAdapter categoryItemAdapter;
     private final StatisticsBuilder statBuilder;
+    private RecyclerView recyclerView;
 
     @SuppressLint("ClickableViewAccessibility")
     public ApplicationViewBuilder(MainActivity mainActivity, ConstraintLayout mainLayout, Window window,
@@ -43,12 +43,10 @@ public class ApplicationViewBuilder{
         this.category = category;
         this.dataHelper = DataHelper.getDataHelper(activity);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(activity, category.equals(Utils.TOTAL) ? 4 : 3);
-        categoryItemAdapter = new ItemsRecyclerAppViewAdapter(mainActivity, this, Utils.getCategoryItems(predicate));
-
-        RecyclerView recyclerView = mainLayout.findViewById(R.id.app_view_recycler);
-        recyclerView.setAdapter(categoryItemAdapter);
-        recyclerView.setLayoutManager(gridLayoutManager);
+        GridLayoutManager manager = new GridLayoutManager(activity, category.equals(Utils.TOTAL) ? 4 : 3);
+        recyclerView = mainLayout.findViewById(R.id.app_view_recycler);
+        populateRecyclerView(Utils.getCategoryItems(predicate));
+        recyclerView.setLayoutManager(manager);
         recyclerView.addItemDecoration(new SpacesItemDecoration());
         recyclerView.setItemAnimator(new MyItemAnimator());
         recyclerView.setOnTouchListener((v, event) -> {
@@ -62,23 +60,31 @@ public class ApplicationViewBuilder{
         statBuilder = new StatisticsBuilder(activity, mainLayout, statistics, category);
     }
 
-    public void refreshItems(Enums.Action action, boolean isToRefresh) {
+    public void refreshItems(Enums.Action action) {
         dataHelper.setListOfCategoryItems();
-        categoryItemAdapter.updateData(Utils.getCategoryItems(Utils.NO_PARENT_PREDICATE));
-        if (isToRefresh)
-        {
-            categoryItemAdapter.notifyDataSetChanged();
-        }
+        List<Category> categoryItems = Utils.getCategoryItems(Utils.NO_PARENT_PREDICATE);
+        populateRecyclerView(categoryItems);
         MonthlyStatistics statistics = DataHelper.getDataHelper(activity).getMonthlyStatistics(Utils.getCurrentDate(PAY));
         statBuilder.populateStatistics(statistics.getStatistics().get(category));
         if (action == ADD_ITEM)
         {
+            //categoryItemAdapter.updateData(categoryItems);
             activity.moveToMainPage();
+            //categoryItemAdapter.notifyDataSetChanged();
         }
+        //categoryItemAdapter.notifyDataSetChanged();
 //        if (action == DELETE_ITEM)
 //        {
-//            categoryItemAdapter.rec
+//            categoryItemAdapter.notifyItemRemoved(3);
+//            //categoryItemAdapter.notifyItemChanged(4);
+//            ///categoryItemAdapter.notifyItemRangeChanged(4,1);
 //        }
+
+    }
+
+    private void populateRecyclerView(List<Category> categoryItems) {
+        categoryItemAdapter = new ItemsRecyclerAppViewAdapter(activity, this, categoryItems);
+        recyclerView.setAdapter(categoryItemAdapter);
     }
 
     public void dimMainScreen(boolean dimScreen) {

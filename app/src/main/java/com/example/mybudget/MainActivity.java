@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dataHelper.fetchData(Utils.getCurrentDate(PAY));
         //Map<String, Integer> target =
         //        ImmutableMap.of(Utils.TOTAL, 1500, "Cafes", 350, "Home", 200, "Car", 500, "Clothes", 250);
-        //dataHelper.updateTarget(target, Utils.getCurrentDate(PAY));
+       // dataHelper.updateTarget(target, Utils.getCurrentDate(PAY));
         appView = new ApplicationViewMainContainer(this);
         navigationView = findViewById(R.id.bottom_navigation_view);
         dimNavigationView(false);

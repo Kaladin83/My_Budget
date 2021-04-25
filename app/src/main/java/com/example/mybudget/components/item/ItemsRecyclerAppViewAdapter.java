@@ -3,6 +3,7 @@ package com.example.mybudget.components.item;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.example.mybudget.components.custom.CategoryIcon;
 import com.example.mybudget.domain.domain.Category;
 import com.example.mybudget.domain.domain.Item;
 import com.example.mybudget.helpers.DataHelper;
+import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.Utils;
 import com.google.common.collect.ImmutableMap;
 
@@ -44,14 +46,14 @@ import static com.example.mybudget.utils.Enums.Action.DELETE_ITEM;
 import static com.example.mybudget.utils.Enums.MessageType.*;
 
 public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyclerAppViewAdapter.MyViewHolder> {
-    private final Map<Category, List<Category>> parentsAndChildren;
-    private final List<Category> categoryItems;
+    private  Map<Category, List<Category>> parentsAndChildren;
+    private  List<Category> categoryItems;
     private final MainActivity activity;
     private final ApplicationViewBuilder viewBuilder;
     private boolean dimScreen = false;
     private boolean deleteItems = false;
     private Mode mode;
-    private Map<String, Boolean> categoriesToDelete = new HashMap<>();
+    private Map<Pair<Integer, String>, Boolean> categoriesToDelete = new HashMap<>();
 
     public ItemsRecyclerAppViewAdapter(MainActivity mainActivity, ApplicationViewBuilder viewBuilder,
                                        List<Category> categoryItems) {
@@ -115,7 +117,7 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
 
     @Override
     public int getItemCount() {
-        return parentsAndChildren.size();
+        return categoryItems.size();
     }
 
     @NonNull
@@ -135,10 +137,10 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         }
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Category parent = categoryItems.get(position);
+        int pos = holder.getAdapterPosition();
+        Category parent = categoryItems.get(pos);
         String categoryName = parent.getName();
         List<Category> children = Objects.requireNonNull(parentsAndChildren.get(parent));
         int txtColor = dimScreen ? Utils.getTintDimColor(activity) : Utils.getAttrColor(activity, android.R.attr.textColorPrimary);
@@ -154,15 +156,7 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
             populateFolder(children, categoryName, (MyViewHolder2) holder);
         }
         animateIcon(holder, categoryName);
-//        if (categoriesToDelete.contains(categoryName))
-//        {
-//
-//        }
-//        else
-//        {
-//            animateIcon(View.INVISIBLE, holder);
-//        }
-        if (position == categoryItems.size() - 1 && mode == Mode.VIEW)
+        if (pos == categoryItems.size() - 1 && mode == Mode.VIEW)
         {
             categoriesToDelete.clear();
         }
@@ -176,21 +170,16 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
     private void animateIcon(MyViewHolder holder, String categoryName) {
         View view = holder instanceof MyViewHolder1 ? ((MyViewHolder1) holder).categoryIcon : ((MyViewHolder2) holder).folder;
         ViewGroup viewGroup = (ViewGroup) view.getParent();
-        Boolean isToBlur = categoriesToDelete.get(categoryName);
+        Boolean isToBlur = categoriesToDelete.get(Pair.create(holder.getAdapterPosition(), categoryName));
         holder.deleteLayout.setVisibility(isToBlur == null || !isToBlur? INVISIBLE: VISIBLE);
-//        if (isToBlur != null && !isToBlur )
-//        {
-//            Blurry.delete(viewGroup);
-//        }
-//        else if (isToBlur != null && viewGroup.getChildCount() == 3)
-//        {
-//            Blurry.with(activity).radius(16).sampling(1).onto(viewGroup);
-//        }
-    }
-
-    @Override
-    public void setHasStableIds(boolean hasStableIds) {
-        super.setHasStableIds(true);
+        if (isToBlur != null && !isToBlur )
+        {
+            Blurry.delete(viewGroup);
+        }
+        else if (isToBlur != null && viewGroup.getChildCount() == 3)
+        {
+            Blurry.with(activity).radius(16).sampling(1).onto(viewGroup);
+        }
     }
 
     @Override
@@ -249,14 +238,14 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         else
         {
             int position = holder.getAdapterPosition();
-            if (categoriesToDelete.containsKey(category))
+            Pair<Integer, String> pair = Pair.create(position, category);
+            if (categoriesToDelete.containsKey(pair))
             {
                 deleteItems(holder);
             }
             else if (!categoriesToDelete.isEmpty())
             {
-
-                categoriesToDelete.put(category, true);
+                categoriesToDelete.put(pair, true);
                 notifyItemChanged(position);
             }
         }
@@ -265,7 +254,7 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
     private boolean markIconForDelete(View view, MyViewHolder holder) {
         int position = holder.getAdapterPosition();
         mode = Mode.DELETE;
-        categoriesToDelete.put(holder.categoryTxt.getText().toString(), true);
+        categoriesToDelete.put(Pair.create(position, holder.categoryTxt.getText().toString()), true);
         AnimatorSet scaleSet = new AnimatorSet();
         scaleSet.playSequentially(getAnimationSet(view, 1.2f), getAnimationSet(view, 1f));
         scaleSet.start();
@@ -304,12 +293,12 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         dimScreen = Utils.dimScreen(true, viewBuilder, activity);
         DataHelper dataHelper = DataHelper.getDataHelper(activity);
         List<Item> expenses = new ArrayList<>();
-        for (String category : categoriesToDelete.keySet())
+        for (Pair<Integer, String> pair : categoriesToDelete.keySet())
         {
-            List<String> subcategories = Utils.getCategoriesNames(cat -> cat.getParent().equals(category));
+            List<String> subcategories = Utils.getCategoriesNames(cat -> cat.getParent().equals(pair.second));
             if (subcategories.isEmpty())
             {
-                expenses.addAll(dataHelper.getListOfItems(item -> item.getCategory().equals(category)));
+                expenses.addAll(dataHelper.getListOfItems(item -> item.getCategory().equals(pair.second)));
             }
             else
             {
@@ -321,9 +310,9 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         }
 
         StringBuilder message = new StringBuilder("<p>Are you sure you want to delete the categories below?</p><ul><small>");
-        for (String category : categoriesToDelete.keySet())
+        for (Pair<Integer, String> pair : categoriesToDelete.keySet())
         {
-            message.append("<li>&nbsp;&nbsp;").append(category).append("</li>");
+            message.append("<li>&nbsp;&nbsp;").append(pair.second).append("</li>");
         }
         message.append("</ul></small>");
 
@@ -331,13 +320,6 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
         dialog.show();
         dialog.setOnDismissListener(v -> {
             switchToViewMode();
-
-            if (deleteItems)
-            {
-                DataHelper.getDataHelper(activity).removeItems(expenses);
-                viewBuilder.refreshItems(DELETE_ITEM, false);
-                deleteItems = false;
-            }
             dimScreen = Utils.dimScreen(false, viewBuilder, activity);
         });
     }
@@ -358,8 +340,8 @@ public class ItemsRecyclerAppViewAdapter extends RecyclerView.Adapter<ItemsRecyc
 
         @Override
         protected void okPressed() {
-            deleteItems = true;
-            notifyItemRemoved(4);
+            DataHelper.getDataHelper(activity).removeItems(expenses);
+            viewBuilder.refreshItems(DELETE_ITEM);
             dismiss();
         }
     }

@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storePassword 'android'
+            keyPassword 'android'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
     defaultConfig {

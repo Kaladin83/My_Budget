@@ -16,6 +16,8 @@ import com.example.mybudget.helpers.DataHelper;
 import com.example.mybudget.utils.Enums;
 import com.example.mybudget.utils.Utils;
 
+import java.util.List;
+
 import static com.example.mybudget.utils.Enums.DateFormat.PAY;
 
 public class ApplicationViewMainContainer extends Fragment {
@@ -33,7 +35,7 @@ public class ApplicationViewMainContainer extends Fragment {
     }
 
     public void refreshItems(Enums.Action action) {
-        appViewBuilder.refreshItems(action, true);
+        appViewBuilder.refreshItems(action);
     }
 
     public ApplicationViewMainContainer(MainActivity mainActivity) {
